@@ -1,0 +1,61 @@
+# 原生接缝安全门禁（定义侧 / 主防线）：对本仓库原生桥的安全不变量做
+# 「快照 vs golden」校验。安全常量定义在本仓库 runtime/bridge/dsh-go-bridge，
+# 因此这里直接检查工作区源码，无需再检出另一份上游仓库。
+#
+# 职责：在 pull_request / push:main / 定时巡检 / 手动触发时校验桥的 effect
+# 白名单、scope 键、LIMITS/CAP_LIMITS/FILE_LIMITS 预算及行为硬红线。任何差异
+# 或硬红线失守都返回非零，阻止合并。工作区规则由本 workflow 自己承载；上游
+# 仓库不受本 workflow 影响，也不向其提出任何变更。
+#
+# 安全模型：permissions 仅 contents: read，无 Secret；只读检查，不改源码、
+# 不构建、不签名。Node 24.22.1 与本仓库其他 workflow 一致。
+name: seam-security
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: "41 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: seam-security-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: 24.22.1
+
+jobs:
+  seam-gate:
+    name: 接缝安全门禁
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: 检出本仓库
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 门禁 1/2：接缝安全快照 vs golden
+        # 被检对象就是本仓库的桥源码；check_seam_security.py 默认 golden 为
+        # golden/seam-baseline.json。
+        run: python3 scripts/check_seam_security.py .
+
+      - name: 门禁 2/2：门禁自测（意图驱动变异测试）
+        # 变异写入临时复制的 native 子树，不触碰工作区源码。
+        env:
+          DSH_UPSTREAM_SRC: .
+        run: python3 -m unittest discover -s tests -p 'test_seam_security_gate.py' -v
+
+      - name: 汇总
+        if: always()
+        run: echo "接缝安全门禁执行完毕（详情见各步骤日志）。"

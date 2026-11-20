@@ -1,0 +1,177 @@
+{
+  "schema": 2,
+  "source": {
+    "commit": "c1a84e3f833ad59ff07a5027994dae3935907a2d",
+    "tag": "v1.2.0"
+  },
+  "protocol": 1,
+  "effects": {
+    "static": [
+      "command",
+      "copy",
+      "insert",
+      "link",
+      "open",
+      "toast"
+    ],
+    "all": [
+      "command",
+      "copy",
+      "insert",
+      "link",
+      "open",
+      "patch",
+      "refresh",
+      "toast"
+    ],
+    "deferred": [
+      "copy",
+      "insert",
+      "patch",
+      "toast"
+    ],
+    "effectFeatures": [
+      "audio",
+      "overlay",
+      "voice"
+    ],
+    "pickerTypes": [
+      "pickFile",
+      "pickImage"
+    ]
+  },
+  "capabilities": {
+    "features": [
+      "audio",
+      "files",
+      "micro",
+      "overlay",
+      "voice"
+    ],
+    "capEvents": [
+      "audio.ended",
+      "audio.error",
+      "audio.stopped",
+      "overlay.closed",
+      "voice.error",
+      "voice.speechEnd",
+      "voice.speechStart",
+      "voice.stopped"
+    ],
+    "terminalEvents": [
+      "audio.ended",
+      "audio.error",
+      "audio.stopped",
+      "overlay.closed",
+      "voice.error",
+      "voice.stopped"
+    ]
+  },
+  "scopeKeys": [
+    "callId",
+    "messageId",
+    "sessionId",
+    "turnId"
+  ],
+  "limits": {
+    "manifestBytes": 16384,
+    "perPlugin": {
+      "composer.actions": 2,
+      "message.actions": 2,
+      "composer.strip": 1,
+      "panels": 4,
+      "composer.tools": 2,
+      "session.actions": 2,
+      "turn.note": 1
+    },
+    "textChars": {
+      "composerTool": 8,
+      "sessionAction": 12,
+      "turnNote": 16,
+      "pluginTitle": 24,
+      "composerAction": 10,
+      "messageAction": 12,
+      "panelTitle": 16,
+      "stripText": 24,
+      "toast": 40
+    },
+    "viewBytes": 32768,
+    "viewNodes": 120,
+    "viewDepth": 8,
+    "toolCardBytes": 8192,
+    "toolCardNodes": 40,
+    "dataBytes": 32768,
+    "patchBytes": 16384,
+    "dataHz": 4,
+    "invokeBytes": 65536,
+    "invokeValueBytes": 4096,
+    "contextFieldBytes": 16384,
+    "invokeBurst": 8,
+    "invokePerSecond": 4,
+    "invokeConcurrent": 4,
+    "effectsPerInvoke": 4,
+    "insertChars": 2000,
+    "copyChars": 8000,
+    "commandArgsChars": 500,
+    "linkChars": 2048,
+    "handlerTimeoutMs": 3000,
+    "viewTimeoutMs": 3000,
+    "firstDataWaitMs": 1000,
+    "effectWindowMs": 3000,
+    "streamConnections": 8,
+    "streamSubscriptions": 32,
+    "streamInboundFrameBytes": 4096,
+    "streamOutboundFrameBytes": 49152,
+    "streamBacklogBytes": 1048576,
+    "heartbeatSeconds": 25,
+    "idleTimeoutSeconds": 60,
+    "feedLingerMs": 30000,
+    "feeds": 64,
+    "assetBytes": 1048576,
+    "violationsToDegrade": 5,
+    "pendingPerPlugin": 2,
+    "pendingDefaultMs": 30000,
+    "pendingMinMs": 1000,
+    "pendingMaxMs": 60000,
+    "pendingLabelChars": 16,
+    "pendingEarlyResultMs": 5000,
+    "turnNotesPerFeed": 64
+  },
+  "capLimits": {
+    "mediaBytes": 16777216,
+    "mediaMs": 30000,
+    "mediaConcurrent": 2,
+    "leases": 8,
+    "pluginLeases": 2,
+    "eventBurst": 4,
+    "eventsPerSecond": 10,
+    "microBytes": 1024,
+    "microMs": 100,
+    "microSubs": 8,
+    "pluginMicroSubs": 2,
+    "textChars": 240,
+    "perKind": 2
+  },
+  "fileLimits": {
+    "count": 4,
+    "bytes": 8388608,
+    "totalBytes": 16777216,
+    "cacheBytes": 67108864,
+    "requests": 8,
+    "requestMs": 300000,
+    "uploadMs": 30000,
+    "nameChars": 128
+  },
+  "sourceGuards": {
+    "permissionHardDeny": true,
+    "linkHttpsOnly": true,
+    "linkNoCredentials": true,
+    "unknownEffectNoViolation": true,
+    "capabilityEffectUnknownNoViolation": true,
+    "pickerEffectUnknownNoViolation": true,
+    "pickerUserGesture": true,
+    "degradeAtThreshold": true,
+    "routesUserGesturePassthrough": true,
+    "routesUserGestureTypeCheck": true
+  }
+}
