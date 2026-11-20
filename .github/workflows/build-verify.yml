@@ -1,0 +1,143 @@
+# 打包构建验证：在 GitHub runner 上用仓库自带工具链编译 fork 的原生桥与 APK，
+# 验证接缝改造与桥源码能通过真实编译。不签名、不发布、不接触任何 Secret。
+#
+# 构建前先过接缝安全快照门禁（桥安全不变量漂移即阻断），再装工具链、生成
+# rootfs、打 release 模式的 APK。无 key.properties 时 Gradle 回退 debug 签名，
+# 产物只作验证用、不发布；与维护者自己的发布密钥无关。密钥守卫步骤确保
+# key.properties / beta token 不会进入构建环境。
+#
+# 触发：push:main 在相关路径变化时运行；workflow_dispatch 可手动全量跑。
+# PR 上的编译回归由仓库自带 ci.yml 承担，本 workflow 不重复，只在主分支验证可打包性。
+name: build-verify
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'runtime/**'
+      - 'tooling/**'
+      - 'scripts/**'
+      - 'golden/**'
+      - 'sdk/plugin-kit/**'
+      - 'docs/design/**'
+      - '.github/workflows/build-verify.yml'
+      - '.github/workflows/seam-security.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-verify-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: 24.22.1
+
+jobs:
+  build:
+    name: 接缝门禁 + 工具链 + APK 构建验证
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    permissions:
+      contents: read
+    steps:
+      - name: 检出本仓库
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: 配置 Node（接缝快照脚本运行时）
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 接缝安全快照检查（构建前硬闸）
+        # 被检对象就是本仓库的桥源码；差异或硬红线失守即阻断，不带病构建。
+        run: python3 scripts/check_seam_security.py .
+
+      - name: 密钥守卫
+        # 纯验证构建必须无发布密钥：有 key.properties 或 beta token 立即失败，
+        # 避免把维护者凭据编进 debug 产物或带进构建环境。
+        run: |
+          set -euo pipefail
+          for f in key.properties app/android/key.properties app/key.properties android/key.properties; do
+            if [ -e "$f" ]; then
+              echo "构建环境含密钥文件 $f，停止"; exit 1
+            fi
+          done
+          for f in "$HOME/keys/dshgo-beta-channel.token" "${DSH_BETA_TOKEN_FILE:-}"; do
+            if [ -n "$f" ] && [ -s "$f" ]; then
+              echo "构建环境含 beta token，停止"; exit 1
+            fi
+          done
+          echo "密钥守卫通过：无发布密钥、无 beta token"
+
+      - name: 缓存工具链
+        id: cache-toolchain
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/dev/android-sdk
+            ~/dev/flutter
+            ~/dev/jdk-17
+            ~/dev/.downloads
+          key: toolchain-v1-${{ runner.os }}-${{ hashFiles('tooling/setup-toolchain.sh', 'runtime/build-runtime.sh', 'runtime/tawcroot/source.json') }}
+          restore-keys: |
+            toolchain-v1-${{ runner.os }}-
+
+      - name: 安装工具链（NDK 随 source.json，禁用 emulator/system-image）
+        run: |
+          set -euo pipefail
+          NDK_VER=$(python3 -c "import json; print(json.load(open('runtime/tawcroot/source.json'))['ndkVersion'])")
+          echo "NDK 版本（来自 source.json）: $NDK_VER"
+          sed -i -E "s|^NDK_VERSION=.*$|NDK_VERSION=\"${NDK_VER}\"|" tooling/setup-toolchain.sh
+          sed -i 's/"emulator" "$SYSTEM_IMAGE"//g' tooling/setup-toolchain.sh
+          sed -i 's/"emulator"//g' tooling/setup-toolchain.sh
+          bash tooling/setup-toolchain.sh
+          source tooling/env.sh
+          flutter --version
+          java -version
+          test -d "$ANDROID_HOME/ndk/${NDK_VER}"
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${NDK_VER}" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/${NDK_VER}" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK=$ANDROID_HOME/ndk/${NDK_VER}" >> "$GITHUB_ENV"
+          # 固定 Gradle 的 ndkVersion 与 tawcroot 校验所用的 NDK 为同一份，避免装入两份。
+          sed -i -E 's/^([[:space:]]*)ndkVersion[[:space:]]*=[[:space:]]*flutter\.ndkVersion[[:space:]]*$/\1ndkVersion = "'"${NDK_VER}"'"/' app/android/app/build.gradle.kts
+          grep -q "ndkVersion = \"${NDK_VER}\"" app/android/app/build.gradle.kts || {
+            echo "Gradle ndkVersion 未固定到 ${NDK_VER}，终止以免多份 NDK"; exit 1; }
+
+      - name: 保存工具链缓存
+        if: success() && steps.cache-toolchain.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/dev/android-sdk
+            ~/dev/flutter
+            ~/dev/jdk-17
+            ~/dev/.downloads
+          key: ${{ steps.cache-toolchain.outputs.cache-primary-key }}
+
+      - name: 生成运行时 rootfs
+        run: |
+          source tooling/env.sh
+          bash runtime/build-runtime.sh arm64-v8a
+
+      - name: 构建 APK（release 模式，回退 debug 签名）
+        run: |
+          set -euo pipefail
+          source tooling/env.sh
+          BT=$(ls -1 "$ANDROID_HOME/build-tools" | sort -V | tail -n1)
+          export PATH="$ANDROID_HOME/build-tools/$BT:$PATH"
+          # 不写 key.properties：build.gradle.kts 在无 key.properties 时回退 debug 签名。
+          bash tooling/build-apk.sh -f arm64
+          echo "构建完成（release 模式 + debug 签名，仅作验证产物）"
+
+      - name: 上传 APK 产物
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: apk-arm64-debug-verify
+          path: app/build/app/outputs/flutter-apk/app-arm64-release.apk
+          retention-days: 7
+          if-no-files-found: error
