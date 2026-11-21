@@ -94,9 +94,15 @@ void main() {
     expect(tester.getSize(find.byKey(const ValueKey('tile'))), const Size(52, 52));
     final shift = BrandMark.opticalShift(40);
     final vc = BrandMark.visualCentre;
-    // The shift is exactly what optically centres the ink in the box.
-    expect(vc.dx + shift.dx / (40 * BrandMark.aspect), closeTo(0.5, 1e-6));
-    expect(vc.dy + shift.dy / 40, closeTo(0.5, 1e-6));
+    // Alignment direction: a heavy (below-centre) glyph shifts up, and vice versa.
+    expect(shift.dy.isNegative, vc.dy > 0.5);
+    expect(shift.dx.isNegative, vc.dx > 0.5);
+    // Magnitude matches the documented contract, recomputed independently.
+    final expected = Offset(
+      (0.5 - vc.dx) * 40 * BrandMark.aspect,
+      (0.5 - vc.dy) * 40,
+    );
+    expect((shift - expected).distance, lessThan(1e-9));
   });
 
   group('lockup', () {

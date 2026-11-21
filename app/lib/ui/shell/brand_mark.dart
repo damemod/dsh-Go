@@ -34,8 +34,8 @@ class BrandMark extends StatelessWidget {
   static const aspect = BrandGlyph.aspect;
 
   /// The glyph's visual centre, the area centroid of its ink, as fractions of its
-  /// width and height from the top left. A little below the box's centre: the body
-  /// carries the weight.
+  /// width and height from the top left. The offset from the box centre follows
+  /// the shipped artwork; opticalShift compensates it.
   static final visualCentre = Offset(
     (BrandGlyph.centroid.dx - BrandGlyph.box.left) / BrandGlyph.box.width,
     (BrandGlyph.centroid.dy - BrandGlyph.box.top) / BrandGlyph.box.height,
