@@ -20,7 +20,7 @@ mkdir -p "$DEV_ROOT" "$DL"
 log() { printf '[toolchain %s] %s\n' "$(date +%H:%M:%S)" "$*"; }
 
 download_cached() (
-  local destination="$1" url="$2" pending attempt max_attempts=8
+  local destination="$1" url="$2" pending attempt max_attempts=4 size_before size_after curl_status
   if [ -f "$destination" ]; then return 0; fi
   # A stable .part name keeps partial progress across a failed step and across
   # runs (the workflow saves .downloads into the cache even when install fails).
@@ -29,14 +29,29 @@ download_cached() (
     # --http1.1 avoids the HTTP/2 stream reset (curl 92) seen on the Flutter
     # mirror. -C - resumes whatever bytes are already in .part. Retries are
     # driven by this shell loop, NOT curl --retry-all-errors (that hung on an
-    # empty temp file in an earlier attempt). --max-time bounds a wedged
-    # transfer so the loop can retry instead of hanging forever.
-    if curl -fL --http1.1 -C - --connect-timeout 20 --max-time 1800 \
-           -o "$pending" "$url"; then
+    # empty temp file in an earlier attempt). --max-time 900 plus four attempts
+    # keeps the worst case (~60 min) well under the job's 180-minute timeout.
+    size_before=$(stat -c%s "$pending" 2>/dev/null || echo 0)
+    curl_status=0
+    curl -fL --http1.1 -C - --connect-timeout 20 --max-time 900 \
+      -o "$pending" "$url" || curl_status=$?
+    if [ "$curl_status" -eq 0 ]; then
       mv -T -- "$pending" "$destination"
       return 0
     fi
-    log "download attempt $attempt/$max_attempts failed for $(basename "$destination")"
+    size_after=$(stat -c%s "$pending" 2>/dev/null || echo 0)
+    # curl 416 means the .part is already complete (Range starts at EOF).
+    # Let sha256 verify it rather than burning the remaining attempts.
+    if [ "$curl_status" -eq 22 ] && [ "$size_after" -gt 0 ]; then
+      mv -T -- "$pending" "$destination"
+      return 0
+    fi
+    log "download attempt $attempt/$max_attempts failed for $(basename "$destination") (curl $curl_status)"
+    # If an attempt made no progress, the .part is wedged (e.g. a stale full
+    # file); drop it so the next attempt starts clean instead of looping.
+    if [ "$size_after" -le "$size_before" ]; then
+      rm -f -- "$pending"
+    fi
     [ "$attempt" -lt "$max_attempts" ] && sleep $((attempt * 2))
   done
   return 1

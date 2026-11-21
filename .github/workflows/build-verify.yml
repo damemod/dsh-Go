@@ -84,12 +84,12 @@ jobs:
             ~/dev/jdk-17
             ~/dev/.downloads
           # Key by tool versions, NOT script text: a download-flag tweak must
-          # not throw away a good cache. Bump the flutter tag here whenever
-          # FLUTTER_VERSION in setup-toolchain.sh changes; the NDK version is
-          # covered by source.json.
+          # not throw away a good cache. Both key and restore-keys carry the
+          # Flutter tag so a cache built with another Flutter is never restored;
+          # bump the tag in BOTH places whenever FLUTTER_VERSION changes.
           key: toolchain-v2-${{ runner.os }}-flutter3.47.7-${{ hashFiles('runtime/tawcroot/source.json') }}
           restore-keys: |
-            toolchain-v2-${{ runner.os }}-
+            toolchain-v2-${{ runner.os }}-flutter3.47.7-
 
       - name: 安装工具链（NDK 随 source.json，禁用 emulator/system-image）
         run: |
@@ -103,6 +103,9 @@ jobs:
           bash tooling/setup-toolchain.sh
           source tooling/env.sh
           flutter --version
+          # A cached toolchain must be the pinned version, never a stale one.
+          actual_flutter=$(flutter --version | grep -oE 'Flutter [0-9]+\.[0-9]+\.[0-9]+' | head -1 | awk '{print $2}')
+          [ "$actual_flutter" = "3.47.7" ] || { echo "cached Flutter $actual_flutter != 3.47.7"; exit 1; }
           java -version
           test -d "$ANDROID_HOME/ndk/${NDK_VER}"
           echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${NDK_VER}" >> "$GITHUB_ENV"
@@ -114,10 +117,12 @@ jobs:
             echo "Gradle ndkVersion 未固定到 ${NDK_VER}，终止以免多份 NDK"; exit 1; }
 
       - name: 保存工具链缓存
-        # Save partial downloads too: a flaky mirror can fail the install, but
-        # the .downloads/*.part left behind is resumed on the next run. The
-        # save action skips harmlessly when nothing matching path exists.
-        if: ${{ !cancelled() && steps.cache-toolchain.outputs.cache-hit != 'true' }}
+        # Save on every non-cancelled run, using a run-unique suffix. Partial
+        # downloads from a failed run are resumed later; a run that repaired a
+        # corrupt archive persists good state under a NEW key (cache keys are
+        # immutable, so reusing the primary key could never replace bad state).
+        # restore-keys above matches the stable prefix, so freshness wins.
+        if: ${{ !cancelled() }}
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
@@ -125,7 +130,7 @@ jobs:
             ~/dev/flutter
             ~/dev/jdk-17
             ~/dev/.downloads
-          key: ${{ steps.cache-toolchain.outputs.cache-primary-key }}
+          key: ${{ steps.cache-toolchain.outputs.cache-primary-key }}-${{ github.run_id }}
 
       - name: 生成运行时 rootfs
         run: |
