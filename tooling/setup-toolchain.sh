@@ -20,14 +20,26 @@ mkdir -p "$DEV_ROOT" "$DL"
 log() { printf '[toolchain %s] %s\n' "$(date +%H:%M:%S)" "$*"; }
 
 download_cached() (
-  local destination="$1" url="$2" pending_download
-  if [ -f "$destination" ]; then return; fi
-  pending_download=$(mktemp "$destination.part.XXXXXX")
-  trap 'rm -f -- "$pending_download"' EXIT
-  trap 'exit 130' INT
-  trap 'exit 143' TERM
-  curl -fL --retry 3 -o "$pending_download" "$url"
-  mv -T -- "$pending_download" "$destination"
+  local destination="$1" url="$2" pending attempt max_attempts=8
+  if [ -f "$destination" ]; then return 0; fi
+  # A stable .part name keeps partial progress across a failed step and across
+  # runs (the workflow saves .downloads into the cache even when install fails).
+  pending="$destination.part"
+  for ((attempt = 1; attempt <= max_attempts; attempt++)); do
+    # --http1.1 avoids the HTTP/2 stream reset (curl 92) seen on the Flutter
+    # mirror. -C - resumes whatever bytes are already in .part. Retries are
+    # driven by this shell loop, NOT curl --retry-all-errors (that hung on an
+    # empty temp file in an earlier attempt). --max-time bounds a wedged
+    # transfer so the loop can retry instead of hanging forever.
+    if curl -fL --http1.1 -C - --connect-timeout 20 --max-time 1800 \
+           -o "$pending" "$url"; then
+      mv -T -- "$pending" "$destination"
+      return 0
+    fi
+    log "download attempt $attempt/$max_attempts failed for $(basename "$destination")"
+    [ "$attempt" -lt "$max_attempts" ] && sleep $((attempt * 2))
+  done
+  return 1
 )
 
 install_jdk() {
@@ -51,7 +63,12 @@ install_flutter() {
   local url="https://storage.flutter-io.cn/flutter_infra_release/releases/stable/linux/$name"
   log "Flutter: $name"
   download_cached "$DL/$name" "$url"
-  echo "$FLUTTER_SHA256  $DL/$name" | sha256sum -c -
+  if ! echo "$FLUTTER_SHA256  $DL/$name" | sha256sum -c -; then
+    # Do not leave a corrupt archive behind: with caching on, a bad file
+    # would be restored next run and skip the download (sha256 would loop).
+    rm -f "$DL/$name" "$DL/$name.part"
+    return 1
+  fi
   mkdir -p "$FLUTTER_DIR"
   touch "$FLUTTER_DIR/.dsh-toolchain-incomplete"
   tar -xJf "$DL/$name" -C "$DEV_ROOT"

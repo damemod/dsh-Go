@@ -83,9 +83,13 @@ jobs:
             ~/dev/flutter
             ~/dev/jdk-17
             ~/dev/.downloads
-          key: toolchain-v1-${{ runner.os }}-${{ hashFiles('tooling/setup-toolchain.sh', 'runtime/build-runtime.sh', 'runtime/tawcroot/source.json') }}
+          # Key by tool versions, NOT script text: a download-flag tweak must
+          # not throw away a good cache. Bump the flutter tag here whenever
+          # FLUTTER_VERSION in setup-toolchain.sh changes; the NDK version is
+          # covered by source.json.
+          key: toolchain-v2-${{ runner.os }}-flutter3.47.7-${{ hashFiles('runtime/tawcroot/source.json') }}
           restore-keys: |
-            toolchain-v1-${{ runner.os }}-
+            toolchain-v2-${{ runner.os }}-
 
       - name: 安装工具链（NDK 随 source.json，禁用 emulator/system-image）
         run: |
@@ -95,7 +99,7 @@ jobs:
           sed -i -E "s|^NDK_VERSION=.*$|NDK_VERSION=\"${NDK_VER}\"|" tooling/setup-toolchain.sh
           sed -i 's/"emulator" "$SYSTEM_IMAGE"//g' tooling/setup-toolchain.sh
           sed -i 's/"emulator"//g' tooling/setup-toolchain.sh
-          # 使用上游原样的下载参数，不做额外改写。
+          # 下载策略（断点续传 + 有界重试）由 setup-toolchain.sh 统一处理。
           bash tooling/setup-toolchain.sh
           source tooling/env.sh
           flutter --version
@@ -110,7 +114,10 @@ jobs:
             echo "Gradle ndkVersion 未固定到 ${NDK_VER}，终止以免多份 NDK"; exit 1; }
 
       - name: 保存工具链缓存
-        if: success() && steps.cache-toolchain.outputs.cache-hit != 'true'
+        # Save partial downloads too: a flaky mirror can fail the install, but
+        # the .downloads/*.part left behind is resumed on the next run. The
+        # save action skips harmlessly when nothing matching path exists.
+        if: ${{ !cancelled() && steps.cache-toolchain.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
