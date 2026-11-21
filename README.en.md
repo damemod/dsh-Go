@@ -2,6 +2,9 @@
   <a href="README.md">简体中文</a> · <b>English</b>
 </p>
 
+> **This is a modified build of [ccch1mneyyy/dsh-Go](https://github.com/ccch1mneyyy/dsh-go).** Original author: [ccch1mneyyy](https://github.com/ccch1mneyyy). Brand and art assets have been replaced with original ones; see [NOTICE.md](NOTICE.md).
+
+
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/assets/hero-en-dark.webp">

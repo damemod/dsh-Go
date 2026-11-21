@@ -2,6 +2,9 @@
   <b>简体中文</b> · <a href="README.en.md">English</a>
 </p>
 
+> **本项目为 [ccch1mneyyy/dsh-Go](https://github.com/ccch1mneyyy/dsh-go) 的修改版。** 原作者 [ccch1mneyyy](https://github.com/ccch1mneyyy)。品牌与美术素材已替换为自有素材；详见 [NOTICE.md](NOTICE.md)。
+
+
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/assets/hero-zh-dark.webp">
