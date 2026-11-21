@@ -46,6 +46,12 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      - name: 配置 Flutter（复用缓存，避免重复下载 1.5G）
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          flutter-version: 3.47.7
+          channel: stable
+          cache: true
       - name: 接缝安全快照检查（构建前硬闸）
         run: python3 scripts/check_seam_security.py .
 
@@ -91,12 +97,11 @@ jobs:
             echo "Gradle ndkVersion 未固定到 ${NDK_VER}，终止以免多份 NDK"; exit 1; }
 
       - name: 保存工具链缓存
-        # Save on every non-cancelled run, using a run-unique suffix. Partial
-        # downloads from a failed run are resumed later; a run that repaired a
-        # corrupt archive persists good state under a NEW key (cache keys are
-        # immutable, so reusing the primary key could never replace bad state).
-        # restore-keys above matches the stable prefix, so freshness wins.
-        if: ${{ !cancelled() }}
+        # Only persist a KNOWN-GOOD toolchain. Saving a failed run would store
+        # a corrupt archive under a fresh key and restore-keys would resurrect
+        # it next run -> endless bad-cache loop. Flutter comes from flutter-action,
+        # so there is no partial 1.5G download worth preserving any more.
+        if: success() && steps.cache-toolchain.outputs.cache-hit != 'true'
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
@@ -104,7 +109,7 @@ jobs:
             ~/dev/flutter
             ~/dev/jdk-17
             ~/dev/.downloads
-          key: ${{ steps.cache-toolchain.outputs.cache-primary-key }}-${{ github.run_id }}
+          key: ${{ steps.cache-toolchain.outputs.cache-primary-key }}
 
       - name: 生成运行时 rootfs
         run: |

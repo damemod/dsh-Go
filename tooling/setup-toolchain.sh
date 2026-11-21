@@ -13,6 +13,11 @@ SYSTEM_IMAGE="${SYSTEM_IMAGE:-system-images;android-35;google_apis;x86_64}"
 
 JDK_DIR="$DEV_ROOT/jdk-17"
 FLUTTER_DIR="$DEV_ROOT/flutter"
+# CI (subosito/flutter-action, cache: true) can supply Flutter with a warm cache;
+# reuse it instead of re-downloading the 1.5G archive from the slow mirror.
+if [ -n "${FLUTTER_ROOT:-}" ] && [ -x "$FLUTTER_ROOT/bin/flutter" ]; then
+  FLUTTER_DIR="$FLUTTER_ROOT"
+fi
 SDK_DIR="$DEV_ROOT/android-sdk"
 DL="$DEV_ROOT/.downloads"
 mkdir -p "$DEV_ROOT" "$DL"
@@ -20,41 +25,14 @@ mkdir -p "$DEV_ROOT" "$DL"
 log() { printf '[toolchain %s] %s\n' "$(date +%H:%M:%S)" "$*"; }
 
 download_cached() (
-  local destination="$1" url="$2" pending attempt max_attempts=4 size_before size_after curl_status
-  if [ -f "$destination" ]; then return 0; fi
-  # A stable .part name keeps partial progress across a failed step and across
-  # runs (the workflow saves .downloads into the cache even when install fails).
-  pending="$destination.part"
-  for ((attempt = 1; attempt <= max_attempts; attempt++)); do
-    # --http1.1 avoids the HTTP/2 stream reset (curl 92) seen on the Flutter
-    # mirror. -C - resumes whatever bytes are already in .part. Retries are
-    # driven by this shell loop, NOT curl --retry-all-errors (that hung on an
-    # empty temp file in an earlier attempt). --max-time 900 plus four attempts
-    # keeps the worst case (~60 min) well under the job's 180-minute timeout.
-    size_before=$(stat -c%s "$pending" 2>/dev/null || echo 0)
-    curl_status=0
-    curl -fL --http1.1 -C - --connect-timeout 20 --max-time 900 \
-      -o "$pending" "$url" || curl_status=$?
-    if [ "$curl_status" -eq 0 ]; then
-      mv -T -- "$pending" "$destination"
-      return 0
-    fi
-    size_after=$(stat -c%s "$pending" 2>/dev/null || echo 0)
-    # curl 416 means the .part is already complete (Range starts at EOF).
-    # Let sha256 verify it rather than burning the remaining attempts.
-    if [ "$curl_status" -eq 22 ] && [ "$size_after" -gt 0 ]; then
-      mv -T -- "$pending" "$destination"
-      return 0
-    fi
-    log "download attempt $attempt/$max_attempts failed for $(basename "$destination") (curl $curl_status)"
-    # If an attempt made no progress, the .part is wedged (e.g. a stale full
-    # file); drop it so the next attempt starts clean instead of looping.
-    if [ "$size_after" -le "$size_before" ]; then
-      rm -f -- "$pending"
-    fi
-    [ "$attempt" -lt "$max_attempts" ] && sleep $((attempt * 2))
-  done
-  return 1
+  local destination="$1" url="$2" pending_download
+  if [ -f "$destination" ]; then return; fi
+  pending_download=$(mktemp "$destination.part.XXXXXX")
+  trap 'rm -f -- "$pending_download"' EXIT
+  trap 'exit 130' INT
+  trap 'exit 143' TERM
+  curl -fL --retry 3 -o "$pending_download" "$url"
+  mv -T -- "$pending_download" "$destination"
 )
 
 install_jdk() {
@@ -78,12 +56,7 @@ install_flutter() {
   local url="https://storage.flutter-io.cn/flutter_infra_release/releases/stable/linux/$name"
   log "Flutter: $name"
   download_cached "$DL/$name" "$url"
-  if ! echo "$FLUTTER_SHA256  $DL/$name" | sha256sum -c -; then
-    # Do not leave a corrupt archive behind: with caching on, a bad file
-    # would be restored next run and skip the download (sha256 would loop).
-    rm -f "$DL/$name" "$DL/$name.part"
-    return 1
-  fi
+  echo "$FLUTTER_SHA256  $DL/$name" | sha256sum -c -
   mkdir -p "$FLUTTER_DIR"
   touch "$FLUTTER_DIR/.dsh-toolchain-incomplete"
   tar -xJf "$DL/$name" -C "$DEV_ROOT"

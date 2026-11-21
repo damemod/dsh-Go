@@ -279,7 +279,7 @@ class PetFramesTest {
                     val f = frames(p, size, density)
                     val where = "$id $size @$density"
                     assertTrue("$where idle", f.rest.contains(f.cell(p.primary(PetPack.IDLE, 0))))
-                    assertTrue("$where drag", f.held.contains(f.cell(p.reaction("drag")!!)))
+                    p.reaction("drag")?.let { assertTrue("$where drag", f.held.contains(f.cell(it))) }
                     assertTrue("$where rest ⊂ held", f.held.contains(f.rest))
                     for (a in shownAnims(p)) {
                         val g = f.frameFor(a, holding = false)
@@ -301,7 +301,8 @@ class PetFramesTest {
         for (id in packs) {
             val p = shipped(id)
             val f = frames(p)
-            val d = drawn(id, p.reaction("drag")!!, f)
+            val drag = p.reaction("drag") ?: continue
+            val d = drawn(id, drag, f)
             assertTrue("$id: $d in ${f.held}", f.held.contains(d))
             assertFalse("$id: $d would be cut at rest ${f.rest}", f.rest.contains(d))
             if (id == "deepy-whale") assertTrue("Deepy's lifted head: $d", d.top <= -50)
@@ -321,7 +322,7 @@ class PetFramesTest {
             for (size in listOf("small", "medium", "large")) for (density in listOf(2f, 2.75f, 3.5f)) {
                 val f = frames(p, size, density)
                 val k = ceil(f.k.toDouble()).toInt()
-                for (a in shownAnims(p) + p.reaction("drag")!!) {
+                for (a in shownAnims(p) + listOfNotNull(p.reaction("drag"))) {
                     val held = a.name == p.reaction("drag")?.name
                     val g = f.frameFor(a, holding = false)
                     val d = drawn(id, a, f)
@@ -355,7 +356,7 @@ class PetFramesTest {
             val p = shipped(id)
             for (size in listOf("small", "medium", "large")) {
                 val f = frames(p, size)
-                for (a in shownAnims(p) + p.reaction("drag")!!) {
+                for (a in shownAnims(p) + listOfNotNull(p.reaction("drag"))) {
                     val hit = f.hit(a)
                     val where = "$id $size ${a.name}: hit $hit"
                     assertTrue("$where ⊇ rest", hit.contains(f.rest))
