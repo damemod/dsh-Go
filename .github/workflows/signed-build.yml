@@ -70,11 +70,8 @@ jobs:
           sed -i -E "s|^NDK_VERSION=.*$|NDK_VERSION=\"${NDK_VER}\"|" tooling/setup-toolchain.sh
           sed -i 's/"emulator" "$SYSTEM_IMAGE"//g' tooling/setup-toolchain.sh
           sed -i 's/"emulator"//g' tooling/setup-toolchain.sh
-          # 下载加固：禁 HTTP/2 以避开 flutter-io.cn 的 stream INTERNAL_ERROR（curl 92）；
-          # 提高重试并断点续传，重试不再从头下 1.5G。只命中 curl -fL ... -o 的大文件下载，
-          # 不影响 curl -fsSL 的目录列举。
-          sed -i 's|--retry 3 -o |--http1.1 --retry 8 --retry-all-errors --retry-delay 5 -C - -o |g' tooling/setup-toolchain.sh
-          grep -q -- '--http1.1 --retry 8' tooling/setup-toolchain.sh || { echo "下载加固未生效"; exit 1; }
+          # 使用上游原样的下载参数。此前的 --http1.1 + -C - + --retry-all-errors
+          # 组合在 mktemp 空临时文件上挂起，且拖慢下载，已移除。
           bash tooling/setup-toolchain.sh
           source tooling/env.sh
           flutter --version
