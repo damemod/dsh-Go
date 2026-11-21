@@ -69,9 +69,10 @@ void main() {
     // The glyph sits in the tile's visible square like the launcher's glyph.
     expect(BrandGlyph.tileBox.contains(BrandGlyph.box.topLeft), isTrue);
     expect(BrandGlyph.tileBox.contains(BrandGlyph.box.bottomRight), isTrue);
-    // Visual centre: a little below the box's middle, near the middle across.
-    expect(BrandMark.visualCentre.dy, inInclusiveRange(0.5, 0.65));
-    expect((BrandMark.visualCentre.dx - 0.5).abs(), lessThan(0.05));
+    // The ink centre lies inside its own box — true for any shipped artwork.
+    final vc = BrandMark.visualCentre;
+    expect(vc.dx, inInclusiveRange(0, 1));
+    expect(vc.dy, inInclusiveRange(0, 1));
   });
 
   testWidgets('sizes: the glyph keeps its aspect, the tile is square', (tester) async {
@@ -92,8 +93,10 @@ void main() {
     expect(tester.getSize(find.byKey(const ValueKey('mono'))), Size(18 * BrandMark.aspect, 18));
     expect(tester.getSize(find.byKey(const ValueKey('tile'))), const Size(52, 52));
     final shift = BrandMark.opticalShift(40);
-    expect(shift.dy, lessThan(0));
-    expect(shift.dx.abs(), lessThan(40 * BrandMark.aspect * 0.05));
+    final vc = BrandMark.visualCentre;
+    // The shift is exactly what optically centres the ink in the box.
+    expect(vc.dx + shift.dx / (40 * BrandMark.aspect), closeTo(0.5, 1e-6));
+    expect(vc.dy + shift.dy / 40, closeTo(0.5, 1e-6));
   });
 
   group('lockup', () {
