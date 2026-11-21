@@ -26,7 +26,7 @@ download_cached() (
   trap 'rm -f -- "$pending_download"' EXIT
   trap 'exit 130' INT
   trap 'exit 143' TERM
-  curl --http1.1 -fL --retry 3 -o "$pending_download" "$url"
+  curl -fL --retry 3 -o "$pending_download" "$url"
   mv -T -- "$pending_download" "$destination"
 )
 
@@ -34,10 +34,10 @@ install_jdk() {
   if [ -x "$JDK_DIR/bin/java" ] && [ ! -f "$JDK_DIR/.dsh-toolchain-incomplete" ]; then log "JDK present"; return; fi
   local base="https://mirrors.tuna.tsinghua.edu.cn/Adoptium/17/jdk/x64/linux/"
   local name
-  name=$(curl --http1.1 -fsSL "$base" | grep -oE 'OpenJDK17U-jdk_x64_linux_hotspot_[0-9._]+\.tar\.gz' | sort -uV | tail -1)
+  name=$(curl -fsSL "$base" | grep -oE 'OpenJDK17U-jdk_x64_linux_hotspot_[0-9._]+\.tar\.gz' | sort -uV | tail -1)
   [ -n "$name" ] || { log "could not find JDK tarball"; return 1; }
   log "JDK: $name"
-  curl --http1.1 -fL --retry 3 -o "$DL/$name" "$base$name"
+  curl -fL --retry 3 -o "$DL/$name" "$base$name"
   mkdir -p "$JDK_DIR"
   touch "$JDK_DIR/.dsh-toolchain-incomplete"
   tar -xzf "$DL/$name" -C "$JDK_DIR" --strip-components=1
