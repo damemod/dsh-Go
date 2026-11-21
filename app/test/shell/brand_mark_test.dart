@@ -69,10 +69,16 @@ void main() {
     // The glyph sits in the tile's visible square like the launcher's glyph.
     expect(BrandGlyph.tileBox.contains(BrandGlyph.box.topLeft), isTrue);
     expect(BrandGlyph.tileBox.contains(BrandGlyph.box.bottomRight), isTrue);
-    // The ink centre lies inside its own box — true for any shipped artwork.
+    // The visual centre must follow the measured ink geometry, and applying
+    // opticalShift must bring that centroid to the box centre.
     final vc = BrandMark.visualCentre;
-    expect(vc.dx, inInclusiveRange(0, 1));
-    expect(vc.dy, inInclusiveRange(0, 1));
+    expect(vc.dx, closeTo((centroid.dx - box.left) / box.width, 1e-3));
+    expect(vc.dy, closeTo((centroid.dy - box.top) / box.height, 1e-3));
+    final shift = BrandMark.opticalShift(40);
+    expect((centroid.dx - box.left) / box.width + shift.dx / (40 * BrandMark.aspect),
+        closeTo(0.5, 1e-3));
+    expect((centroid.dy - box.top) / box.height + shift.dy / 40,
+        closeTo(0.5, 1e-3));
   });
 
   testWidgets('sizes: the glyph keeps its aspect, the tile is square', (tester) async {
@@ -92,17 +98,6 @@ void main() {
     expect(tester.getSize(find.byKey(const ValueKey('glyph'))), Size(40 * BrandMark.aspect, 40));
     expect(tester.getSize(find.byKey(const ValueKey('mono'))), Size(18 * BrandMark.aspect, 18));
     expect(tester.getSize(find.byKey(const ValueKey('tile'))), const Size(52, 52));
-    final shift = BrandMark.opticalShift(40);
-    final vc = BrandMark.visualCentre;
-    // Alignment direction: a heavy (below-centre) glyph shifts up, and vice versa.
-    expect(shift.dy.isNegative, vc.dy > 0.5);
-    expect(shift.dx.isNegative, vc.dx > 0.5);
-    // Magnitude matches the documented contract, recomputed independently.
-    final expected = Offset(
-      (0.5 - vc.dx) * 40 * BrandMark.aspect,
-      (0.5 - vc.dy) * 40,
-    );
-    expect((shift - expected).distance, lessThan(1e-9));
   });
 
   group('lockup', () {
