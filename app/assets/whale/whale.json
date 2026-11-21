@@ -8,28 +8,28 @@
       "image": "whale_1.png",
       "frames": 1,
       "frameMs": 0,
-      "source": "1.webp"
+      "source": "原创球体轨道图"
     },
     {
       "level": 2,
       "image": "whale_2.png",
       "frames": 24,
       "frameMs": 30,
-      "source": "2.gif"
+      "source": "原创球体轨道图"
     },
     {
       "level": 3,
       "image": "whale_3.png",
       "frames": 24,
       "frameMs": 20,
-      "source": "3.gif"
+      "source": "原创球体轨道图"
     },
     {
       "level": 4,
       "image": "whale_4.png",
       "frames": 36,
       "frameMs": 20,
-      "source": "4.gif"
+      "source": "原创球体轨道图"
     }
   ]
 }
