@@ -149,7 +149,7 @@ jobs:
           BT=$(ls -1 "$ANDROID_HOME/build-tools" | sort -V | tail -n1)
           export PATH="$ANDROID_HOME/build-tools/$BT:$PATH"
           # 不写 key.properties：build.gradle.kts 在无 key.properties 时回退 debug 签名。
-          bash tooling/build-apk.sh -f arm64
+          bash tooling/build-apk.sh -f arm64 --no-companion
           echo "构建完成（release 模式 + debug 签名，仅作验证产物）"
 
       - name: 上传 APK 产物

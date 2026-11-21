@@ -122,7 +122,7 @@ jobs:
           source tooling/env.sh
           BT=$(ls -1 "$ANDROID_HOME/build-tools" | sort -V | tail -n1)
           export PATH="$ANDROID_HOME/build-tools/$BT:$PATH"
-          bash tooling/build-apk.sh -f arm64
+          bash tooling/build-apk.sh -f arm64 --no-companion
 
       - name: 提取版本元数据并整理产物
         run: |
