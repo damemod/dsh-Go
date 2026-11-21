@@ -2942,13 +2942,13 @@ class L10nZh extends L10n {
   String get botsPetSettings => '宠物设置';
 
   @override
-  String get botsPetDeepy => 'Deepy 小鲸鱼';
+  String get botsPetLumi => 'Lumi 与小鸟';
 
   @override
-  String get botsPetWhaleGirl => '鲸娘';
+  String get botsPetMia => 'Mia';
 
   @override
-  String get botsPetPinkFish => '小粉鱼';
+  String get botsPetKira => '琪拉';
 
   @override
   String get botsPetNone => '不显示';
@@ -2957,7 +2957,7 @@ class L10nZh extends L10n {
   String get botsPets => '宠物';
 
   @override
-  String get botsPetSource => '来自 DSH-TUI';
+  String get botsPetSource => '本 fork 自有素材';
 
   @override
   String get botsPetImport => '导入';

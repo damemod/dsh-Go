@@ -106,7 +106,7 @@ void main() {
     // The same pet again: the same id.
     expect(userPetIdFor('小猫'), userPetIdFor('小猫'));
     expect(isUserPet('user-cat'), isTrue);
-    expect(isUserPet('deepy-whale'), isFalse);
+    expect(isUserPet('lumi'), isFalse);
   });
 
   test("a PNG's size from its header", () {
@@ -255,7 +255,7 @@ void main() {
     await library.remove('user-cat');
     expect((await library.list()).map((p) => p.id), ['user-dog']);
     // Never a built-in one.
-    await library.remove('deepy-whale');
+    await library.remove('lumi');
     expect(leftovers(), isEmpty);
   });
 

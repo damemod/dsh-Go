@@ -28,9 +28,9 @@ import 'pet_sprite.dart';
 
 /// Names for the picker before a pack has loaded (and for 不显示).
 Map<String, String> get petNames => {
-  'deepy-whale': appL10n.botsPetDeepy,
-  'whale-girl': appL10n.botsPetWhaleGirl,
-  'pink-fish': appL10n.botsPetPinkFish,
+  'lumi': appL10n.botsPetLumi,
+  'mia': appL10n.botsPetMia,
+  'kira': appL10n.botsPetKira,
   noPetId: appL10n.botsPetNone,
 };
 

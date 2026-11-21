@@ -13,10 +13,10 @@ import 'pet_library.dart';
 import 'pet_state.dart';
 
 /// The pets that ship with the app, in picker order.
-const builtInPets = ['deepy-whale', 'whale-girl', 'pink-fish'];
+const builtInPets = ['lumi', 'mia', 'kira'];
 
 /// The default pet.
-const defaultPetId = 'deepy-whale';
+const defaultPetId = 'lumi';
 
 /// Explicit choice for the existing Android overlay. Pixel remains the default.
 enum PetOverlayRenderer {

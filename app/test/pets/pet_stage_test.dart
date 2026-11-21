@@ -102,7 +102,7 @@ Rect hitBox(WidgetTester tester, PetPack pack, [String anim = 'idle']) {
 PetPack deepyWith(Map<String, Object?> changes) => PetPack.parse({
   ...jsonDecode(File('assets/pets/deepy-whale/pack.json').readAsStringSync()) as Map<String, Object?>,
   ...changes,
-});
+}, dir: 'assets/pets/deepy-whale');
 
 /// A [math.Random] that always draws zero: any chance is hit and index 0 picked.
 class _ZeroRandom implements math.Random {

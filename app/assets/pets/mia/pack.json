@@ -1,0 +1,364 @@
+{
+  "schema": 1,
+  "id": "mia",
+  "name": "Mia",
+  "author": "fork 自持素材",
+  "license": "原创素材，随本 fork 作为修改版一并分发",
+  "source": "原创插画素材",
+  "pixelArt": false,
+  "scale": 1,
+  "canvas": {
+    "w": 144,
+    "h": 144
+  },
+  "anchor": {
+    "x": 72,
+    "baseline": 144
+  },
+  "contentBox": {
+    "x": 28,
+    "y": 0,
+    "w": 89,
+    "h": 144
+  },
+  "hitBoxes": {
+    "default": {
+      "x": 28,
+      "y": 0,
+      "w": 89,
+      "h": 144
+    },
+    "wide": {
+      "x": 21,
+      "y": 0,
+      "w": 103,
+      "h": 144
+    },
+    "sleeping": {
+      "x": 5,
+      "y": 25,
+      "w": 134,
+      "h": 111
+    },
+    "byAnim": {
+      "waking": {
+        "x": 18,
+        "y": 1,
+        "w": 109,
+        "h": 143
+      },
+      "roam": {
+        "x": 19,
+        "y": 3,
+        "w": 89,
+        "h": 131
+      }
+    },
+    "wideAnims": [
+      "juggling",
+      "error",
+      "celebrate",
+      "notification",
+      "notification2",
+      "sweeping"
+    ],
+    "sleepingAnims": [
+      "sleeping"
+    ]
+  },
+  "animations": {
+    "idle": {
+      "sheet": "idle.png",
+      "frameW": 90,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 27,
+        "y": 0,
+        "w": 90,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "thinking": {
+      "sheet": "thinking.png",
+      "frameW": 91,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 26,
+        "y": 0,
+        "w": 91,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "juggling": {
+      "sheet": "juggling.png",
+      "frameW": 103,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 20,
+        "y": 0,
+        "w": 103,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "error": {
+      "sheet": "error.png",
+      "frameW": 107,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 18,
+        "y": 0,
+        "w": 107,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "celebrate": {
+      "sheet": "celebrate.png",
+      "frameW": 96,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 24,
+        "y": 0,
+        "w": 96,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "celebrate2": {
+      "sheet": "celebrate2.png",
+      "frameW": 90,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 27,
+        "y": 0,
+        "w": 90,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "notification": {
+      "sheet": "notification.png",
+      "frameW": 95,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 24,
+        "y": 0,
+        "w": 95,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "notification2": {
+      "sheet": "notification2.png",
+      "frameW": 102,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 21,
+        "y": 0,
+        "w": 102,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "sweeping": {
+      "sheet": "sweeping.png",
+      "frameW": 112,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 16,
+        "y": 0,
+        "w": 112,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "sleeping": {
+      "sheet": "sleeping.png",
+      "frameW": 134,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 5,
+        "y": 0,
+        "w": 134,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "waking": {
+      "sheet": "waking.png",
+      "frameW": 112,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 16,
+        "y": 0,
+        "w": 112,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "roam": {
+      "sheet": "roam.png",
+      "frameW": 105,
+      "frameH": 138,
+      "cols": 1,
+      "box": {
+        "x": 18,
+        "y": 0,
+        "w": 105,
+        "h": 138
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    }
+  },
+  "idlePool": {
+    "everyMs": {
+      "mean": 120000,
+      "min": 45000,
+      "max": 300000
+    },
+    "anims": []
+  },
+  "states": {
+    "attention": [
+      "celebrate",
+      "celebrate2"
+    ],
+    "error": [
+      "error"
+    ],
+    "idle": [
+      "idle"
+    ],
+    "juggling": [
+      "juggling"
+    ],
+    "notification": [
+      "notification",
+      "notification2"
+    ],
+    "roam": [
+      "roam"
+    ],
+    "sleeping": [
+      "sleeping"
+    ],
+    "sweeping": [
+      "sweeping"
+    ],
+    "thinking": [
+      "thinking"
+    ],
+    "waking": [
+      "waking"
+    ]
+  },
+  "bonus": {},
+  "tiers": {},
+  "timings": {},
+  "reactions": {},
+  "roam": {
+    "anim": "roam",
+    "faces": "front"
+  },
+  "sleep": {
+    "afterMs": 60000
+  }
+}

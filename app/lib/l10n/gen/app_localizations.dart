@@ -5462,23 +5462,23 @@ abstract class L10n {
   /// **'宠物设置'**
   String get botsPetSettings;
 
-  /// No description provided for @botsPetDeepy.
+  /// No description provided for @botsPetLumi.
   ///
   /// In zh, this message translates to:
-  /// **'Deepy 小鲸鱼'**
-  String get botsPetDeepy;
+  /// **'Lumi 与小鸟'**
+  String get botsPetLumi;
 
-  /// No description provided for @botsPetWhaleGirl.
+  /// No description provided for @botsPetMia.
   ///
   /// In zh, this message translates to:
-  /// **'鲸娘'**
-  String get botsPetWhaleGirl;
+  /// **'Mia'**
+  String get botsPetMia;
 
-  /// No description provided for @botsPetPinkFish.
+  /// No description provided for @botsPetKira.
   ///
   /// In zh, this message translates to:
-  /// **'小粉鱼'**
-  String get botsPetPinkFish;
+  /// **'琪拉'**
+  String get botsPetKira;
 
   /// No description provided for @botsPetNone.
   ///
@@ -5495,7 +5495,7 @@ abstract class L10n {
   /// No description provided for @botsPetSource.
   ///
   /// In zh, this message translates to:
-  /// **'来自 DSH-TUI'**
+  /// **'本 fork 自有素材'**
   String get botsPetSource;
 
   /// No description provided for @botsPetImport.

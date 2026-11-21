@@ -1,0 +1,437 @@
+{
+  "schema": 1,
+  "id": "lumi",
+  "name": "Lumi 与小鸟",
+  "author": "fork 自持素材",
+  "license": "原创素材，随本 fork 作为修改版一并分发",
+  "source": "原创插画素材",
+  "pixelArt": false,
+  "scale": 1,
+  "canvas": {
+    "w": 144,
+    "h": 144
+  },
+  "anchor": {
+    "x": 77,
+    "baseline": 144
+  },
+  "contentBox": {
+    "x": 7,
+    "y": 0,
+    "w": 129,
+    "h": 144
+  },
+  "hitBoxes": {
+    "default": {
+      "x": 7,
+      "y": 0,
+      "w": 129,
+      "h": 144
+    },
+    "wide": {
+      "x": 0,
+      "y": 0,
+      "w": 144,
+      "h": 144
+    },
+    "sleeping": {
+      "x": 0,
+      "y": 0,
+      "w": 144,
+      "h": 144
+    },
+    "byAnim": {},
+    "wideAnims": [
+      "working",
+      "working2",
+      "error",
+      "notification",
+      "sweeping"
+    ],
+    "sleepingAnims": [
+      "sleeping",
+      "sleeping2"
+    ]
+  },
+  "animations": {
+    "idle": {
+      "sheet": "idle.png",
+      "frameW": 129,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 7,
+        "y": 0,
+        "w": 129,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "thinking": {
+      "sheet": "thinking.png",
+      "frameW": 128,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 8,
+        "y": 0,
+        "w": 128,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "working": {
+      "sheet": "working.png",
+      "frameW": 144,
+      "frameH": 136,
+      "cols": 1,
+      "box": {
+        "x": 0,
+        "y": 8,
+        "w": 144,
+        "h": 136
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "working2": {
+      "sheet": "working2.png",
+      "frameW": 144,
+      "frameH": 137,
+      "cols": 1,
+      "box": {
+        "x": 0,
+        "y": 7,
+        "w": 144,
+        "h": 137
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "error": {
+      "sheet": "error.png",
+      "frameW": 144,
+      "frameH": 128,
+      "cols": 1,
+      "box": {
+        "x": 0,
+        "y": 16,
+        "w": 144,
+        "h": 128
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "celebrate": {
+      "sheet": "celebrate.png",
+      "frameW": 130,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 7,
+        "y": 0,
+        "w": 130,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "celebrate2": {
+      "sheet": "celebrate2.png",
+      "frameW": 126,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 9,
+        "y": 0,
+        "w": 126,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "celebrate3": {
+      "sheet": "celebrate3.png",
+      "frameW": 132,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 6,
+        "y": 0,
+        "w": 132,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "notification": {
+      "sheet": "notification.png",
+      "frameW": 138,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 3,
+        "y": 0,
+        "w": 138,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "notification2": {
+      "sheet": "notification2.png",
+      "frameW": 127,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 8,
+        "y": 0,
+        "w": 127,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "sweeping": {
+      "sheet": "sweeping.png",
+      "frameW": 138,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 3,
+        "y": 0,
+        "w": 138,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "carrying": {
+      "sheet": "carrying.png",
+      "frameW": 140,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 2,
+        "y": 0,
+        "w": 140,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "sleeping": {
+      "sheet": "sleeping.png",
+      "frameW": 125,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 9,
+        "y": 0,
+        "w": 125,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "sleeping2": {
+      "sheet": "sleeping2.png",
+      "frameW": 144,
+      "frameH": 108,
+      "cols": 1,
+      "box": {
+        "x": 0,
+        "y": 36,
+        "w": 144,
+        "h": 108
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "waking": {
+      "sheet": "waking.png",
+      "frameW": 120,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 12,
+        "y": 0,
+        "w": 120,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    },
+    "roam": {
+      "sheet": "roam.png",
+      "frameW": 131,
+      "frameH": 144,
+      "cols": 1,
+      "box": {
+        "x": 5,
+        "y": 0,
+        "w": 131,
+        "h": 144
+      },
+      "loop": true,
+      "ms": 100,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 100
+        }
+      ]
+    }
+  },
+  "idlePool": {
+    "everyMs": {
+      "mean": 120000,
+      "min": 45000,
+      "max": 300000
+    },
+    "anims": []
+  },
+  "states": {
+    "carrying": [
+      "carrying"
+    ],
+    "attention": [
+      "celebrate",
+      "celebrate2",
+      "celebrate3"
+    ],
+    "error": [
+      "error"
+    ],
+    "idle": [
+      "idle"
+    ],
+    "notification": [
+      "notification",
+      "notification2"
+    ],
+    "roam": [
+      "roam"
+    ],
+    "sleeping": [
+      "sleeping",
+      "sleeping2"
+    ],
+    "sweeping": [
+      "sweeping"
+    ],
+    "thinking": [
+      "thinking"
+    ],
+    "waking": [
+      "waking"
+    ],
+    "working": [
+      "working",
+      "working2"
+    ]
+  },
+  "bonus": {},
+  "tiers": {},
+  "timings": {},
+  "reactions": {},
+  "roam": {
+    "anim": "roam",
+    "faces": "front"
+  },
+  "sleep": {
+    "afterMs": 60000
+  }
+}

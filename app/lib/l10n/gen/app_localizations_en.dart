@@ -3125,13 +3125,13 @@ class L10nEn extends L10n {
   String get botsPetSettings => 'Pet settings';
 
   @override
-  String get botsPetDeepy => 'Deepy';
+  String get botsPetLumi => 'Lumi';
 
   @override
-  String get botsPetWhaleGirl => 'Whale girl';
+  String get botsPetMia => 'Mia';
 
   @override
-  String get botsPetPinkFish => 'Pink fish';
+  String get botsPetKira => 'Kira';
 
   @override
   String get botsPetNone => 'None';
@@ -3140,7 +3140,7 @@ class L10nEn extends L10n {
   String get botsPets => 'Pets';
 
   @override
-  String get botsPetSource => 'From DSH-TUI';
+  String get botsPetSource => 'Original assets of this fork';
 
   @override
   String get botsPetImport => 'Import';

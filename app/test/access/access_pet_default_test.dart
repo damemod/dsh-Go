@@ -78,7 +78,7 @@ void main() {
     expect(c.read(petPrefsProvider).packId, defaultPetId);
   });
 
-  for (final chosen in [noPetId, 'whale-girl']) {
+  for (final chosen in [noPetId, 'mia']) {
     test('a pet choice already made stays: $chosen', () async {
       final c = await container(prefs: {PetPrefsController.keys.pack: chosen});
       await c.read(accessSetupProvider.notifier).choose({AccessFeature.pet});

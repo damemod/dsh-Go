@@ -1,0 +1,336 @@
+{
+  "schema": 1,
+  "id": "kira",
+  "name": "琪拉",
+  "author": "fork 自持素材",
+  "license": "原创素材，随本 fork 作为修改版一并分发",
+  "source": "原创插画素材",
+  "pixelArt": false,
+  "scale": 1,
+  "canvas": {
+    "w": 321,
+    "h": 394
+  },
+  "anchor": {
+    "x": 160,
+    "baseline": 394
+  },
+  "contentBox": {
+    "x": 0,
+    "y": 0,
+    "w": 321,
+    "h": 394
+  },
+  "hitBoxes": {
+    "default": {
+      "x": 0,
+      "y": 0,
+      "w": 321,
+      "h": 394
+    },
+    "wide": {
+      "x": 0,
+      "y": 0,
+      "w": 321,
+      "h": 394
+    },
+    "sleeping": {
+      "x": 0,
+      "y": 0,
+      "w": 321,
+      "h": 394
+    },
+    "byAnim": {},
+    "wideAnims": [
+      "working",
+      "error",
+      "panic",
+      "notify"
+    ],
+    "sleepingAnims": [
+      "sleeping"
+    ]
+  },
+  "animations": {
+    "idle": {
+      "sheet": "idle.png",
+      "frameW": 321,
+      "frameH": 394,
+      "cols": 1,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 321,
+        "h": 394
+      },
+      "loop": true,
+      "ms": 120,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 120
+        }
+      ]
+    },
+    "thinking": {
+      "sheet": "thinking.png",
+      "frameW": 321,
+      "frameH": 394,
+      "cols": 1,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 321,
+        "h": 394
+      },
+      "loop": true,
+      "ms": 120,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 120
+        }
+      ]
+    },
+    "working": {
+      "sheet": "working.png",
+      "frameW": 321,
+      "frameH": 394,
+      "cols": 1,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 321,
+        "h": 394
+      },
+      "loop": true,
+      "ms": 120,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 120
+        }
+      ]
+    },
+    "error": {
+      "sheet": "error.png",
+      "frameW": 321,
+      "frameH": 394,
+      "cols": 1,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 321,
+        "h": 394
+      },
+      "loop": true,
+      "ms": 120,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 120
+        }
+      ]
+    },
+    "panic": {
+      "sheet": "panic.png",
+      "frameW": 321,
+      "frameH": 394,
+      "cols": 1,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 321,
+        "h": 394
+      },
+      "loop": true,
+      "ms": 120,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 120
+        }
+      ]
+    },
+    "point": {
+      "sheet": "point.png",
+      "frameW": 321,
+      "frameH": 394,
+      "cols": 1,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 321,
+        "h": 394
+      },
+      "loop": true,
+      "ms": 120,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 120
+        }
+      ]
+    },
+    "notify": {
+      "sheet": "notify.png",
+      "frameW": 321,
+      "frameH": 394,
+      "cols": 1,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 321,
+        "h": 394
+      },
+      "loop": true,
+      "ms": 120,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 120
+        }
+      ]
+    },
+    "sweeping": {
+      "sheet": "sweeping.png",
+      "frameW": 321,
+      "frameH": 394,
+      "cols": 1,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 321,
+        "h": 394
+      },
+      "loop": true,
+      "ms": 120,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 120
+        }
+      ]
+    },
+    "carry": {
+      "sheet": "carry.png",
+      "frameW": 321,
+      "frameH": 394,
+      "cols": 1,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 321,
+        "h": 394
+      },
+      "loop": true,
+      "ms": 120,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 120
+        }
+      ]
+    },
+    "sleeping": {
+      "sheet": "sleeping.png",
+      "frameW": 321,
+      "frameH": 394,
+      "cols": 1,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 321,
+        "h": 394
+      },
+      "loop": true,
+      "ms": 120,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 120
+        }
+      ]
+    },
+    "celebrate": {
+      "sheet": "celebrate.png",
+      "frameW": 321,
+      "frameH": 394,
+      "cols": 1,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 321,
+        "h": 394
+      },
+      "loop": true,
+      "ms": 120,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 120
+        }
+      ]
+    },
+    "roam": {
+      "sheet": "roam.png",
+      "frameW": 321,
+      "frameH": 394,
+      "cols": 1,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 321,
+        "h": 394
+      },
+      "loop": true,
+      "ms": 120,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 120
+        }
+      ]
+    }
+  },
+  "states": {
+    "idle": [
+      "idle",
+      "thinking"
+    ],
+    "thinking": [
+      "thinking"
+    ],
+    "working": [
+      "working"
+    ],
+    "error": [
+      "error",
+      "panic"
+    ],
+    "happy": [
+      "celebrate"
+    ],
+    "notification": [
+      "notify"
+    ],
+    "sleeping": [
+      "sleeping"
+    ],
+    "roam": [
+      "roam"
+    ]
+  },
+  "tiers": {},
+  "idlePool": [],
+  "bonus": {},
+  "reactions": {},
+  "roam": {
+    "anim": "roam",
+    "faces": "front"
+  },
+  "sleep": {
+    "afterMs": 60000
+  },
+  "timings": {}
+}

@@ -30,7 +30,8 @@ export '../chat/support/harness.dart' show testApp, usePhoneView, testTheme;
 
 /// A shipped pack, from `assets/pets/<id>/pack.json`.
 PetPack diskPack(String id) =>
-    PetPack.parse(jsonDecode(File('assets/pets/$id/pack.json').readAsStringSync()) as Map<String, Object?>);
+    PetPack.parse(jsonDecode(File('assets/pets/$id/pack.json').readAsStringSync()) as Map<String, Object?>,
+        dir: 'assets/pets/$id');
 
 final deepy = diskPack('deepy-whale');
 final girl = diskPack('whale-girl');

@@ -777,8 +777,8 @@ class CompanionWater extends StatelessWidget {
   );
 }
 
-/// The little pixel whale girl the app already ships: on first run and when
-/// something failed, she stands in for the Live2D one.
+/// The bundled pixel pet standing in for the Live2D one on first run and when
+/// something failed.
 class CompanionPixelWhale extends ConsumerWidget {
   const CompanionPixelWhale({super.key, this.state = PetStateName.idle, this.bodyHeight = 92});
 
@@ -789,7 +789,7 @@ class CompanionPixelWhale extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final pack = ref.watch(petPackProvider('whale-girl')).value;
+    final pack = ref.watch(petPackProvider('mia')).value;
     final dpr = MediaQuery.devicePixelRatioOf(context);
     if (pack == null) return SizedBox(height: bodyHeight);
     // Whole device pixels per art pixel, or pixel art goes soft.
