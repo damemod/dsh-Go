@@ -14,8 +14,9 @@ import kotlin.math.ceil
 import kotlin.math.floor
 
 /**
- * The alpha of a palette PNG (how the bundled sheets are stored: 4- or 8-bit indices with a tRNS
- * table), decoded by hand: unit tests compile against android.jar, without javax.imageio.
+ * The alpha of a PNG sheet, decoded by hand: unit tests compile against android.jar, without
+ * javax.imageio. Bundled sheets are palette (4-/8-bit indices with a tRNS table) or RGBA; only
+ * the alpha channel matters here.
  */
 private class PaletteAlpha(val width: Int, val height: Int, private val alpha: ByteArray) {
     fun alpha(x: Int, y: Int): Int = alpha[y * width + x].toInt() and 0xff
@@ -28,6 +29,7 @@ private class PaletteAlpha(val width: Int, val height: Int, private val alpha: B
             var w = 0
             var h = 0
             var depth = 0
+            var colorType = 0
             var trns = ByteArray(0)
             val idat = ByteArrayOutputStream()
             var i = 8
@@ -38,14 +40,19 @@ private class PaletteAlpha(val width: Int, val height: Int, private val alpha: B
                         w = int(i + 8)
                         h = int(i + 12)
                         depth = d[i + 16].toInt()
-                        check(d[i + 17].toInt() == 3 && d[i + 20].toInt() == 0) { "${file.name}: not a plain palette PNG" }
+                        colorType = d[i + 17].toInt()
+                        check((colorType == 3 || colorType == 6) && d[i + 20].toInt() == 0) {
+                            "${file.name}: expected a non-interlaced palette or RGBA PNG"
+                        }
+                        check(colorType != 6 || depth == 8) { "${file.name}: RGBA must be 8-bit" }
                     }
                     "tRNS" -> trns = d.copyOfRange(i + 8, i + 8 + n)
                     "IDAT" -> idat.write(d, i + 8, n)
                 }
                 i += 12 + n
             }
-            val stride = (w * depth + 7) / 8
+            val bpp = if (colorType == 6) 4 else 1
+            val stride = if (colorType == 6) w * 4 else (w * depth + 7) / 8
             val raw = ByteArray(h * (stride + 1))
             Inflater().run {
                 setInput(idat.toByteArray())
@@ -59,9 +66,9 @@ private class PaletteAlpha(val width: Int, val height: Int, private val alpha: B
                 val row = raw.copyOfRange(y * (stride + 1) + 1, (y + 1) * (stride + 1))
                 val filter = raw[y * (stride + 1)].toInt()
                 for (x in 0 until stride) {
-                    val a = if (x > 0) row[x - 1].toInt() and 0xff else 0
+                    val a = if (x >= bpp) row[x - bpp].toInt() and 0xff else 0
                     val b = prev[x].toInt() and 0xff
-                    val c = if (x > 0) prev[x - 1].toInt() and 0xff else 0
+                    val c = if (x >= bpp) prev[x - bpp].toInt() and 0xff else 0
                     val add = when (filter) {
                         1 -> a
                         2 -> b
@@ -78,14 +85,18 @@ private class PaletteAlpha(val width: Int, val height: Int, private val alpha: B
                     row[x] = ((row[x].toInt() and 0xff) + add).toByte()
                 }
                 for (x in 0 until w) {
-                    val index = if (depth == 8) {
-                        row[x].toInt() and 0xff
+                    out[y * w + x] = if (colorType == 6) {
+                        row[x * 4 + 3]
                     } else {
-                        val perByte = 8 / depth
-                        val shift = 8 - depth * (x % perByte + 1)
-                        ((row[x / perByte].toInt() and 0xff) shr shift) and ((1 shl depth) - 1)
+                        val index = if (depth == 8) {
+                            row[x].toInt() and 0xff
+                        } else {
+                            val perByte = 8 / depth
+                            val shift = 8 - depth * (x % perByte + 1)
+                            ((row[x / perByte].toInt() and 0xff) shr shift) and ((1 shl depth) - 1)
+                        }
+                        if (index < trns.size) trns[index] else 0xff.toByte()
                     }
-                    out[y * w + x] = if (index < trns.size) trns[index] else 0xff.toByte()
                 }
                 prev = row
             }
