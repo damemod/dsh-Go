@@ -95,8 +95,7 @@ jobs:
           sed -i -E "s|^NDK_VERSION=.*$|NDK_VERSION=\"${NDK_VER}\"|" tooling/setup-toolchain.sh
           sed -i 's/"emulator" "$SYSTEM_IMAGE"//g' tooling/setup-toolchain.sh
           sed -i 's/"emulator"//g' tooling/setup-toolchain.sh
-          # 使用上游原样的下载参数。此前的 --http1.1 + -C - + --retry-all-errors
-          # 组合在 mktemp 空临时文件上挂起，且拖慢下载，已移除。
+          # 使用上游原样的下载参数，不做额外改写。
           bash tooling/setup-toolchain.sh
           source tooling/env.sh
           flutter --version
