@@ -10,6 +10,7 @@ import 'package:flutter/widgets.dart' show IconData;
 
 import '../../l10n/l10n.dart';
 import 'native_icons.dart';
+import 'native_limits.g.dart';
 
 /// The four places of protocol v1 a plugin can show up in.
 enum NativeSurface {
@@ -62,45 +63,51 @@ class NativeTurnNotes {
 }
 
 /// The app's limits (protocol §7; the bridge enforces them first).
+/// Value-mirroring constants come from the bridge's LIMITS table via
+/// [GeneratedNativeLimits]; app-derived totals and the App-only gesture window
+/// stay here because the bridge has no counterpart for them.
 abstract final class NativeLimits {
   /// Composer buttons and message-menu items, per plugin.
-  static const actionsPerPlugin = 2;
+  static const actionsPerPlugin = GeneratedNativeLimits.actionsPerPlugin;
 
-  /// Capsules above the composer, ui.json's included.
+  /// Capsules above the composer, ui.json's included. App-derived: no bridge key.
   static const capsulesTotal = 8;
 
   /// A capsule's label.
-  static const capsuleLabelMax = 10;
+  static const capsuleLabelMax = GeneratedNativeLimits.capsuleLabelMax;
 
   /// A message-menu item's label.
-  static const menuLabelMax = 12;
+  static const menuLabelMax = GeneratedNativeLimits.menuLabelMax;
 
   /// A panel's title.
-  static const panelTitleMax = 16;
+  static const panelTitleMax = GeneratedNativeLimits.panelTitleMax;
 
   /// A ＋ panel tool's name, under its tile.
-  static const toolLabelMax = 8;
+  static const toolLabelMax = GeneratedNativeLimits.toolLabelMax;
 
-  /// ＋ panel tools on the panel, every plugin's.
+  /// ＋ panel tools on the panel, every plugin's. App-derived: no bridge key.
   static const toolsTotal = 8;
 
-  /// Plugins whose note follows one turn's footnote.
+  /// Plugins whose note follows one turn's footnote. App-derived: no bridge key.
   static const turnNotesShown = 2;
 
   /// Note plugins one conversation follows. The stream allows 32 subscriptions a connection, and
   /// panels and strips must still get theirs however many note plugins are installed.
+  /// App-derived: no bridge key.
   static const turnNoteFeeds = 8;
 
   /// Panels per plugin.
-  static const panelsPerPlugin = 4;
+  static const panelsPerPlugin = GeneratedNativeLimits.panelsPerPlugin;
 
   /// The status line's text.
-  static const stripTextMax = 24;
+  static const stripTextMax = GeneratedNativeLimits.stripTextMax;
 
   /// A toast.
-  static const toastMax = 40;
+  static const toastMax = GeneratedNativeLimits.toastMax;
 
-  /// Effects run only this soon after the tap.
+  /// Effects run only this soon after the tap. App-only security window
+  /// (protocol §7 "App / drop"); the bridge's effectWindowMs is declared but
+  /// unused and is a WIDEN_IS_BAD gate field, so this stays hand-written.
   static const tapWindow = Duration(seconds: 3);
 }
 
