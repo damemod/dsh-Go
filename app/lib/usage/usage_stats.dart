@@ -1,8 +1,8 @@
 // 发送匿名使用统计: anonymous, per-day counts kept on the phone and sent once
-// each, the day after (contracts v1–v3, usage_ledger.dart). On by default, but
-// nothing is counted until the person has seen the switch (first run's
-// 「想让 DSH Go 帮你做哪些事」, or 设置 › 隐私与分享). Off means nothing is
-// counted, nothing is kept and no request is made.
+// each, the day after (contracts v1–v3, usage_ledger.dart). Off by default:
+// nothing is counted, kept or sent until the person turns the switch on
+// (first run's 「想让 DSH Go 帮你做哪些事」, or 设置 › 隐私与分享). Off means
+// nothing is counted, nothing is kept and no request is made.
 
 import 'dart:async';
 import 'dart:convert';
@@ -22,11 +22,11 @@ import 'usage_net.dart';
 export 'usage_ledger.dart' show UsageCount;
 
 class UsageStatsState {
-  const UsageStatsState({this.loaded = false, this.enabled = true, this.noticed = false});
+  const UsageStatsState({this.loaded = false, this.enabled = false, this.noticed = false});
 
   final bool loaded;
 
-  /// The switch. On unless the person turned it off.
+  /// The switch. Off unless the person turned it on.
   final bool enabled;
 
   /// The person has seen the switch and what it says.
@@ -112,7 +112,7 @@ class UsageStatsController extends Notifier<UsageStatsState> {
     try {
       final prefs = await SharedPreferences.getInstance();
       if (!ref.mounted) return;
-      final enabled = prefs.getBool(enabledKey) ?? true;
+      final enabled = prefs.getBool(enabledKey) ?? false;
       DateTime? time(String key) => switch (prefs.getInt(key)) {
         final int ms => DateTime.fromMillisecondsSinceEpoch(ms),
         null => null,

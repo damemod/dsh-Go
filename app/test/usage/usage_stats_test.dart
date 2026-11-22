@@ -18,7 +18,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'support.dart';
 
-const noticed = {UsageStatsController.noticedKey: true};
+/// Opted in: the person saw the switch and left it on. With collection now
+/// off by default, "noticed" alone is not consent — the switch must be on too.
+const noticed = {
+  UsageStatsController.noticedKey: true,
+  UsageStatsController.enabledKey: true,
+};
 
 late FakeUsageHttp http;
 late DateTime now;
@@ -107,17 +112,19 @@ void main() {
   });
   tearDown(() => UsageBuild.active = wasActive);
 
-  test('nothing is counted or sent before the person has seen the switch', () async {
+  test('nothing is counted or sent until the person turns the switch on', () async {
     final c = await start();
-    expect(c.read(usageStatsProvider).enabled, isTrue, reason: 'on by default');
+    expect(c.read(usageStatsProvider).enabled, isFalse, reason: 'off by default');
+    // Even seeing the switch does not start collection — it is opt-in now.
+    await c.usage.markNoticed();
     await c.count(UsageCount.turns, 3);
     now = DateTime(2026, 10, 29, 9);
     await c.comeBack();
     expect(http.requests, isEmpty);
     expect((await stored()).keys.where((k) => k.startsWith('usage_stats_days')), isEmpty);
 
-    // Shown at first run (or in settings): from then on, it counts.
-    await c.usage.markNoticed();
+    // Turned on in settings (or first run): from then on, it counts.
+    await c.usage.setEnabled(true);
     await c.count(UsageCount.turns);
     now = DateTime(2026, 10, 30, 9);
     await c.comeBack();
