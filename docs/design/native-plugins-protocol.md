@@ -532,7 +532,12 @@ handler 在 3 秒内返回 `{ pending, result }`（§2.2），桥接立即回：
 | 图片资源 | 1 MiB / 个 | 桥接 | 404 |
 | 延后结果（v1.1） | 每插件同时 2 个；`timeoutMs` 缺省 30 s、1–60 s；`label` 16 字；先到的结果 App 暂存 5 s | 桥接（暂存由 App） | 429 `too-many-pending` / 夹到边界 / 截断 |
 
-`contributions.limits` 以 JSON 给出同一张表（键名见 `contributions.schema.json`），SDK 的 `check` 与 App 都从这里取数，避免三处各写一份。下发的是**本主机的生效值**：六项计时（`handlerTimeoutMs`、`viewTimeoutMs`、`firstDataWaitMs`、`heartbeatSeconds`、`idleTimeoutSeconds`、`feedLingerMs`）可由桥接配置 `native: {…}` 调整（测试用来缩短），所以 schema 里只约束为正数，表中数字是协议默认值；其余各项是协议常量。App 一律以下发值为准（`welcome.hb` 同理）。
+`contributions.limits` 以 JSON 给出同一张表的**本主机生效值**（键名见 `contributions.schema.json`）。这里要区分两类键：
+
+- 六项计时（`handlerTimeoutMs`、`viewTimeoutMs`、`firstDataWaitMs`、`heartbeatSeconds`、`idleTimeoutSeconds`、`feedLingerMs`）可由桥接配置 `native: {…}` 调整（测试用来缩短），所以 schema 只约束为正数，表中数字是协议默认值；它们是本次连接真正生效的值。
+- 其余各项是**协议常量**，各端按 v1 本地持有，不从下发值读取。App 在 `NativeLimits` 里持有这些常量（单一事实源见 `scripts/gen-native-limits.mjs` 生成的 `native_limits.g.dart`），SDK `check` 用自己随包 vendored 的 `bridge/limits.js`；两者与桥同源生成/同步，因此三处一致但不是"从下发值取数"。若未来需要让某个常量由主机动态下发，再另行设计，届时需同步本协议与各端读取方式。
+
+`welcome.hb` 同理：桥按生效值下发心跳间隔，但 App 当前用本地静默检测（60 s），不读取该字段。
 
 ## 8. 版本兼容
 
