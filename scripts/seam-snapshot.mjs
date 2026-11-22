@@ -107,6 +107,24 @@ const sourceGuards = {
       && n.issues.length === 2 && n.issues.every((i) => i.code === "unknown-effect");
   }),
 
+  // close 能关闭 UI，ownership 是它的安全边界：id 或 tap source 必须命中本插件
+  // 声明的 panel；无来源、别人的 panel、静态 / 延后 / 文件回调一律硬拒。
+  // 这是行为探针而非文本断言：ownership 若被放松成恒真，本探针即翻假。
+  closeOwnPanel: guard(() => {
+    const panels = new Set(["usage"]);
+    const good = effects.validate({ type: "close", id: "usage" }, { panels }).effect?.id === "usage"
+      && effects.validate({ type: "close" }, { panels, source: "usage" }).effect?.id === "usage"
+      && effects.normalize({ close: "usage" }, { panels }).effects[0]?.id === "usage";
+    const rejected = [
+      effects.validate({ type: "close" }, { panels }),
+      effects.validate({ type: "close", id: "foreign" }, { panels }),
+      effects.validate({ type: "close", id: "usage" }, { panels, static: true }),
+      effects.validate({ type: "close", id: "usage" }, { panels, deferred: true }),
+      effects.validate({ type: "close", id: "usage" }, { panels, fileResult: true }),
+    ].every((r) => r.issue?.violation === true);
+    return good && rejected;
+  }),
+
   // capabilities.js:131 capabilityEffect 的 unknown()：未声明或未协商都不得计违规。
   capabilityEffectUnknownNoViolation: guard(() => {
     return [

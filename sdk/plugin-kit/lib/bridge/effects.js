@@ -5,10 +5,13 @@ import { LIMITS } from "./limits.js";
 import { chars, cleanBlock, cleanLine, isPlainObject, toJson, truncateChars } from "./util.js";
 
 export const STATIC_TYPES = new Set(["insert", "command", "open", "link", "toast", "copy"]);
-export const ALL_TYPES = new Set([...STATIC_TYPES, "refresh", "patch"]);
+// `close` targets one of the plugin's own panels by id (id, or the panel a tap came from),
+// exactly like refresh/patch: it is a handler effect, never a manifest-static one (a static
+// effect has no tap source and would run outside the panel's own route).
+export const ALL_TYPES = new Set([...STATIC_TYPES, "refresh", "patch", "close"]);
 /** What a deferred result may carry (protocol §4.7): no command / open / link / refresh. */
 export const DEFERRED_TYPES = new Set(["insert", "copy", "toast", "patch"]);
-const SHORTHAND = ["insert", "command", "open", "link", "toast", "copy", "refresh", "patch"];
+const SHORTHAND = ["insert", "command", "open", "link", "toast", "copy", "refresh", "patch", "close"];
 const COMMAND = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$/;
 const PAGE = /^(panel:([A-Za-z0-9][A-Za-z0-9_.-]{0,39})|[a-z][a-z0-9-]{0,31})$/;
 const ID = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,39}$/;
@@ -35,6 +38,7 @@ function fromShorthand(key, v) {
     case "open": return { type: "open", page: v };
     case "command": return isPlainObject(v) ? { type: "command", name: v.name, args: v.args } : { type: "command", name: v };
     case "refresh": return v === true ? { type: "refresh" } : { type: "refresh", id: v };
+    case "close": return v === true ? { type: "close" } : { type: "close", id: v };
     case "patch": return { type: "patch", data: v };
   }
   return { type: key };
@@ -97,6 +101,11 @@ export function validate(e, opts) {
       const id = e.id ?? opts.source;
       if (!ownPanel(id)) return bad("refresh needs one of this plugin's panels (id, or a tap from a panel)");
       return { effect: { type: "refresh", id } };
+    }
+    case "close": {
+      const id = e.id ?? opts.source;
+      if (!ownPanel(id)) return bad("close needs one of this plugin's panels (id, or a tap from a panel)");
+      return { effect: { type: "close", id } };
     }
     case "patch": {
       const id = e.id ?? opts.source;

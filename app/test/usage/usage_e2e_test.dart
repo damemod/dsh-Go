@@ -21,6 +21,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../shell/golden_harness.dart' show FakeRuntime;
 
+/// Opted in: with collection off by default, consent needs the switch on too.
+const optedIn = {
+  UsageStatsController.noticedKey: true,
+  UsageStatsController.enabledKey: true,
+};
+
 class _Received {
   _Received(this.method, this.path, this.headers, this.body);
 
@@ -106,7 +112,7 @@ void main() {
   }
 
   test('one POST per past day, plain JSON, no cookie, nothing extra; a 500 is tried again', () async {
-    final c = await start({UsageStatsController.noticedKey: true});
+    final c = await start(optedIn);
     final usage = c.read(usageStatsProvider.notifier);
     usage
       ..count(UsageCount.turns)
@@ -187,7 +193,7 @@ void main() {
   });
 
   test('turned off, the server hears nothing', () async {
-    final c = await start({UsageStatsController.noticedKey: true});
+    final c = await start(optedIn);
     final usage = c.read(usageStatsProvider.notifier);
     usage.count(UsageCount.turns);
     await settle();

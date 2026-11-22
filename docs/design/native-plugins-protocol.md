@@ -184,6 +184,7 @@ export function apply(ctx) {
 | `{ command: "compact" }` / `{ command: { name, args } }` | `{ type: "command", name, args? }` |
 | `{ refresh: true }` / `{ refresh: "usage" }` | `{ type: "refresh", id? }` |
 | `{ patch: {...} }` | `{ type: "patch", data }` |
+| `{ close: true }` / `{ close: "usage" }` | `{ type: "close", id? }` |
 
 一个简写对象里写多个键，按键的顺序展开成多个效果。
 
@@ -492,8 +493,9 @@ handler 在 3 秒内返回 `{ pending, result }`（§2.2），桥接立即回：
 | `copy` | `text` | 1–8000 字 | 复制到剪贴板 |
 | `refresh` | `id?` | 本插件面板 id；缺省 = 发起点按的面板 | 重新 GET 视图 |
 | `patch` | `data`, `id?` | Merge Patch 对象，≤ 16 KiB；`id` 同上 | App 立即合并到该面板的数据；桥接同时并入该 `{pkg, id, scope}` 的数据源（若在运行），其他订阅者经流收到 |
+| `close` | `id?` | 本插件面板 id；缺省 = 发起点按的面板 | 收起该面板；仅当它独占一个 route（独立页 / 专用 sheet）时生效，内嵌在其他页面 / 共享 sheet / 抽屉中的面板忽略此效果，不误关宿主 |
 
-- 清单里的静态 `effect` 只能用前六种（没有 `refresh` / `patch`）。
+- 清单里的静态 `effect` 只能用前六种（没有 `refresh` / `patch` / `close`）。
 - 延后结果（§4.7）只能用 `insert`、`copy`、`toast`、`patch`。
 - **永不开放**：批准工具调用、改权限模式、手机操控、装卸插件、切主机、读 App 设置或凭据、无点按自动触发（总设计 §3.5）。
 - 第二期：`attach {asset}`、`play {asset}`（只认本路由的同源资源）。

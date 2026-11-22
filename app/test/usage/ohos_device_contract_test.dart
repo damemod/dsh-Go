@@ -56,6 +56,7 @@ void main() {
     final ledger = UsageLedger()..count(UsageCount.turns, DateTime(2026, 10, 27, 12));
     SharedPreferences.setMockInitialValues({
       UsageStatsController.noticedKey: true,
+      UsageStatsController.enabledKey: true,
       UsageStatsController.daysKey: ledger.encode(),
     });
     final overrides = usageOverrides(clock: () => now, http: http, onResumes: (_) {}, engine: 'proot');

@@ -45272,24 +45272,6 @@ abstract class L10n {
   /// **'不含对话和个人信息，可随时关闭'**
   String get usageNoticeBody;
 
-  /// No description provided for @usageUpgradeNotice.
-  ///
-  /// In zh, this message translates to:
-  /// **'新增匿名使用统计，帮助改进 DSH Go。\n不含对话和个人信息'**
-  String get usageUpgradeNotice;
-
-  /// No description provided for @usageUpgradeLearn.
-  ///
-  /// In zh, this message translates to:
-  /// **'了解'**
-  String get usageUpgradeLearn;
-
-  /// No description provided for @usageUpgradeOff.
-  ///
-  /// In zh, this message translates to:
-  /// **'关闭'**
-  String get usageUpgradeOff;
-
   /// No description provided for @viewArtifactSaved.
   ///
   /// In zh, this message translates to:

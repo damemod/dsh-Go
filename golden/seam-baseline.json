@@ -15,6 +15,7 @@
       "toast"
     ],
     "all": [
+      "close",
       "command",
       "copy",
       "insert",
@@ -167,6 +168,7 @@
     "linkHttpsOnly": true,
     "linkNoCredentials": true,
     "unknownEffectNoViolation": true,
+    "closeOwnPanel": true,
     "capabilityEffectUnknownNoViolation": true,
     "pickerEffectUnknownNoViolation": true,
     "pickerUserGesture": true,

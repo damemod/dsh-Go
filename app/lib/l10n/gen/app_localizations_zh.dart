@@ -24681,15 +24681,6 @@ class L10nZh extends L10n {
   String get usageNoticeBody => '不含对话和个人信息，可随时关闭';
 
   @override
-  String get usageUpgradeNotice => '新增匿名使用统计，帮助改进 DSH Go。\n不含对话和个人信息';
-
-  @override
-  String get usageUpgradeLearn => '了解';
-
-  @override
-  String get usageUpgradeOff => '关闭';
-
-  @override
   String viewArtifactSaved(String value) {
     return '已存到 $value';
   }

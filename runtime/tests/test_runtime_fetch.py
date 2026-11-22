@@ -60,6 +60,9 @@ sys.exit(status)
         env = dict(os.environ, PATH=str(self.bin) + os.pathsep + os.environ["PATH"],
                    FETCH_TEST_ROOT=str(self.root), RUNTIME_LAYERS="0", UPDATE_DEB_LOCK="0",
                    UBUNTU_EXTRA="tzdata ca-certificates git", RUNTIME_INPUT_STORE_URL="")
+        # fetch tests model a local build's domestic-mirror path by default; the
+        # runner-official-source path is covered explicitly in a dedicated test.
+        env.pop("GITHUB_ACTIONS", None)
         env.update(extra_env or {})
         return subprocess.run(["bash", str(harness)], env=env, text=True,
                               capture_output=True, timeout=15)
@@ -316,11 +319,13 @@ os.replace(sys.argv[1], sys.argv[2])
         for arch in ("arm64", "amd64"):
             name = f"ubuntu-base-24.04.5-base-{arch}.tar.gz"
             cases.append((f"ubuntu_base {arch}", name,
-                          f"https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cdimage/ubuntu-base/releases/24.04/release/{name}", None))
+                          f"https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cdimage/ubuntu-base/releases/24.04/release/{name}",
+                          f"https://cdimage.ubuntu.com/ubuntu-base/releases/24.04/release/{name}"))
         for arch in ("arm64", "x64"):
             name = f"node-v24.22.1-linux-{arch}.tar.xz"
             cases.append((f"node_dist {arch}", name,
-                          f"https://npmmirror.com/mirrors/node/v24.22.1/{name}", None))
+                          f"https://npmmirror.com/mirrors/node/v24.22.1/{name}",
+                          f"https://nodejs.org/dist/v24.22.1/{name}"))
         for arch in ("aarch64", "x86_64"):
             name = f"cpython-3.12.15+20261021-{arch}-unknown-linux-gnu-install_only_stripped.tar.gz"
             cases.append((f"python_dist {arch}", name,
@@ -340,6 +345,33 @@ os.replace(sys.argv[1], sys.argv[2])
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertEqual(Path(result.stdout).read_text(), self.payload)
                 self.assertEqual(self.calls()[before:], [primary] + ([backup] if backup else []) + [cas])
+
+    def test_ci_runner_uses_official_sources_without_domestic_mirror(self):
+        cases = []
+        for arch in ("arm64", "amd64"):
+            name = f"ubuntu-base-24.04.5-base-{arch}.tar.gz"
+            cases.append((f"ubuntu_base {arch}", name,
+                          f"https://cdimage.ubuntu.com/ubuntu-base/releases/24.04/release/{name}",
+                          f"https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cdimage/ubuntu-base/releases/24.04/release/{name}"))
+        for arch in ("arm64", "x64"):
+            name = f"node-v24.22.1-linux-{arch}.tar.xz"
+            cases.append((f"node_dist {arch}", name,
+                          f"https://nodejs.org/dist/v24.22.1/{name}",
+                          f"https://npmmirror.com/mirrors/node/v24.22.1/{name}"))
+        for call, name, official, domestic in cases:
+            with self.subTest(call=call):
+                cas = f"{self.store}/sha256-{self.sha}"
+                self.routes = {official: [0, self.payload],
+                               domestic: [22, "runner must not use the domestic mirror"],
+                               cas: [22, "unused"]}
+                before = len(self.calls())
+                entry = f'PIN["$TEST_NAME"]="$EXPECTED"\nvalue="$({call})"\nprintf "%s" "$value"'
+                result = self.run_shell(entry, dict(TEST_NAME=name, EXPECTED=self.sha,
+                    UBUNTU_VERSION="24.04.5", NODE_VERSION="24.22.1", PBS_RELEASE="20261021",
+                    RUNTIME_INPUT_STORE_URL=self.store, GITHUB_ACTIONS="true"))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(Path(result.stdout).read_text(), self.payload)
+                self.assertEqual(self.calls()[before:], [official])
 
     def test_pinned_termux_inputs_do_not_require_live_package_index(self):
         for pkg, version, pool in (("proot", "5.1.107.102", "p"),

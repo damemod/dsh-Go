@@ -60,8 +60,20 @@ XZ_THREADS="${XZ_THREADS:-4}"       # xz 5.8.1 -6, 136704-byte sample: -T1=408 B
 PRUNE_DEV_METADATA="${PRUNE_DEV_METADATA:-1}"   # drop *.map / *.d.ts from node_modules
 SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-1767225600}"  # 2026-01-01T00:00:00Z, fixed tar mtimes
 
+# 分发包主源：本地走国内镜像，CI runner（海外）走官方源，避免跨境链路抖动。
+# 本地主源之外保留官方回退（sha256 pin 校验，换来源不换字节）；runner 主源已是官方，无需回退。
+# 赋值保持 NAME="..." 字面量形态，input_store.shell_inputs() 才能解析。
 UBUNTU_MIRROR="https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cdimage/ubuntu-base/releases/24.04/release"
 NODE_MIRROR="https://npmmirror.com/mirrors/node"
+if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
+  UBUNTU_MIRROR="https://cdimage.ubuntu.com/ubuntu-base/releases/24.04/release"
+  NODE_MIRROR="https://nodejs.org/dist"
+  UBUNTU_MIRROR_BACKUP=""
+  NODE_MIRROR_BACKUP=""
+else
+  UBUNTU_MIRROR_BACKUP="https://cdimage.ubuntu.com/ubuntu-base/releases/24.04/release"
+  NODE_MIRROR_BACKUP="https://nodejs.org/dist"
+fi
 NPM_REGISTRY="https://registry.npmmirror.com"
 TERMUX_REPO="https://packages.termux.dev/apt/termux-main"
 UBUNTU_ARCHIVE_AMD64="https://mirrors.tuna.tsinghua.edu.cn/ubuntu"        # InRelease verified with gpgv
@@ -155,7 +167,7 @@ ubuntu_base() {  # $1 = ubuntu arch; echoes path
     pin="$(awk -v f="$name" '{n=$2; sub(/^\*/,"",n); if (n==f) print $1}' "$dir/SHA256SUMS")"
     [[ -n "$pin" ]] || { rm -f "$dir/SHA256SUMS"; die "$name not listed in SHA256SUMS (stale cache removed, rerun)"; }
   fi
-  fetch "$UBUNTU_MIRROR/$name" "$dir/$name" "$pin"
+  fetch "$UBUNTU_MIRROR/$name" "$dir/$name" "$pin" "${UBUNTU_MIRROR_BACKUP:+$UBUNTU_MIRROR_BACKUP/$name}"
   printf '%s' "$dir/$name"
 }
 
@@ -167,7 +179,7 @@ node_dist() {  # $1 = node arch (arm64|x64); echoes path
     pin="$(awk -v f="$name" '$2==f {print $1}' "$dir/SHASUMS256.txt")"
     [[ -n "$pin" ]] || die "$name not listed in SHASUMS256.txt"
   fi
-  fetch "$NODE_MIRROR/v$NODE_VERSION/$name" "$dir/$name" "$pin"
+  fetch "$NODE_MIRROR/v$NODE_VERSION/$name" "$dir/$name" "$pin" "${NODE_MIRROR_BACKUP:+$NODE_MIRROR_BACKUP/v$NODE_VERSION/$name}"
   printf '%s' "$dir/$name"
 }
 

@@ -158,6 +158,7 @@ export function apply(ctx) {
 | `{ open: 'panel:stats' }` / `{ open: '页面 id' }` | 打开本插件面板或 App 页面 |
 | `{ command: 'compact' }` | 在当前对话执行斜杠命令 |
 | `{ refresh: true }` / `{ patch: {…} }` | 面板重取视图 / 合并数据 |
+| `{ close: true }` / `{ close: 'stats' }` | 收起自己的面板；仅独占页面 / 专用 sheet 时生效，内嵌面板忽略 |
 | 多个键写在一个对象里 | 按顺序都执行，例如 `{ copy: md, toast: '已复制' }` |
 
 **慢活（调模型、联网）用延后效果**：先回 `pending`，App 显示等待；结果 ≤ 60 秒到，只能是 `insert` `copy` `toast` `patch`；每插件同时最多 2 个；`signal` 在取消 / 超时 / 断开时触发，收到就停。

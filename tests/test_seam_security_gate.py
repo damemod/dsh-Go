@@ -103,7 +103,7 @@ class SeamGateTests(unittest.TestCase):
         r = run_checker(UPSTREAM)
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
         self.assertIn("放行", r.stdout)
-        self.assertIn("[OK] 10 项安全硬红线全部命中", r.stdout)
+        self.assertIn("[OK] 11 项安全硬红线全部命中", r.stdout)
 
     # ---------------------------------------------------------------- M2 https-only
 
@@ -419,6 +419,39 @@ class SeamGateTests(unittest.TestCase):
         snap = snapshot(self.copy)
         self.assertIn("files", snap["effects"]["effectFeatures"])
         self._assert_reject("effects.effectFeatures", "[REVIEW]", hard=False)
+
+    # ---------------------------------------------------------------- close 安全不变量
+
+    def test_intent_close_ownership_relaxed_rejected(self):
+        # 意图：close 只能关本插件声明的 panel。把 ownership 判据放松为恒真后，
+        # 别人的 panel / 无来源 tap 都会被放行；行为探针必须翻假、门禁必须拒绝。
+        self._replace("effects.js",
+                      '      if (!ownPanel(id)) return bad("close needs one of this plugin\'s panels (id, or a tap from a panel)");',
+                      '      if (false) return bad("close needs one of this plugin\'s panels (id, or a tap from a panel)");')
+        self.assertIs(self._guard("closeOwnPanel"), False,
+                      "ownership 被放松后探针应检测到 foreign / no-source close 被放行")
+        self._assert_reject("closeOwnPanel", "[HARD] sourceGuards.closeOwnPanel")
+
+    def test_intent_close_leaks_into_static_rejected(self):
+        # 意图：close 不是静态 effect（静态没有 tap source，会在宿主栈上乱关）。
+        # 把它塞进 STATIC_TYPES 后静态 manifest 可声明 close，探针必须翻假。
+        self._replace("effects.js",
+                      'export const STATIC_TYPES = new Set(["insert", "command", "open", "link", "toast", "copy"]);',
+                      'export const STATIC_TYPES = new Set(["insert", "command", "open", "link", "toast", "copy", "close"]);')
+        self.assertIs(self._guard("closeOwnPanel"), False,
+                      "close 变成静态后探针应检测到 static close 不再被拒")
+        r = self._assert_reject("closeOwnPanel")
+        self.assertIn("effects.static", r.stdout, "白名单变更也必须进入差异表")
+
+    def test_intent_close_leaks_into_deferred_rejected(self):
+        # 意图：close 不能出现在延后结果里（tap 已过期，关闭会误伤宿主栈）。
+        # 把它塞进 DEFERRED_TYPES 后延后结果可返回 close，探针必须翻假。
+        self._replace("effects.js",
+                      'export const DEFERRED_TYPES = new Set(["insert", "copy", "toast", "patch"]);',
+                      'export const DEFERRED_TYPES = new Set(["insert", "copy", "toast", "patch", "close"]);')
+        self.assertIs(self._guard("closeOwnPanel"), False,
+                      "close 变成延后后探针应检测到 deferred close 不再被拒")
+        self._assert_reject("closeOwnPanel", "effects.deferred")
 
     # ---------------------------------------------------------------- HARD 标记叶子路径
 
