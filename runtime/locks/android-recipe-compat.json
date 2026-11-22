@@ -4,7 +4,7 @@
   "target": "android",
   "sources": {
     "build-runtime.sh": {
-      "sha256": "beab81526f3a3a7a3f291b585d4ebd7e8d7ad343f4d456371c6d8b20be82efd0",
+      "sha256": "538fe06a80f3ae93cea1170f99f83b348ee920f0b05e8bb9f702802a4632f353",
       "legacySha256": "71918e114d6f9a80392cc63410b4b65751c6f815d741d48066b2e401aff83bd4"
     },
     "lib/rtbuild.py": {
