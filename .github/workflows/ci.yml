@@ -85,6 +85,7 @@ jobs:
           python3 app/tool/l10n_merge.py --check
           python3 app/tool/guide_sync.py --check
           node sdk/plugin-kit/scripts/sync-skill.mjs --check
+          node sdk/plugin-kit/scripts/sync-messages.mjs --check
           node scripts/gen-native-limits.mjs --check
           # Not --check: this also writes site/build/share, which the share worker builds from.
           python3 app/tool/make_replay_viewer.py

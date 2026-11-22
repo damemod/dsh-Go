@@ -79,6 +79,13 @@ python3 app/tool/l10n_merge.py
 python3 app/tool/l10n_merge.py --check
 ```
 
+其中 `view` / `plugview` 的文案还要同步进插件 SDK 的检查消息（CI 会核对）：
+
+```bash
+node sdk/plugin-kit/scripts/sync-messages.mjs
+node sdk/plugin-kit/scripts/sync-messages.mjs --check
+```
+
 **用户指南：** 修改 `docs/guide/`（鸿蒙版在 `docs/guide/harmony/`，功能在鸿蒙上不同时两套都改），同步 App 内置的教学技能：
 
 ```bash
