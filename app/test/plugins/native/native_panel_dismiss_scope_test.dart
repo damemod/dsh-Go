@@ -45,9 +45,10 @@ void main() {
       ),
     );
     expect(seen, isNotNull);
-    expect(seen!.panelId, 'own');
-    expect(seen.dismiss, isNotNull);
-    seen.dismiss!();
+    final scope = seen!;
+    expect(scope.panelId, 'own');
+    expect(scope.dismiss, isNotNull);
+    scope.dismiss!();
     expect(dismissed, 1);
   });
 
@@ -88,8 +89,9 @@ void main() {
       ),
     );
     expect(seen, isNotNull);
-    expect(seen!.panelId, 'inner');
-    seen.dismiss!();
+    final scope = seen!;
+    expect(scope.panelId, 'inner');
+    scope.dismiss!();
     expect(innerDismissed, 1);
     expect(outerDismissed, 0);
   });
