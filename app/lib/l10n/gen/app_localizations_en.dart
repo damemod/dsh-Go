@@ -26001,15 +26001,6 @@ class L10nEn extends L10n {
   String get usageNoticeBody => 'No chats or personal info.\nTurn off anytime.';
 
   @override
-  String get usageUpgradeNotice => 'New: anonymous usage stats, to help improve DSH Go.\nNo chats or personal info.';
-
-  @override
-  String get usageUpgradeLearn => 'Learn more';
-
-  @override
-  String get usageUpgradeOff => 'Turn off';
-
-  @override
   String viewArtifactSaved(String value) {
     return 'Saved to $value';
   }

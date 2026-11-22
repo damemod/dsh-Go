@@ -3,8 +3,8 @@
 // welcome row's text starts 16 in from the button's left edge and the switch
 // track ends 16 in from its right, both centred on the row, the row as far
 // from either screen edge; at 320 dp with large text in both languages
-// nothing overflows or is cut. Seeing either one is what starts the
-// counting; the switch turns it all off.
+// nothing overflows or is cut. Seeing either one is not consent — the switch
+// is off by default and starts counting only when the person turns it on.
 //
 //   flutter test --update-goldens test/usage/usage_ui_test.dart
 
@@ -108,30 +108,33 @@ void main() {
       });
     }
 
-    testWidgets('seeing it starts the counting; on by default', (tester) async {
+    testWidgets('seeing it does not start the counting; off by default', (tester) async {
       await _pumpWelcome(tester);
       await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
       await tester.pump();
       final state = _container(tester).read(usageStatsProvider);
-      expect(state.enabled, isTrue);
+      expect(state.enabled, isFalse, reason: 'off until the person turns it on');
       expect(state.noticed, isTrue);
-      expect(tester.widget<Switch>(find.byKey(_switch)).value, isTrue);
-      expect((await tester.runAsync(_stored))![UsageStatsController.noticedKey], isTrue);
+      expect(tester.widget<Switch>(find.byKey(_switch)).value, isFalse);
+      final stored = (await tester.runAsync(_stored))!;
+      expect(stored[UsageStatsController.noticedKey], isTrue);
+      // Default-off writes no opt-in to prefs: absent or false both mean not opted in.
+      expect(stored[UsageStatsController.enabledKey], isNot(true));
     });
 
-    testWidgets('one tap anywhere on the row turns it off, and back on', (tester) async {
+    testWidgets('one tap anywhere on the row turns it on, and back off', (tester) async {
       await _pumpWelcome(tester);
       await tester.tap(find.text(appL10n.usageNoticeBody));
       await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
       await tester.pump();
-      expect(_container(tester).read(usageStatsProvider).enabled, isFalse);
-      expect(tester.widget<Switch>(find.byKey(_switch)).value, isFalse);
-      expect((await tester.runAsync(_stored))![UsageStatsController.enabledKey], isFalse);
+      expect(_container(tester).read(usageStatsProvider).enabled, isTrue);
+      expect(tester.widget<Switch>(find.byKey(_switch)).value, isTrue);
+      expect((await tester.runAsync(_stored))![UsageStatsController.enabledKey], isTrue);
 
       await tester.tap(find.byKey(_switch));
       await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
       await tester.pump();
-      expect(_container(tester).read(usageStatsProvider).enabled, isTrue);
+      expect(_container(tester).read(usageStatsProvider).enabled, isFalse);
     });
 
     testWidgets('reads as one switch to a screen reader', (tester) async {
@@ -151,15 +154,22 @@ void main() {
       overrides: engine.engineOverrides(DshClient.withCarrier(engine.FakeSettingsHost())),
     );
 
-    testWidgets('the page counts as being told; the switch turns it all off', (tester) async {
+    testWidgets('the page counts as being told; the switch is off until turned on', (tester) async {
       await pumpPrivacy(tester);
       await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
       await tester.pump();
       final container = ProviderScope.containerOf(tester.element(find.byType(PrivacyPage)));
       expect(container.read(usageStatsProvider).noticed, isTrue);
       final tile = find.widgetWithText(InkWell, appL10n.usageStatsTitle);
-      expect(tester.widget<Switch>(find.descendant(of: tile, matching: find.byType(Switch))).value, isTrue);
+      expect(tester.widget<Switch>(find.descendant(of: tile, matching: find.byType(Switch))).value, isFalse);
       expect(find.text(appL10n.usageStatsFooter), findsOneWidget);
+
+      // Turn it on, then off: turning it off again drops the id and counts.
+      await tester.tap(tile);
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
+      await tester.pump();
+      expect(container.read(usageStatsProvider).enabled, isTrue);
+      expect(tester.widget<Switch>(find.descendant(of: tile, matching: find.byType(Switch))).value, isTrue);
 
       await tester.tap(tile);
       await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
