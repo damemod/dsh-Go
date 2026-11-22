@@ -87,6 +87,14 @@ final class PickFileEffect extends NativeEffect {
   final int maxTotalBytes;
 }
 
+/// Close one of the plugin's own panels: [panel], or the one tapped in.
+/// The app only closes the panel the tap came from (self-close); closing an
+/// arbitrary panel by id needs an id→route map and is not done here.
+final class CloseEffect extends NativeEffect {
+  const CloseEffect({this.panel});
+  final String? panel;
+}
+
 /// Read a panel's view again: [panel], or the one tapped in.
 final class RefreshEffect extends NativeEffect {
   const RefreshEffect({this.panel});
@@ -106,20 +114,6 @@ final class PatchEffect extends NativeEffect {
   @override
   bool get needsTap => false;
 }
-
-/// The effect names of v1 (sent in `caps.effects`).
-const nativeEffectNames = [
-  'insert',
-  'command',
-  'open',
-  'link',
-  'toast',
-  'copy',
-  'refresh',
-  'patch',
-  'pickFile',
-  'pickImage',
-];
 
 /// Reads [effects] (each `{"type": "insert", "text": …}` or the short
 /// `{"insert": "…"}`), keeping whitelisted, well-formed ones. Problems are
@@ -143,6 +137,7 @@ List<NativeEffect> parseNativeEffects(List<Map<String, Object?>> effects, List<N
         'open' => value is String ? {'page': value} : _map(value),
         'command' => value is String ? {'name': value} : _map(value),
         'patch' => {'data': value},
+        'close' => value is String ? {'id': value} : const <String, Object?>{},
         'refresh' => value is String ? {'id': value} : const <String, Object?>{},
         _ => _map(value),
       };
@@ -249,6 +244,8 @@ List<NativeEffect> parseNativeEffects(List<Map<String, Object?>> effects, List<N
         } else {
           out.add(CopyEffect(_cut(t, 8000, '$pointer/text', issues)));
         }
+      case 'close':
+        out.add(CloseEffect(panel: text('id')));
       case 'refresh':
         out.add(RefreshEffect(panel: text('id')));
       case 'patch':

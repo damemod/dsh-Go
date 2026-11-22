@@ -185,6 +185,9 @@
           "$ref": "#/$defs/patch"
         },
         {
+          "$ref": "#/$defs/close"
+        },
+        {
           "$ref": "#/$defs/audio"
         },
         {
@@ -337,6 +340,21 @@
       "properties": {
         "type": {
           "const": "refresh"
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "close": {
+      "type": "object",
+      "description": "Close one of this plugin's panels (id, or the panel the tap came from).",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "const": "close"
         },
         "id": {
           "$ref": "#/$defs/id"

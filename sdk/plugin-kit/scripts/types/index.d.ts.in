@@ -11,7 +11,7 @@ import type {
   ViewImageComponent, ViewNodeBase,
   Manifest, ManifestAction, ManifestStrip, ManifestPanel, ManifestText,
   InvokeEffect, InvokeStaticEffect, InvokeScope, InvokeInsert, InvokeCommand, InvokeOpen, InvokeLink,
-  InvokeToast, InvokeCopy, InvokeRefresh, InvokePatch, InvokePickFile, InvokePickImage, InvokeFileSelection,
+  InvokeToast, InvokeCopy, InvokeClose, InvokeRefresh, InvokePatch, InvokePickFile, InvokePickImage, InvokeFileSelection,
   ContributionsIssue, ContributionsPlugin, StreamStripData,
 } from './schema.js'
 
@@ -82,6 +82,7 @@ export interface EffectShorthand {
   link?: string
   open?: string
   command?: string | { name: string; args?: string }
+  close?: true | string
   refresh?: true | string
   patch?: Record<string, unknown>
 }
@@ -229,6 +230,7 @@ export namespace effects {
   function link(url: string): InvokeLink
   function toast(text: string): InvokeToast
   function copy(text: string): InvokeCopy
+  function close(id?: string): InvokeClose
   function refresh(id?: string): InvokeRefresh
   function patch(data: Record<string, unknown>, id?: string): InvokePatch
   function pickFile(action: string, options?: { maxFiles?: number }): InvokePickFile

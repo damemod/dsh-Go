@@ -62,6 +62,30 @@ abstract interface class NativeComposerHost {
   BuildContext? get context;
 }
 
+/// The dismiss action for a native panel that owns its own route. Only a
+/// standalone panel page or a dedicated panel sheet provides one; a panel
+/// embedded in a shared page / chat sheet / drawer does not, so a plugin's
+/// `close` effect is ignored there rather than popping a route the panel does
+/// not own.
+class NativePanelDismissScope extends InheritedWidget {
+  const NativePanelDismissScope({super.key, required this.panelId, required this.dismiss, required super.child});
+
+  /// The id of the panel whose own route this scope belongs to. A close that
+  /// names a different panel is ignored instead of popping this panel's route.
+  final String panelId;
+
+  /// Pops this panel's own route; null when the panel is embedded and cannot
+  /// close itself without tearing down its host.
+  final VoidCallback? dismiss;
+
+  static NativePanelDismissScope? maybeOf(BuildContext context) =>
+      context.getInheritedWidgetOfExactType<NativePanelDismissScope>();
+
+  @override
+  bool updateShouldNotify(NativePanelDismissScope oldWidget) =>
+      oldWidget.panelId != panelId || !identical(oldWidget.dismiss, dismiss);
+}
+
 /// Hands the chat screen's composer (and its [ref], for controls drawn by
 /// plain widgets such as a reply's menu) to the plugin controls below it.
 class NativeComposerScope extends InheritedWidget {
@@ -726,11 +750,24 @@ Future<void> _runEffect(
     case OpenEffect(:final page?):
       await openNativePage(context, ref, page, sessionId: sessionId);
     case OpenEffect(:final panel?):
-      final target = plugin.panels.where((p) => p.id == panel).firstOrNull;
-      if (target == null) {
+      final openTarget = plugin.panels.where((p) => p.id == panel).firstOrNull;
+      if (openTarget == null) {
         issues.add(NativeIssue('/effects', l10n.plugslotsIssueUnknownPage('panel:$panel')));
       } else {
-        await openNativePanel(context, target, sessionId: sessionId);
+        await openNativePanel(context, openTarget, sessionId: sessionId);
+      }
+    case CloseEffect(:final panel):
+      // Only a panel that owns its own route (standalone page / dedicated
+      // sheet) can close itself. That container supplies a dismiss scope; an
+      // embedded panel has none, so close is ignored rather than popping a
+      // shared route and tearing down the host. `panel` names this panel's id
+      // (or is null for the tapped panel); the scope is already bound to that
+      // panel's route, so a foreign id is ignored.
+      final dismissScope = NativePanelDismissScope.maybeOf(context);
+      if (dismissScope != null &&
+          (panel == null || panel == dismissScope.panelId) &&
+          stillCurrent?.call() != false) {
+        dismissScope.dismiss?.call();
       }
     case LinkEffect(:final url):
       await openConfirmedLink(context, url, stillCurrent: stillCurrent);

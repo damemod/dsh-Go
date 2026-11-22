@@ -16,6 +16,8 @@ export const link = (url) => ({ type: 'link', url })
 export const toast = (text) => ({ type: 'toast', text })
 /** Copy text to the clipboard (1–8000 characters). */
 export const copy = (text) => ({ type: 'copy', text })
+/** Close one of this plugin's panels (default: the panel the tap came from). */
+export const close = (id) => (id === undefined ? { type: 'close' } : { type: 'close', id })
 /** Re-fetch a panel's view (default: the panel the tap came from). */
 export const refresh = (id) => (id === undefined ? { type: 'refresh' } : { type: 'refresh', id })
 /** Merge into a panel's data now (JSON Merge Patch, ≤ 16 KiB). */

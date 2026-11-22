@@ -137,6 +137,25 @@ test("effects: shorthand, whitelist, limits", () => {
   assert.ok(validate({ type: "refresh" }, { panels: new Set(["a"]), source: "a", static: true }).issue);
 });
 
+test("effects: close targets an own panel by id or tap source, handler-only", () => {
+  const panels = new Set(["usage"]);
+  // shorthand + explicit, with a panel tap source
+  let r = normalize([{ close: true }, { type: "close", id: "usage" }], { panels, source: "usage" });
+  assert.deepEqual(r.effects, [{ type: "close", id: "usage" }, { type: "close", id: "usage" }]);
+  assert.equal(r.violation, false);
+  // explicit id from a non-panel tap
+  r = normalize({ close: "usage" }, { panels });
+  assert.deepEqual(r.effects, [{ type: "close", id: "usage" }]);
+  // no source and no id, or a foreign/undeclared panel: bad-effect violation
+  assert.equal(validate({ type: "close" }, { panels }).issue.code, "bad-effect");
+  assert.ok(validate({ type: "close", id: "other" }, { panels }).issue);
+  // never a manifest-static or deferred effect
+  assert.ok(validate({ type: "close" }, { panels, source: "usage", static: true }).issue);
+  assert.equal(validate({ type: "close", id: "usage" }, { panels, deferred: true }).issue.code, "bad-effect");
+  // file-selection callback only allows patch/refresh/toast
+  assert.ok(validate({ type: "close", id: "usage" }, { panels, fileResult: true }).issue);
+});
+
 test("effects: overflow diagnostics survive unknown and unnegotiated entries", () => {
   const known = Array.from({ length: 6 }, (_, i) => ({ type: "toast", text: String(i + 1) }));
   const unknown = { type: "future-effect" };

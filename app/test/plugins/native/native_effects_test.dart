@@ -46,6 +46,7 @@ void main() {
         {'type': 'link', 'url': 'https://example.com/a?b=1'},
         {'toast': '好了'},
         {'copy': 'text'},
+        {'close': 'usage'},
         {'refresh': 'usage'},
         {
           'type': 'patch',
@@ -62,13 +63,15 @@ void main() {
         LinkEffect,
         ToastEffect,
         CopyEffect,
+        CloseEffect,
         RefreshEffect,
         PatchEffect,
       ]);
       expect((effects[3] as CommandEffect).line, '/compact summary');
       expect((effects[4] as OpenEffect).page, 'skills');
       expect((effects[5] as OpenEffect).panel, 'usage');
-      expect((effects[9] as RefreshEffect).panel, 'usage');
+      expect((effects[9] as CloseEffect).panel, 'usage');
+      expect((effects[10] as RefreshEffect).panel, 'usage');
     });
 
     test('nothing outside the list, and no unsafe forms', () {

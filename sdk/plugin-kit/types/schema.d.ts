@@ -648,7 +648,7 @@ export interface InvokeResponse {
 
 export type InvokeError = ContributionsError
 
-export type InvokeEffect = InvokeInsert | InvokeCommand | InvokeOpen | InvokeLink | InvokeToast | InvokeCopy | InvokeRefresh | InvokePatch | InvokeAudio | InvokeVoice | InvokeOverlay | InvokePickFile | InvokePickImage
+export type InvokeEffect = InvokeInsert | InvokeCommand | InvokeOpen | InvokeLink | InvokeToast | InvokeCopy | InvokeRefresh | InvokePatch | InvokeClose | InvokeAudio | InvokeVoice | InvokeOverlay | InvokePickFile | InvokePickImage
 
 /** Effects allowed in a manifest action's static `effect` (no refresh / patch). */
 export type InvokeStaticEffect = InvokeInsert | InvokeCommand | InvokeOpen | InvokeLink | InvokeToast | InvokeCopy
@@ -687,6 +687,12 @@ export interface InvokeCopy {
 
 export interface InvokeRefresh {
   type: "refresh"
+  id?: InvokeId
+}
+
+/** Close one of this plugin's panels (id, or the panel the tap came from). */
+export interface InvokeClose {
+  type: "close"
   id?: InvokeId
 }
 
