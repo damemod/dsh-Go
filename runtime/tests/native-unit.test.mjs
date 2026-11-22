@@ -10,7 +10,7 @@ import { join } from "node:path";
 import { Duplex } from "node:stream";
 
 const LIB = new URL("../bridge/dsh-go-bridge/lib/native/", import.meta.url);
-const { checkManifest, parseManifest, renderPlugin } = await import(new URL("manifest.js", LIB));
+const { checkManifest, classifyState, parseManifest, renderPlugin } = await import(new URL("manifest.js", LIB));
 const { checkEffects, normalize, splitPending, validate } = await import(new URL("effects.js", LIB));
 const util = await import(new URL("util.js", LIB));
 const { createNativeRoutes } = await import(new URL("routes.js", LIB));
@@ -814,4 +814,66 @@ for (const keepOld of [true, false]) test(`core: plugin reload resolves its new 
   assert.equal(resolved.length, 2, "new generation asks the live loader again");
   assert.equal(core.contributions(CAPS), after);
   assert.equal(resolved.length, 2, "new generation is cached again");
+});
+
+// ------------------------------------------------------------------ state classification (single source)
+
+test("classifyState: exhaustive matrix matches the pre-merge rules", () => {
+  // 合并前的两段规则，作为独立参考实现写在这里（不引用生产代码）。
+  const oldRenderState = (parsed, caps, degraded) => {
+    if (!parsed.valid) return "invalid";
+    if (parsed.v !== PROTOCOL_REF || (caps && !caps.versions.includes(parsed.v))) return "unsupported";
+    if (caps && parsed.minApp !== undefined && util.compareSemver(caps.app, parsed.minApp) < 0) return "needs-app";
+    if (degraded) return "degraded";
+    return "ok";
+  };
+  const PROTOCOL_REF = 1;
+
+  const capSets = [undefined, { versions: [1], app: "1.0.0" }, { versions: [2], app: "1.0.0" }, { versions: [1], app: "0.0.1" }];
+  const parsers = [
+    { valid: false, v: 1, minApp: undefined },
+    { valid: true, v: 2, minApp: undefined },
+    { valid: true, v: 1, minApp: "2.0.0" },
+    { valid: true, v: 1, minApp: "0.0.1" },
+    { valid: true, v: 1, minApp: undefined },
+  ];
+  let seen = new Set();
+  for (const parsed of parsers) for (const caps of capSets) for (const degraded of [false, true]) {
+    const want = oldRenderState(parsed, caps, degraded);
+    const got = classifyState(parsed, caps, degraded);
+    assert.equal(got, want, `matrix mismatch: ${JSON.stringify({ parsed, caps, degraded })}`);
+    seen.add(got);
+  }
+  assert.deepEqual([...seen].sort(), ["degraded", "invalid", "needs-app", "ok", "unsupported"], "all five states must be reachable");
+});
+
+test("classifyState: renderPlugin and core.stateOf both reuse it (issues + degraded preserved)", () => {
+  assert.equal(typeof classifyState, "function");
+  // renderPlugin 的 unsupported / needs-app 仍带原文 issue，degraded 保持
+  const { pkg, dir } = pkgDir("state-v2", { v: 2, contributes: {} });
+  const row2 = renderPlugin(parseManifest(pkg, dir), CAPS, LIVE0);
+  assert.equal(row2.state, "unsupported");
+  assert.deepEqual(row2.issues.find((i) => i.code === "unsupported-version"), {
+    path: "/dshGo/v", code: "unsupported-version", severity: "error",
+    message: "protocol v2 is not supported (app speaks 1)",
+  });
+  const { pkg: pkg2, dir: dir2 } = pkgDir("state-newapp", { v: 1, minApp: "9.9.9", contributes: {} });
+  const row3 = renderPlugin(parseManifest(pkg2, dir2), CAPS, LIVE0);
+  assert.equal(row3.state, "needs-app");
+  assert.deepEqual(row3.issues.find((i) => i.code === "needs-app"), {
+    path: "/dshGo/minApp", code: "needs-app", severity: "error",
+    message: "needs app 9.9.9 (have 0.10.0)",
+  });
+  const { pkg: pkg3, dir: dir3 } = pkgDir("state-deg", { v: 1, contributes: {} });
+  const row4 = renderPlugin(parseManifest(pkg3, dir3), CAPS, { ...LIVE0, degraded: true });
+  assert.equal(row4.state, "degraded");
+
+  // core.stateOf 走同一判定：无 caps 跳过 app 检查、有 caps 不跳过，degraded 经 health 生效
+  const host = fakeHost([{ dir: dir3 }]);
+  const core = new NativeCore(host.ctx, LIMITS, "state-test");
+  const name = pkg3.name;
+  assert.equal(core.stateOf(core.plugin(name)), "ok");
+  for (let i = 0; i < 5; i++) core.violation(name, "x", "y");
+  assert.equal(core.stateOf(core.plugin(name)), "degraded");
+  core.dispose();
 });
