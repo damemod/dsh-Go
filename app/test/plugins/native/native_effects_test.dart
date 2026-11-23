@@ -71,7 +71,10 @@ void main() {
         RefreshEffect,
         PatchEffect,
       ]);
-      expect((effects[4] as CommandEffect).line, '/compact summary');
+      expect(
+        effects.whereType<CommandEffect>().map((e) => e.line).toList(),
+        ['/compact', '/compact summary'],
+      );
       expect((effects[6] as OpenEffect).page, 'skills');
       expect((effects[7] as OpenEffect).panel, 'usage');
       expect((effects[11] as CloseEffect).panel, 'usage');
