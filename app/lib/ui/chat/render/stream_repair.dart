@@ -114,11 +114,12 @@ class _BlockScan {
       _fenceChar = fence.group(1)![0];
       _fenceLength = fence.group(1)!.length;
       _openFenceLine = offset;
-    } else if (line.trim().isEmpty || line.replaceAll(RegExp(r'[\s>]'), '').isEmpty) {
+    } else if (line.trim().isEmpty || !_nonQuoteText.hasMatch(line)) {
       lastBlockStart = offset + line.length + 1;
     }
   }
 
+  static final _nonQuoteText = RegExp(r'[^\s>]');
   static final _fence = RegExp(r'^[ \t]*(?:>[ \t]?)*[ \t]*(`{3,}|~{3,})(?!.*`)');
   static final _fenceClose = RegExp(r'^[ \t]*(?:>[ \t]?)*[ \t]*(`{3,}|~{3,})[ \t]*$');
 }
@@ -259,6 +260,7 @@ class _InlineScan {
   static const _closeBracket = 0x5d;
 
   final String text;
+  late final int _trimmedEnd = text.trimRight().length;
   final openers = <_Opener>[];
   int? openCode;
   int codeRun = 0;
@@ -309,7 +311,7 @@ class _InlineScan {
         used = true;
       }
     }
-    if (!used && text.substring(i + run).trim().isEmpty) dangling = i;
+    if (!used && i + run >= _trimmedEnd) dangling = i;
     return i + run;
   }
 
