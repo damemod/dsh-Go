@@ -111,6 +111,12 @@ abstract final class NativeLimits {
   /// to keep the two thresholds from drifting apart.
   static const copyMax = GeneratedNativeLimits.copyMax;
 
+  /// Strips and turn notes per plugin. The bridge trims each surface to
+  /// perPlugin['composer.strip'] / perPlugin['turn.note'] (manifest.js:137,147);
+  /// the app applies the same cap as a second line of defence.
+  static const stripPerPlugin = GeneratedNativeLimits.stripPerPlugin;
+  static const turnNotePerPlugin = GeneratedNativeLimits.turnNotePerPlugin;
+
   /// Effects run only this soon after the tap. App-only security window
   /// (protocol §7 "App / drop"); the bridge's effectWindowMs is declared but
   /// unused and is a WIDEN_IS_BAD gate field, so this stays hand-written.
@@ -513,7 +519,7 @@ NativePlugin _plugin(DshGoPlugin p, Set<String> features) {
   ];
 
   final strips = [
-    for (final s in p.strips.where((s) => s.ready).take(1))
+    for (final s in p.strips.where((s) => s.ready).take(NativeLimits.stripPerPlugin))
       NativeStrip(
         package: p.pkg,
         id: s.id,
@@ -552,7 +558,7 @@ NativePlugin _plugin(DshGoPlugin p, Set<String> features) {
   final menu = actions(NativeSurface.messageActions, p.messageActions, NativeLimits.menuLabelMax);
   final tools = actions(NativeSurface.composerTools, p.composerTools, NativeLimits.toolLabelMax);
   final sessionActions = actions(NativeSurface.sessionActions, p.sessionActions, NativeLimits.menuLabelMax);
-  final turnNotes = p.turnNotes.take(1).toList();
+  final turnNotes = p.turnNotes.take(NativeLimits.turnNotePerPlugin).toList();
   return NativePlugin(
     package: p.pkg,
     title: p.title,

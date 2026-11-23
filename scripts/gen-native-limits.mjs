@@ -42,6 +42,8 @@ const values = {
   stripTextMax: LIMITS.textChars.stripText,
   toastMax: LIMITS.textChars.toast,
   copyMax: LIMITS.copyChars,
+  stripPerPlugin: LIMITS.perPlugin['composer.strip'],
+  turnNotePerPlugin: LIMITS.perPlugin['turn.note'],
 }
 
 const lines = [

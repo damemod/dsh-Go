@@ -11,4 +11,6 @@ abstract final class GeneratedNativeLimits {
   static const int stripTextMax = 24;
   static const int toastMax = 40;
   static const int copyMax = 8000;
+  static const int stripPerPlugin = 1;
+  static const int turnNotePerPlugin = 1;
 }
