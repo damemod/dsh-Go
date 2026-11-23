@@ -780,7 +780,7 @@ Future<void> _runEffect(
       final ok = await showAppDialog<bool>(
         context: context,
         builder: (dialog) => AlertDialog(
-          title: Text(l10n.plugslotsReplaceConfirm(plugin.title)),
+          title: Text(l10n.plugslotsReplaceConfirm(title)),
           actions: [
             TextButton(onPressed: () => Navigator.pop(dialog, false), child: Text(l10n.commonCancel)),
             FilledButton(onPressed: () => Navigator.pop(dialog, true), child: Text(l10n.commonConfirm)),
