@@ -10,6 +10,9 @@ plugin-manager-cancel-tree-confirmation.diff
 preset-legacy-delegation.diff
 route-guard.diff
 client-hmr-closed-response.diff
+client-modules-combo-rebuild.diff
+client-modules-manifest-read.diff
+client-modules-combo-buffer.diff
 schemastery-json-context.diff
 session-title-word-prefix.diff
 str-editor-view-prefix.diff
@@ -116,6 +119,9 @@ zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-sqlite-document-count.diff
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-session-lifecycle-enumeration.diff
 jsonl-materialize-rename.diff
 jsonl-migration-link-fallback.diff
+jsonl-decoder-stream-buffer.diff
+jsonl-header-first-read.diff
+jsonl-frozen-live-event.diff
 attachment-link-fallback.diff
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-session-cold-hint-stat.diff
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-session-preset-resume-errors.diff
@@ -132,6 +138,7 @@ zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-phone-caller.diff
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-companion-signals.diff
 tool-author-annotation-keys.diff
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-phone-run-end.diff
+tool-schema-keyword-types.diff
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-phone-run-end-schema.diff
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-phone-run-end-retry.diff
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-phone-run-end-live-retry.diff
@@ -155,6 +162,7 @@ deepseek-refusal.diff
 deepseek-unnamed-stream-error.diff
 web-empty-reply-notice.diff
 profile-root-installation-precedence.diff
+office-converter-lazy.diff
 # HarmonyOS-only overlays (pins.json targetSets.ohos), after the whole common chain.
 ohos-attachment-publication.diff
 ohos-attachment-diagnostic.diff
