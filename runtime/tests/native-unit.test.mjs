@@ -137,6 +137,24 @@ test("effects: shorthand, whitelist, limits", () => {
   assert.ok(validate({ type: "refresh" }, { panels: new Set(["a"]), source: "a", static: true }).issue);
 });
 
+test("effects: replace is a handler effect with the insert ceiling, never static or deferred", () => {
+  const opts = { panels: new Set(["usage"]), source: "usage" };
+  // canonical + shorthand both carry the text through fromShorthand
+  let r = normalize([{ type: "replace", text: "all new" }, { replace: "整段替换" }], opts);
+  assert.deepEqual(r.effects, [
+    { type: "replace", text: "all new" },
+    { type: "replace", text: "整段替换" },
+  ]);
+  assert.equal(r.violation, false);
+  // reuses the insert ceiling (2000), not copy's 8000
+  r = normalize([{ replace: "x".repeat(LIMITS.insertChars + 1) }], opts);
+  assert.equal(r.effects.length, 0);
+  assert.equal(r.violation, true);
+  assert.equal(normalize({ replace: "ok" }, { ...opts, static: true }).effects.length, 0, "never a manifest-static effect");
+  assert.equal(normalize({ replace: "ok" }, { ...opts, deferred: true }).effects.length, 0, "v1: not a deferred effect");
+  assert.ok(validate({ type: "replace", text: "" }, opts).issue, "empty text rejected");
+});
+
 test("effects: close targets an own panel by id or tap source, handler-only", () => {
   const panels = new Set(["usage"]);
   // shorthand + explicit, with a panel tap source

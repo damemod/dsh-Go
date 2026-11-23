@@ -397,6 +397,8 @@ class NativePlugin {
   bool get wantsDraft => wants.contains('draft');
   bool get wantsClipboard => wants.contains('clipboard');
   bool get wantsMessage => wants.contains('message');
+  /// Consent to write back into the composer via the `replace` effect.
+  bool get wantsCompose => wants.contains('compose');
 
   bool get isEmpty =>
       composerTools.isEmpty &&
@@ -566,7 +568,7 @@ NativePlugin _plugin(DshGoPlugin p, Set<String> features) {
     version: p.version,
     wants: {
       for (final w in p.wants)
-        if (w == 'draft' || w == 'clipboard' || w == 'message') w,
+        if (w == 'draft' || w == 'clipboard' || w == 'message' || w == 'compose') w,
     },
     composerActions: List.unmodifiable(composer),
     messageActions: List.unmodifiable(menu),

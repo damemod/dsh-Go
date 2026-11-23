@@ -571,8 +571,8 @@ export interface Manifest {
   /** Display name, <= 24 characters after locale resolution. */
   title?: ManifestText
   icon?: ManifestIconName
-  /** Content attached to taps: draft/clipboard on composer.actions and composer.tools, message on message.actions. */
-  wants?: Array<"draft" | "clipboard" | "message">
+  /** Content attached to taps: draft/clipboard on composer.actions and composer.tools, message on message.actions. compose consents to the replace effect writing back into the composer. */
+  wants?: Array<"draft" | "clipboard" | "message" | "compose">
   /** Image directory served by GET /dsh-go/v1/assets/<pkg>/<path>. */
   assets?: ManifestRelativePath
   contributes: {
@@ -648,7 +648,7 @@ export interface InvokeResponse {
 
 export type InvokeError = ContributionsError
 
-export type InvokeEffect = InvokeInsert | InvokeCommand | InvokeOpen | InvokeLink | InvokeToast | InvokeCopy | InvokeRefresh | InvokePatch | InvokeClose | InvokeAudio | InvokeVoice | InvokeOverlay | InvokePickFile | InvokePickImage
+export type InvokeEffect = InvokeInsert | InvokeReplace | InvokeCommand | InvokeOpen | InvokeLink | InvokeToast | InvokeCopy | InvokeRefresh | InvokePatch | InvokeClose | InvokeAudio | InvokeVoice | InvokeOverlay | InvokePickFile | InvokePickImage
 
 /** Effects allowed in a manifest action's static `effect` (no refresh / patch). */
 export type InvokeStaticEffect = InvokeInsert | InvokeCommand | InvokeOpen | InvokeLink | InvokeToast | InvokeCopy
@@ -656,6 +656,12 @@ export type InvokeStaticEffect = InvokeInsert | InvokeCommand | InvokeOpen | Inv
 /** Put text into the composer at the cursor. Never sends. */
 export interface InvokeInsert {
   type: "insert"
+  text: string
+}
+
+/** Replace the composer's whole text, after explicit user consent and only if it has not changed since the tap. Never sends. */
+export interface InvokeReplace {
+  type: "replace"
   text: string
 }
 
@@ -818,7 +824,7 @@ export interface ContributionsPlugin {
   version: string
   title: string
   icon?: ContributionsIconName
-  wants: Array<"draft" | "clipboard" | "message">
+  wants: Array<"draft" | "clipboard" | "message" | "compose">
   state: "ok" | "degraded" | "unsupported" | "needs-app" | "invalid"
   /** state == ok */
   native: boolean

@@ -68,7 +68,7 @@ export const PLACEMENTS = ["session.tab", "features", "chat.panel", PLACEMENT_PL
 /** Only where the app says it draws them (`surfaces`): see placementFor in manifest.js. */
 export const NEGOTIATED_PLACEMENTS = [PLACEMENT_PLUGIN];
 export const PRESENTATIONS = ["page", "sheet"];
-export const WANTS = ["draft", "clipboard", "message"];
+export const WANTS = ["draft", "clipboard", "message", "compose"];
 export const TONES = ["good", "warn", "bad", "info", "muted"];
 export const SCOPE_KEYS = ["sessionId", "turnId", "messageId", "callId"];
 export const ID = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,39}$/;

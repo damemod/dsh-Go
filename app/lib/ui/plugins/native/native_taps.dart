@@ -57,6 +57,9 @@ abstract interface class NativeComposerHost {
   /// field. Never sends.
   void insert(String text);
 
+  /// Replaces the whole draft with [text] and focuses the field. Never sends.
+  void replace(String text);
+
   /// The chat screen's context while it is mounted: where a tap made in a
   /// sheet that has since closed carries on.
   BuildContext? get context;
@@ -305,7 +308,11 @@ Future<bool> runNativeTap(
   // What may travel with this tap, after asking once.
   final wants = switch (surface) {
     NativeSurface.composerActions ||
-    NativeSurface.composerTools => {if (plugin.wantsDraft) 'draft', if (plugin.wantsClipboard) 'clipboard'},
+    NativeSurface.composerTools => {
+      if (plugin.wantsDraft) 'draft',
+      if (plugin.wantsClipboard) 'clipboard',
+      if (plugin.wantsCompose) 'compose',
+    },
     NativeSurface.messageActions => {if (plugin.wantsMessage && message != null) 'message'},
     _ => const <String>{},
   };
@@ -369,6 +376,8 @@ Future<bool> runNativeTap(
       tappedAt: tappedAt,
       stream: conn == null ? null : stream,
       composer: composer,
+      draftAtTap: composer?.draft,
+      composeAuthorized: wants.contains('compose') && composer != null,
       invocation: DshGoInvocation(
         pkg: package,
         id: id,
@@ -435,6 +444,8 @@ Future<bool> _invoke(
   required DshGoStream? stream,
   required NativeComposerHost? composer,
   required DshGoInvocation invocation,
+  required String? draftAtTap,
+  required bool composeAuthorized,
 }) async {
   final l10n = context.l10n;
   final package = plugin.package;
@@ -510,6 +521,8 @@ Future<bool> _invoke(
       composer: composer,
       issues: issues,
       stillCurrent: () => guard.current,
+      draftAtTap: draftAtTap,
+      composeAuthorized: composeAuthorized,
     );
   }
   for (final effect in parsed.whereType<PickFileEffect>()) {
@@ -656,6 +669,8 @@ Future<bool> _invoke(
                 composer: composer,
                 issues: later,
                 stillCurrent: () => guard.current,
+                draftAtTap: draftAtTap,
+                composeAuthorized: composeAuthorized,
               );
             }
           default:
@@ -737,6 +752,8 @@ Future<void> _runEffect(
   NativeComposerHost? composer,
   required List<NativeIssue> issues,
   bool Function()? stillCurrent,
+  String? draftAtTap,
+  bool composeAuthorized = false,
 }) async {
   if (stillCurrent?.call() == false) return;
   final l10n = context.l10n;
@@ -745,6 +762,36 @@ Future<void> _runEffect(
   switch (effect) {
     case InsertEffect(:final text):
       insertIntoComposer(context, ref, text, sessionId: sessionId, composer: composer);
+    case ReplaceEffect(:final text):
+      // Three gates before a destructive whole-draft overwrite. The app is the
+      // only enforcement point: consent ack lives here, not on the bridge.
+      // composeAuthorized is false on static/file-callback paths, so replace
+      // cannot ride those in (defense in depth; the bridge already excludes it).
+      if (!composeAuthorized || composer == null) {
+        issues.add(NativeIssue('/effects', nativeIssueText('bad-effect'), code: 'bad-effect'));
+        break;
+      }
+      // Optimistic lock: refuse if the person typed anything after the tap.
+      if (draftAtTap == null || composer.draft != draftAtTap) {
+        issues.add(NativeIssue('/effects', l10n.plugslotsIssueReplaceDenied, code: 'bad-effect'));
+        break;
+      }
+      if (!context.mounted) break;
+      final ok = await showAppDialog<bool>(
+        context: context,
+        builder: (dialog) => AlertDialog(
+          title: Text(l10n.plugslotsReplaceConfirm(plugin.title)),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(dialog, false), child: Text(l10n.commonCancel)),
+            FilledButton(onPressed: () => Navigator.pop(dialog, true), child: Text(l10n.commonConfirm)),
+          ],
+        ),
+      );
+      // A cancelled confirm is the person's choice, not a plugin error.
+      // Re-check the draft after the dialog: they may have typed meanwhile.
+      if (ok == true && context.mounted && stillCurrent?.call() != false && composer.draft == draftAtTap) {
+        composer.replace(text);
+      }
     case CommandEffect(:final line):
       await runComposerCommand(context, ref, line, sessionId: sessionId);
     case OpenEffect(:final page?):
@@ -900,6 +947,8 @@ Future<bool> _askWants(BuildContext context, String title, Set<String> wants) as
       ? l10n.plugslotsWantsMessage(title)
       : wants.length > 1
       ? l10n.plugslotsWantsBoth(title)
+      : wants.contains('compose')
+      ? l10n.plugslotsWantsCompose(title)
       : wants.contains('draft')
       ? l10n.plugslotsWantsDraft(title)
       : l10n.plugslotsWantsClipboard(title);

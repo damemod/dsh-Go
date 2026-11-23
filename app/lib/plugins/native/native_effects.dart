@@ -24,6 +24,14 @@ final class InsertEffect extends NativeEffect {
   final String text;
 }
 
+/// Replace the composer's whole text with [text]. Never sent. The app runs this
+/// only after the `compose` want was consented to and the draft has not changed
+/// since the tap (see `_runEffect` in native_taps.dart); never a static effect.
+final class ReplaceEffect extends NativeEffect {
+  const ReplaceEffect(this.text);
+  final String text;
+}
+
 /// `/name args` in the current conversation.
 final class CommandEffect extends NativeEffect {
   const CommandEffect(this.name, {this.args});
@@ -132,7 +140,7 @@ List<NativeEffect> parseNativeEffects(List<Map<String, Object?>> effects, List<N
       type = raw.keys.single;
       final value = raw.values.single;
       body = switch (type) {
-        'insert' || 'toast' || 'copy' => {'text': value},
+        'insert' || 'replace' || 'toast' || 'copy' => {'text': value},
         'link' => {'url': value},
         'open' => value is String ? {'page': value} : _map(value),
         'command' => value is String ? {'name': value} : _map(value),
@@ -189,6 +197,13 @@ List<NativeEffect> parseNativeEffects(List<Map<String, Object?>> effects, List<N
           issues.add(NativeIssue('$pointer/text', l10n.plugslotsIssueMissing));
         } else {
           out.add(InsertEffect(_cut(t, UiSchema.sendTextMax, '$pointer/text', issues)));
+        }
+      case 'replace':
+        final t = text('text');
+        if (t == null) {
+          issues.add(NativeIssue('$pointer/text', l10n.plugslotsIssueMissing));
+        } else {
+          out.add(ReplaceEffect(_cut(t, UiSchema.sendTextMax, '$pointer/text', issues)));
         }
       case 'command':
         final name = text('name')?.trim().replaceFirst(RegExp('^/'), '');

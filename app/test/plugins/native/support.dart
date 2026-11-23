@@ -225,6 +225,9 @@ class FakeComposer implements NativeComposerHost {
   void insert(String text) => inserted.add(text);
 
   @override
+  void replace(String text) => draft = text;
+
+  @override
   BuildContext? get context => hostContext;
 }
 

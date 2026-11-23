@@ -15676,6 +15676,19 @@ class L10nEn extends L10n {
   String get plugslotsWantsWhen => 'Only when you tap it';
 
   @override
+  String plugslotsWantsCompose(String plugin) {
+    return '$plugin wants to replace your input text';
+  }
+
+  @override
+  String plugslotsReplaceConfirm(String plugin) {
+    return 'Let $plugin replace your input text? Your current text will be overwritten and this cannot be undone.';
+  }
+
+  @override
+  String get plugslotsIssueReplaceDenied => 'Input changed since the tap; replace skipped';
+
+  @override
   String get plugslotsAllow => 'Allow';
 
   @override

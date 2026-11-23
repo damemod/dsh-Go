@@ -31,10 +31,11 @@
         "enum": [
           "draft",
           "clipboard",
-          "message"
+          "message",
+          "compose"
         ]
       },
-      "description": "Content attached to taps: draft/clipboard on composer.actions and composer.tools, message on message.actions."
+      "description": "Content attached to taps: draft/clipboard on composer.actions and composer.tools, message on message.actions. compose consents to the replace effect writing back into the composer."
     },
     "assets": {
       "$ref": "#/$defs/relativePath",

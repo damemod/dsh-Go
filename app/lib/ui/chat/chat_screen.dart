@@ -2378,6 +2378,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     _focus.requestFocus();
   }
 
+  /// Replace the whole draft (used by the plugin `replace` effect, which has
+  /// already passed consent + unchanged-draft checks in native_taps.dart).
+  void _replaceText(String text) {
+    _input.value = TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
+    _focus.requestFocus();
+  }
+
   /// The activity strip: the running turn's trajectory.
   void _openRunningTrajectory(String sessionId) {
     final turn = ref.read(chatProvider(sessionId)).runningTurn?.turn;
@@ -2445,6 +2455,9 @@ class _ChatComposerHost implements NativeComposerHost {
 
   @override
   void insert(String text) => _state._insertText(text);
+
+  @override
+  void replace(String text) => _state._replaceText(text);
 
   @override
   BuildContext? get context => _state.mounted ? _state.context : null;

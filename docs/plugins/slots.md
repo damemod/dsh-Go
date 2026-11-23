@@ -39,7 +39,7 @@
 | `minApp` | 否 | `"x.y.z"`。App 低于它时原生部分不显示 |
 | `title` | 否 | 插件显示名，≤ 24 字；缺省用包名 |
 | `icon` | 否 | 图标名（见下）；不认识的画通用图标 |
-| `wants` | 否 | 点按时要附带的内容：`draft`（输入框文字）、`clipboard`（剪贴板）——只在 `composer.actions` 和 `composer.tools`；`message`（被长按的回复正文）——只在 `message.actions`。App 在第一次点按前问用户一次 |
+| `wants` | 否 | 点按时要附带的内容：`draft`（输入框文字）、`clipboard`（剪贴板）——只在 `composer.actions` 和 `composer.tools`；`message`（被长按的回复正文）——只在 `message.actions`；`compose`（授权 `replace` 整体替换输入框，不附带内容）——只在 `composer.actions` 和 `composer.tools`。App 在第一次点按前问用户一次 |
 | `assets` | 否 | 图片目录（相对包目录），给 `image` 组件用 |
 | `contributes` | 是 | 键是插槽名，值是数组 |
 
@@ -93,6 +93,7 @@ export function apply(ctx) {
 |---|---|
 | 一句固定的话放进输入框 | `composer.actions` + 静态 `effect`，不用写宿主代码 |
 | 读剪贴板 / 输入框再加工 | `composer.actions` + `wants` + `on(id)` |
+| 翻译 / 润色 / 纠错后写回输入框 | `wants: ["draft","compose"]` + handler 返回 `replace(text)`；须用户同意 compose、执行前再确认、且文字自点按后未变 |
 | 对某条回复做事：复制、存档、转发到别处 | `message.actions` + `wants: ["message"]` |
 | 一眼能看到的数字：用量、余额、上下文 | `composer.strip` + `strip(id)`，点开接 `panel` |
 | 一页信息：图表、明细、列表、按钮 | `panels` + `panel(id)` |

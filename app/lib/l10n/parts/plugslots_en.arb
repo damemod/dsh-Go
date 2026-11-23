@@ -61,6 +61,23 @@
     }
   },
   "plugslotsWantsWhen": "Only when you tap it",
+  "plugslotsWantsCompose": "{plugin} wants to replace your input text",
+  "@plugslotsWantsCompose": {
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  },
+  "plugslotsReplaceConfirm": "Let {plugin} replace your input text? Your current text will be overwritten and this cannot be undone.",
+  "@plugslotsReplaceConfirm": {
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  },
+  "plugslotsIssueReplaceDenied": "Input changed since the tap; replace skipped",
   "plugslotsAllow": "Allow",
   "plugslotsNoResponse": "{plugin} didn't respond",
   "@plugslotsNoResponse": {

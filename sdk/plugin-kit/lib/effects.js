@@ -4,6 +4,8 @@
 
 /** Put text into the composer at the cursor (1–2000 characters). Never sends. */
 export const insert = (text) => ({ type: 'insert', text })
+/** Replace the composer's whole text (1–2000 characters). Requires the `compose` want and a fresh, unchanged draft; never sends. */
+export const replace = (text) => ({ type: 'replace', text })
 /** Run a slash command in the current chat: command('compact'), command('goal', 'ship it'). */
 export const command = (name, args) => (args === undefined ? { type: 'command', name } : { type: 'command', name, args })
 /** Open an app page id (feature catalog) or `panel:<id>` of this plugin. */

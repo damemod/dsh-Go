@@ -80,7 +80,8 @@
             "enum": [
               "draft",
               "clipboard",
-              "message"
+              "message",
+              "compose"
             ]
           }
         },

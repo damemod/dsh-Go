@@ -8,10 +8,10 @@ export const STATIC_TYPES = new Set(["insert", "command", "open", "link", "toast
 // `close` targets one of the plugin's own panels by id (id, or the panel a tap came from),
 // exactly like refresh/patch: it is a handler effect, never a manifest-static one (a static
 // effect has no tap source and would run outside the panel's own route).
-export const ALL_TYPES = new Set([...STATIC_TYPES, "refresh", "patch", "close"]);
+export const ALL_TYPES = new Set([...STATIC_TYPES, "refresh", "patch", "close", "replace"]);
 /** What a deferred result may carry (protocol §4.7): no command / open / link / refresh. */
 export const DEFERRED_TYPES = new Set(["insert", "copy", "toast", "patch"]);
-const SHORTHAND = ["insert", "command", "open", "link", "toast", "copy", "refresh", "patch", "close"];
+const SHORTHAND = ["insert", "command", "open", "link", "toast", "copy", "refresh", "patch", "close", "replace"];
 const COMMAND = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$/;
 const PAGE = /^(panel:([A-Za-z0-9][A-Za-z0-9_.-]{0,39})|[a-z][a-z0-9-]{0,31})$/;
 const ID = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,39}$/;
@@ -33,7 +33,7 @@ export function expand(result) {
 
 function fromShorthand(key, v) {
   switch (key) {
-    case "insert": case "toast": case "copy": return { type: key, text: v };
+    case "insert": case "toast": case "copy": case "replace": return { type: key, text: v };
     case "link": return { type: "link", url: v };
     case "open": return { type: "open", page: v };
     case "command": return isPlainObject(v) ? { type: "command", name: v.name, args: v.args } : { type: "command", name: v };
@@ -59,10 +59,12 @@ export function validate(e, opts) {
   if (!allowed.has(e.type)) return bad(opts.deferred ? `${e.type} is not allowed in a deferred result (only insert, copy, toast, patch)` : `${e.type} is not allowed here`);
   const ownPanel = (id) => typeof id === "string" && ID.test(id) && opts.panels.has(id);
   switch (e.type) {
-    case "insert": case "copy": {
+    case "insert": case "copy": case "replace": {
       if (typeof e.text !== "string") return bad(`${e.type}.text must be a string`);
       const text = cleanBlock(e.text);
-      const max = e.type === "insert" ? LIMITS.insertChars : LIMITS.copyChars;
+      // replace reuses the insert ceiling (both write into the same composer);
+      // only copy has its own, larger ceiling. All three share this validation shape.
+      const max = e.type === "copy" ? LIMITS.copyChars : LIMITS.insertChars;
       if (text === "" || chars(text) > max) return bad(`${e.type}.text must be 1-${max} characters`);
       return { effect: { type: e.type, text } };
     }

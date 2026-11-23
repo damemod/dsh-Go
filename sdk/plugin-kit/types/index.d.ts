@@ -11,7 +11,7 @@ import type {
   ViewListComponent, ViewKeyValueComponent, ViewProgressComponent, ViewTableComponent, ViewActionsComponent,
   ViewImageComponent, ViewNodeBase,
   Manifest, ManifestAction, ManifestStrip, ManifestPanel, ManifestText,
-  InvokeEffect, InvokeStaticEffect, InvokeScope, InvokeInsert, InvokeCommand, InvokeOpen, InvokeLink,
+  InvokeEffect, InvokeStaticEffect, InvokeScope, InvokeInsert, InvokeReplace, InvokeCommand, InvokeOpen, InvokeLink,
   InvokeToast, InvokeCopy, InvokeClose, InvokeRefresh, InvokePatch, InvokePickFile, InvokePickImage, InvokeFileSelection,
   ContributionsIssue, ContributionsPlugin, StreamStripData,
 } from './schema.js'
@@ -78,6 +78,7 @@ export interface InvokeEvent {
 /** Shorthand results (protocol §2.2); several keys expand in key order. */
 export interface EffectShorthand {
   insert?: string
+  replace?: string
   toast?: string
   copy?: string
   link?: string
@@ -225,6 +226,7 @@ export function adaptView<T extends ViewNode>(view: T, caps: Partial<Caps> | und
 
 export namespace effects {
   function insert(text: string): InvokeInsert
+  function replace(text: string): InvokeReplace
   function command(name: string, args?: string): InvokeCommand
   function open(page: string): InvokeOpen
   function openPanel(id: string): InvokeOpen

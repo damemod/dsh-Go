@@ -164,6 +164,9 @@
           "$ref": "#/$defs/insert"
         },
         {
+          "$ref": "#/$defs/replace"
+        },
+        {
           "$ref": "#/$defs/command"
         },
         {
@@ -244,6 +247,24 @@
         }
       },
       "description": "Put text into the composer at the cursor. Never sends."
+    },
+    "replace": {
+      "type": "object",
+      "required": [
+        "type",
+        "text"
+      ],
+      "properties": {
+        "type": {
+          "const": "replace"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "description": "Replace the composer's whole text, after explicit user consent and only if it has not changed since the tap. Never sends."
     },
     "command": {
       "type": "object",

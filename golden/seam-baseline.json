@@ -1,8 +1,8 @@
 {
   "schema": 2,
   "source": {
-    "commit": "c1a84e3f833ad59ff07a5027994dae3935907a2d",
-    "tag": "v1.2.0"
+    "commit": "11ce7080d3028ab0db18726f7d2d87e2776c3306",
+    "tag": "11ce708"
   },
   "protocol": 1,
   "effects": {
@@ -23,6 +23,7 @@
       "open",
       "patch",
       "refresh",
+      "replace",
       "toast"
     ],
     "deferred": [

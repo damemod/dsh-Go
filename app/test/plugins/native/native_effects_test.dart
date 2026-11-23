@@ -37,6 +37,8 @@ void main() {
       final effects = parse([
         {'type': 'insert', 'text': 'Hello'},
         {'insert': '你好'},
+        {'type': 'replace', 'text': 'Whole new text'},
+        {'replace': '整段替换'},
         {'type': 'command', 'name': 'compact'},
         {
           'command': {'name': 'compact', 'args': 'summary'},
@@ -56,6 +58,8 @@ void main() {
       expect(effects.map((e) => e.runtimeType), [
         InsertEffect,
         InsertEffect,
+        ReplaceEffect,
+        ReplaceEffect,
         CommandEffect,
         CommandEffect,
         OpenEffect,
@@ -67,11 +71,11 @@ void main() {
         RefreshEffect,
         PatchEffect,
       ]);
-      expect((effects[3] as CommandEffect).line, '/compact summary');
-      expect((effects[4] as OpenEffect).page, 'skills');
-      expect((effects[5] as OpenEffect).panel, 'usage');
-      expect((effects[9] as CloseEffect).panel, 'usage');
-      expect((effects[10] as RefreshEffect).panel, 'usage');
+      expect((effects[4] as CommandEffect).line, '/compact summary');
+      expect((effects[6] as OpenEffect).page, 'skills');
+      expect((effects[7] as OpenEffect).panel, 'usage');
+      expect((effects[11] as CloseEffect).panel, 'usage');
+      expect((effects[12] as RefreshEffect).panel, 'usage');
     });
 
     test('nothing outside the list, and no unsafe forms', () {
@@ -100,13 +104,15 @@ void main() {
         {'toast': '第一行\n${'字' * 60}'},
         {'insert': 'x' * 2500},
         {'copy': 'y' * 9000},
+        {'replace': 'z' * 2500},
       ], issues);
       final toast = effects.first as ToastEffect;
       expect(toast.text.contains('\n'), isFalse);
       expect(toast.text.runes.length, NativeLimits.toastMax);
       expect((effects[1] as InsertEffect).text.length, 2000);
       expect((effects[2] as CopyEffect).text.runes.length, NativeLimits.copyMax);
-      expect(issues, hasLength(3));
+      expect((effects[3] as ReplaceEffect).text.length, 2000);
+      expect(issues, hasLength(4));
     });
   });
 

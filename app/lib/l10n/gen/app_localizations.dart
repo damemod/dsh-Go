@@ -27470,6 +27470,24 @@ abstract class L10n {
   /// **'只在点按它时读取'**
   String get plugslotsWantsWhen;
 
+  /// No description provided for @plugslotsWantsCompose.
+  ///
+  /// In zh, this message translates to:
+  /// **'「{plugin}」要替换你输入的文字'**
+  String plugslotsWantsCompose(String plugin);
+
+  /// No description provided for @plugslotsReplaceConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'让「{plugin}」替换你输入的文字？当前文字会被覆盖，且无法撤销。'**
+  String plugslotsReplaceConfirm(String plugin);
+
+  /// No description provided for @plugslotsIssueReplaceDenied.
+  ///
+  /// In zh, this message translates to:
+  /// **'点按后输入框内容已变化，已跳过替换'**
+  String get plugslotsIssueReplaceDenied;
+
   /// No description provided for @plugslotsAllow.
   ///
   /// In zh, this message translates to:

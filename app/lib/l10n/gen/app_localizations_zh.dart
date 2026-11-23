@@ -14895,6 +14895,19 @@ class L10nZh extends L10n {
   String get plugslotsWantsWhen => '只在点按它时读取';
 
   @override
+  String plugslotsWantsCompose(String plugin) {
+    return '「$plugin」要替换你输入的文字';
+  }
+
+  @override
+  String plugslotsReplaceConfirm(String plugin) {
+    return '让「$plugin」替换你输入的文字？当前文字会被覆盖，且无法撤销。';
+  }
+
+  @override
+  String get plugslotsIssueReplaceDenied => '点按后输入框内容已变化，已跳过替换';
+
+  @override
   String get plugslotsAllow => '允许';
 
   @override

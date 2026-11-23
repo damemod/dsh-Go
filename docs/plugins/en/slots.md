@@ -39,7 +39,7 @@ Tool cards (`presentationMeta`) take no slot and need no manifest: see the [Quic
 | `minApp` | no | `"x.y.z"`. On older apps the native part is not shown |
 | `title` | no | Display name, ≤ 24 characters; defaults to the package name |
 | `icon` | no | An icon name (below); unknown names draw a generic icon |
-| `wants` | no | What taps carry: `draft` (composer text) and `clipboard` — `composer.actions` and `composer.tools` only; `message` (the long-pressed reply's text) — `message.actions` only. The app asks the person once before the first tap |
+| `wants` | no | What taps carry: `draft` (composer text) and `clipboard` — `composer.actions` and `composer.tools` only; `message` (the long-pressed reply's text) — `message.actions` only; `compose` (authorizes `replace` to overwrite the composer, carries no content) — `composer.actions` and `composer.tools` only. The app asks the person once before the first tap |
 | `assets` | no | Image directory (relative to the package) for the `image` component |
 | `contributes` | yes | Slot name → array |
 
@@ -93,6 +93,7 @@ The bridge contains throws, 3 s timeouts and malformed returns and counts a viol
 |---|---|
 | A fixed sentence into the composer | `composer.actions` + a static `effect`, no host code |
 | To transform the clipboard or the draft | `composer.actions` + `wants` + `on(id)` |
+| To translate / polish / correct and write back into the composer | `wants: ["draft","compose"]` + handler returns `replace(text)`; needs compose consent, a confirm before each replace, and an unchanged draft since the tap |
 | To act on one reply: copy, archive, send elsewhere | `message.actions` + `wants: ["message"]` |
 | A number always in sight: usage, balance, context | `composer.strip` + `strip(id)`, opening a `panel` |
 | A page: charts, details, lists, buttons | `panels` + `panel(id)` |
