@@ -227,7 +227,7 @@ class _InlineScan {
       } else if (c == _closeBracket && brackets.isNotEmpty) {
         final label = brackets.removeLast();
         if (i + 1 < n && text.codeUnitAt(i + 1) == _openParen) {
-          final close = text.indexOf(_linkTargetEnd, i + 2);
+          final close = _linkTargetEnd.allMatches(text, i + 2).firstOrNull?.start ?? -1;
           if (close == -1 || text[close] == '\n') {
             if (label > 0 && text[label - 1] == '!') {
               openImage = label - 1;
@@ -338,9 +338,12 @@ class _InlineScan {
   }
 }
 
+final _inlineRepairMarker = RegExp(r'[`*_~\[<]');
+
 /// Closes what the last block left open: emphasis, a code span, a link
 /// destination; holds back a half-written image or HTML tag.
 String _repairInline(String tail) {
+  if (!_inlineRepairMarker.hasMatch(tail)) return tail;
   var text = tail;
   var scan = _InlineScan(text);
   // Each cut can expose another unfinished marker (`**a *` → `**a`).
