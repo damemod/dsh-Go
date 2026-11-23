@@ -84,6 +84,7 @@ zzzzzzzzzzzz-plugin-update-hmr-selection.diff
 zzzzzzzzzzzzz-plan-failed-command-pending.diff
 zzzzzzzzzzzzz-plugin-update-hmr-precondition.diff
 zzzzzzzzzzzzzz-plugin-manager-lock-lifetime.diff
+plugin-manager-execa-lazy.diff
 zzzzzzzzzzzzzzz-read-line-surrogate.diff
 zzzzzzzzzzzzzzz-workflow-result-unicode.diff
 zzzzzzzzzzzzzzzz-read-line-cr-truncation.diff
@@ -129,6 +130,7 @@ attachment-direct-boundary.diff
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-companion-recall-gates.diff
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-phone-caller.diff
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-companion-signals.diff
+tool-author-annotation-keys.diff
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-phone-run-end.diff
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-phone-run-end-schema.diff
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-phone-run-end-retry.diff

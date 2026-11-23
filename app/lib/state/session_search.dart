@@ -207,7 +207,6 @@ SessionSearchResults deriveSessionSearchResults({
   }
 
   List<SessionSearchResult> section(List<SessionSummary> members, bool isArchived) {
-    final byId = {for (final s in members) s.sessionId: s};
     final local = <SessionSummary>[];
     for (final s in members) {
       final title = s.title?.trim() ?? '';
@@ -223,6 +222,8 @@ SessionSearchResults deriveSessionSearchResults({
       for (final s in local)
         SessionSearchResult(session: s, archived: isArchived, byTitle: true, snippet: snippets[s.sessionId]),
     ];
+    if (snippets.isEmpty) return results;
+    final byId = {for (final s in members) s.sessionId: s};
     final included = {for (final s in local) s.sessionId};
     for (final MapEntry(key: id, value: snippet) in snippets.entries) {
       final s = byId[id];
@@ -591,7 +592,7 @@ bool _isLowSurrogate(int unit) => unit >= 0xDC00 && unit <= 0xDFFF;
     return (text: bestText, occurrences: bestOccurrences);
   }
 
-  final hits = <({SessionSummary session, int tier, int occurrences, int length, String snippet})>[];
+  final hits = <({SessionSummary session, int tier, int occurrences, int length, String text})>[];
   for (final session in sessions) {
     if (session.blank || session.isSubagent) continue;
     final entry = corpus[session.sessionId];
@@ -604,7 +605,7 @@ bool _isLowSurrogate(int unit) => unit >= 0xDC00 && unit <= 0xDFFF;
         tier: 0,
         occurrences: singleUser.occurrences,
         length: singleUser.text.length,
-        snippet: buildSearchSnippet(singleUser.text, distinctTerms),
+        text: singleUser.text,
       ));
       continue;
     }
@@ -616,7 +617,7 @@ bool _isLowSurrogate(int unit) => unit >= 0xDC00 && unit <= 0xDFFF;
         tier: 1,
         occurrences: multiUser.occurrences,
         length: multiUser.text.length,
-        snippet: buildSearchSnippet(multiUser.text, distinctTerms),
+        text: multiUser.text,
       ));
       continue;
     }
@@ -628,7 +629,7 @@ bool _isLowSurrogate(int unit) => unit >= 0xDC00 && unit <= 0xDFFF;
         tier: 2,
         occurrences: singleAssistant.occurrences,
         length: singleAssistant.text.length,
-        snippet: buildSearchSnippet(singleAssistant.text, distinctTerms),
+        text: singleAssistant.text,
       ));
       continue;
     }
@@ -640,7 +641,7 @@ bool _isLowSurrogate(int unit) => unit >= 0xDC00 && unit <= 0xDFFF;
         tier: 2,
         occurrences: combinedAll.occurrences,
         length: combinedAll.text.length,
-        snippet: buildSearchSnippet(combinedAll.text, distinctTerms),
+        text: combinedAll.text,
       ));
     }
   }
@@ -659,7 +660,10 @@ bool _isLowSurrogate(int unit) => unit >= 0xDC00 && unit <= 0xDFFF;
 
   final hasMore = hits.length > limit;
   return (
-    items: [for (final hit in hits.take(limit)) (sessionId: hit.session.sessionId, snippet: hit.snippet)],
+    items: [
+      for (final hit in hits.take(limit))
+        (sessionId: hit.session.sessionId, snippet: buildSearchSnippet(hit.text, distinctTerms)),
+    ],
     hasMore: hasMore,
   );
 }
@@ -750,7 +754,7 @@ Future<({List<ContentHit> items, bool hasMore})?> _searchHostUserCorpus(Ref ref,
     if (guestFs != null) {
       final file = guestFs.file('${GuestFs.dshHome}/storages/session_projcache/sessions/${s.sessionId}.json');
       try {
-        final stat = file.statSync();
+        final stat = await file.stat();
         if (stat.type == FileSystemEntityType.file) {
           final key = file.path;
           final cached = _localCheckpointCache[key];
@@ -758,7 +762,7 @@ Future<({List<ContentHit> items, bool hasMore})?> _searchHostUserCorpus(Ref ref,
           if (cached != null && cached.length == stat.size && cached.modified == stat.modified) {
             diskEntry = cached.entry;
           } else {
-            diskEntry = extractCheckpointJsonSearchCorpus(file.readAsStringSync());
+            diskEntry = extractCheckpointJsonSearchCorpus(await file.readAsString());
             if (_localCheckpointCache.length >= 512) {
               _localCheckpointCache.remove(_localCheckpointCache.keys.first);
             }
