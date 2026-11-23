@@ -757,6 +757,7 @@ Future<void> _runEffect(
 }) async {
   if (stillCurrent?.call() == false) return;
   final l10n = context.l10n;
+  final title = ref.read(nativePluginTitleProvider(plugin.package));
   composer ??= NativeComposerScope.maybeOf(context);
   final sessionId = scope.sessionId ?? composer?.sessionId;
   switch (effect) {
