@@ -105,6 +105,12 @@ abstract final class NativeLimits {
   /// A toast.
   static const toastMax = GeneratedNativeLimits.toastMax;
 
+  /// Copied text from a `copy` effect. The bridge rejects effects beyond
+  /// LIMITS.copyChars (effects.js:66); the app caps to the same threshold.
+  /// Both sides hold this one protocol constant, so mirror it from the bridge
+  /// to keep the two thresholds from drifting apart.
+  static const copyMax = GeneratedNativeLimits.copyMax;
+
   /// Effects run only this soon after the tap. App-only security window
   /// (protocol §7 "App / drop"); the bridge's effectWindowMs is declared but
   /// unused and is a WIDEN_IS_BAD gate field, so this stays hand-written.

@@ -242,7 +242,7 @@ List<NativeEffect> parseNativeEffects(List<Map<String, Object?>> effects, List<N
         if (t is! String || t.isEmpty) {
           issues.add(NativeIssue('$pointer/text', l10n.plugslotsIssueMissing));
         } else {
-          out.add(CopyEffect(_cut(t, 8000, '$pointer/text', issues)));
+          out.add(CopyEffect(_cut(t, NativeLimits.copyMax, '$pointer/text', issues)));
         }
       case 'close':
         out.add(CloseEffect(panel: text('id')));

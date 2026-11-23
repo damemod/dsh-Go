@@ -94,17 +94,19 @@ void main() {
       expect(issues.map((i) => i.pointer).toSet(), hasLength(10), reason: 'each issue says where');
     });
 
-    test('long texts are cut, a toast to one line of 40', () {
+    test('long texts are cut, a toast to one line of 40, a copy to the limit', () {
       final issues = <NativeIssue>[];
       final effects = parse([
         {'toast': '第一行\n${'字' * 60}'},
         {'insert': 'x' * 2500},
+        {'copy': 'y' * 9000},
       ], issues);
       final toast = effects.first as ToastEffect;
       expect(toast.text.contains('\n'), isFalse);
       expect(toast.text.runes.length, NativeLimits.toastMax);
-      expect((effects.last as InsertEffect).text.length, 2000);
-      expect(issues, hasLength(2));
+      expect((effects[1] as InsertEffect).text.length, 2000);
+      expect((effects[2] as CopyEffect).text.runes.length, NativeLimits.copyMax);
+      expect(issues, hasLength(3));
     });
   });
 

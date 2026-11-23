@@ -41,6 +41,7 @@ const values = {
   panelsPerPlugin: LIMITS.perPlugin.panels,
   stripTextMax: LIMITS.textChars.stripText,
   toastMax: LIMITS.textChars.toast,
+  copyMax: LIMITS.copyChars,
 }
 
 const lines = [

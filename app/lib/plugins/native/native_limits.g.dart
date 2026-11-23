@@ -10,4 +10,5 @@ abstract final class GeneratedNativeLimits {
   static const int panelsPerPlugin = 4;
   static const int stripTextMax = 24;
   static const int toastMax = 40;
+  static const int copyMax = 8000;
 }
