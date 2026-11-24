@@ -21,6 +21,10 @@ import 'usage_net.dart';
 
 export 'usage_ledger.dart' show UsageCount;
 
+/// Where a token figure came from. Companion reports settle through
+/// [UsageStatsController.tokenUsage]; counting still obeys the switch.
+enum UsageTokenSource { chatLog, tavern, companion, engine }
+
 class UsageStatsState {
   const UsageStatsState({this.loaded = false, this.enabled = false, this.noticed = false});
 
@@ -169,6 +173,16 @@ class UsageStatsController extends Notifier<UsageStatsState> {
   /// A model reply reported its tokens: [input] (cached input included) and
   /// [output]. Only what the provider said; nothing is estimated.
   void tokens(int input, int output) => _record((ledger, now) => ledger.tokens(input, output, now));
+
+  /// A provider reported usage for one request. Only the token figures the
+  /// provider actually stated are counted; [source] and [partial] describe
+  /// the origin but do not change whether counting is enabled.
+  void tokenUsage(UsageTokenSource source, Map<String, Object?>? rawUsage, {bool partial = false}) {
+    final input = rawUsage?['inputTokens'];
+    final output = rawUsage?['outputTokens'];
+    if (input is! int || output is! int) return;
+    tokens(input, output);
+  }
 
   /// The host's plugin list was read: [installed] plugins on it.
   void plugins(int installed) => _record((ledger, now) => ledger.plugins(installed, now));
