@@ -42,41 +42,8 @@ class MainActivity : FlutterActivity() {
      * notifications. Plugins are registered once, with the engine.
      */
     override fun provideFlutterEngine(context: Context): FlutterEngine {
-        val cache = FlutterEngineCache.getInstance()
-        cache.get(ENGINE_ID)?.let { return it }
-        return FlutterEngine(applicationContext).also { engine ->
-            engine.plugins.add(RuntimePlugin())
-            engine.plugins.add(PhonePlugin())
-            engine.plugins.add(NotifyPlugin())
-            engine.plugins.add(FilesPlugin())
-            engine.plugins.add(LinksPlugin())
-            engine.plugins.add(UpdatePlugin())
-            engine.plugins.add(VoicePlugin())
-            engine.plugins.add(SharePlugin())
-            engine.plugins.add(ShortcutsPlugin())
-            engine.plugins.add(io.github.ccch1mneyyy.dsh_app.diagnostics.DiagnosticsPlugin())
-            engine.plugins.add(io.github.ccch1mneyyy.dsh_app.media.MediaPlugin())
-            engine.plugins.add(io.github.ccch1mneyyy.dsh_app.media.MediaVideoPlugin())
-            engine.plugins.add(io.github.ccch1mneyyy.dsh_app.icons.LauncherIconPlugin())
-            engine.plugins.add(io.github.ccch1mneyyy.dsh_app.theme.DynamicColorPlugin())
-            engine.plugins.add(io.github.ccch1mneyyy.dsh_app.performance.PerformancePlugin())
-            engine.plugins.add(io.github.ccch1mneyyy.dsh_app.pet.PetOverlayPlugin())
-            engine.plugins.add(io.github.ccch1mneyyy.dsh_app.islands.IslandsPlugin())
-            engine.plugins.add(io.github.ccch1mneyyy.dsh_app.nativemedia.NativeMediaPlugin())
-            engine.plugins.add(io.github.ccch1mneyyy.dsh_app.nativefiles.NativeFilesPlugin())
-            engine.plugins.add(io.github.ccch1mneyyy.dsh_app.web.WebFilesPlugin())
-            engine.plugins.add(io.github.ccch1mneyyy.dsh_app.launch.LaunchPlugin())
-            engine.plugins.add(io.github.ccch1mneyyy.dsh_app.launch.LaunchClipPlugin())
-            engine.plugins.add(io.github.ccch1mneyyy.dsh_app.icons.PictureShortcutPlugin())
-            engine.plugins.add(io.github.ccch1mneyyy.dsh_app.usage.UsagePlugin())
-            engine.plugins.add(io.github.ccch1mneyyy.dsh_app.companion.CompanionVoicePlugin())
-            engine.plugins.add(io.github.ccch1mneyyy.dsh_app.speech.SpeechPlugin())
-            engine.plugins.add(io.github.ccch1mneyyy.dsh_app.companion.CompanionWidgetPlugin())
-            engine.dartExecutor.executeDartEntrypoint(DartExecutor.DartEntrypoint.createDefault())
-            cache.put(ENGINE_ID, engine)
-        }
+        return DshFlutterEngine.getOrCreate(context)
     }
-
     override fun shouldDestroyEngineWithHost(): Boolean = false
 
     /**
