@@ -200,6 +200,16 @@ class UsageStatsController extends Notifier<UsageStatsState> {
   /// off: returns null so every settle() is a no-op and nothing is recorded.
   void Function(UsageOutcome, {UsageOperation? actual})? beginOperation(UsageOperation kind) => null;
 
+  /// Upstream chat state asks whether chat-log usage is observed. The fork's
+  /// gate keeps collection off by default, so this is always false: no v4
+  /// ledger, no daily-activity collection, no network request.
+  bool get observesChatLogUsage => false;
+
+  /// Upstream chat state settles a reported chat-log usage. Zero-collect:
+  /// the fork does not observe chat-log usage, so this is a no-op.
+  void chatLogUsage(Map<String, Object?>? rawUsage,
+      {bool partial = false, required bool local}) {}
+
   /// The host's plugin list was read: [installed] plugins on it.
   void plugins(int installed) => _record((ledger, now) => ledger.plugins(installed, now));
 
