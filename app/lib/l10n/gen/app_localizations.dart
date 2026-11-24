@@ -23276,13 +23276,11 @@ abstract class L10n {
   /// **'一会儿不碰就收起卡片、收成小球；关着时只在你点按时收起'**
   String get phoneAutoCollapseHint;
 
-
   /// No description provided for @phoneEdgeGlow.
   ///
   /// In zh, this message translates to:
   /// **'屏幕边缘光效'**
   String get phoneEdgeGlow;
-
 
   /// No description provided for @phoneEdgeGlowHint.
   ///
@@ -23290,13 +23288,11 @@ abstract class L10n {
   /// **'操控时屏幕四周的流光'**
   String get phoneEdgeGlowHint;
 
-
   /// No description provided for @phoneSystemIsland.
   ///
   /// In zh, this message translates to:
   /// **'用系统灵动岛显示'**
   String get phoneSystemIsland;
-
 
   /// No description provided for @phoneSystemIslandHint.
   ///
@@ -23304,13 +23300,11 @@ abstract class L10n {
   /// **'小米超级岛、ColorOS 流体云、荣耀 MagicOS 上，操作进度放进系统的灵动岛，不再出悬浮条'**
   String get phoneSystemIslandHint;
 
-
   /// No description provided for @phoneSystemIslandOff.
   ///
   /// In zh, this message translates to:
   /// **'要先在通知设置里打开「实时活动」，没打开时仍用悬浮条'**
   String get phoneSystemIslandOff;
-
 
   /// No description provided for @phoneSystemIslandUnsupported.
   ///
@@ -32108,13 +32102,11 @@ abstract class L10n {
   /// **'悬浮条,收起,悬浮球'**
   String get searchKwPhoneAutoCollapse;
 
-
   /// No description provided for @searchKwPhoneEdgeGlow.
   ///
   /// In zh, this message translates to:
   /// **'边缘光,光效,流光,特效,边框'**
   String get searchKwPhoneEdgeGlow;
-
 
   /// No description provided for @searchKwPhoneSystemIsland.
   ///
