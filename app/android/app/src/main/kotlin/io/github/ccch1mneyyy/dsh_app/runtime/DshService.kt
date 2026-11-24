@@ -25,6 +25,8 @@ import io.github.ccch1mneyyy.dsh_app.phone.PhoneControl
 /** Foreground service that keeps the local DSH process alive in the background. */
 class DshService : Service() {
 
+    private val protection by lazy { AndroidBackgroundProtection.get(this) }
+    private var locationForeground = false
     private var wakeLock: PowerManager.WakeLock? = null
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
     private var networkWatch: NetworkAccess.Watch? = null
@@ -38,6 +40,7 @@ class DshService : Service() {
         val controller = RuntimeController.get(this)
         when (intent?.action) {
             ACTION_INSTALL -> {
+                protection.detach(this)
                 controller.clearServiceRecovery()
                 // First unpack or an upgrade: keep the process (and the CPU) up until it is done.
                 ensureChannel(this)
@@ -100,6 +103,7 @@ class DshService : Service() {
                     val expected = if (intent.hasExtra(EXTRA_STOP_GENERATION))
                         intent.getIntExtra(EXTRA_STOP_GENERATION, -1) else null
                     if (controller.stopProcess(expected, intent.getStringExtra(EXTRA_STOP_OWNER))) {
+                        protection.detach(this)
                         running = false
                         stopForegroundCompat()
                     }
@@ -110,6 +114,7 @@ class DshService : Service() {
                 val notification = buildNotification(this, controller)
                 foreground(notification)
                 running = true
+                protection.attach(this)
                 acquireWakeLock()
                 registerNetworkCallback(controller)
                 logBackgroundPolicy(controller)
@@ -122,6 +127,7 @@ class DshService : Service() {
     }
 
     override fun onDestroy() {
+        protection.detach(this)
         running = false
         installSink?.let { RuntimeController.get(this).removeSink(it) }
         installSink = null
@@ -137,13 +143,22 @@ class DshService : Service() {
         super.onDestroy()
     }
 
-    private fun foreground(notification: Notification) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
-        } else {
+    private fun foreground(notification: Notification, location: Boolean = locationForeground) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             startForeground(NOTIFICATION_ID, notification)
+            return
         }
+        val baseType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+        } else ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE
+        val locationType = if (location) ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION else 0
+        startForeground(NOTIFICATION_ID, notification, baseType or locationType)
     }
+
+    internal fun setLocationForeground(enabled: Boolean): Boolean = runCatching {
+        foreground(buildNotification(this, RuntimeController.get(this)), location = enabled)
+        locationForeground = enabled
+    }.isSuccess
 
     private fun registerNetworkCallback(controller: RuntimeController) {
         if (networkCallback != null) return
@@ -213,6 +228,7 @@ class DshService : Service() {
          * PendingIntent: a newer task's button never rewrites the one still on screen. */
         fun phoneStopIntent(context: Context, taskId: Long): Intent = Intent(context, DshService::class.java)
             .setAction(ACTION_PHONE_STOP).setData(Uri.fromParts(PHONE_TASK_SCHEME, taskId.toString(), null))
+
         /** 暂停 ([pause]) or 继续 for exactly [taskId], from the live activity. */
         fun phonePauseIntent(context: Context, taskId: Long, pause: Boolean): Intent = Intent(context, DshService::class.java)
             .setAction(ACTION_PHONE_PAUSE).setData(Uri.fromParts(PHONE_TASK_SCHEME, taskId.toString(), null)).putExtra(EXTRA_PAUSE, pause)

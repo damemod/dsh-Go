@@ -8,175 +8,39 @@
   "plugslotsSurfacePanel": "面板",
   "plugslotsNativeUi": "原生界面",
   "plugslotsIssueCount": "{count} 项有误",
-  "@plugslotsIssueCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "plugslotsAllGood": "正常",
   "plugslotsViewSize": "视图 {size}",
-  "@plugslotsViewSize": {
-    "placeholders": {
-      "size": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsInvokeMs": "响应 {ms} ms",
-  "@plugslotsInvokeMs": {
-    "placeholders": {
-      "ms": {
-        "type": "int"
-      }
-    }
-  },
   "plugslotsLastView": "最近视图",
   "plugslotsLastInvoke": "最近响应",
   "plugslotsProblems": "问题",
   "plugslotsNoProblems": "没有问题",
   "plugslotsWantsDraft": "「{plugin}」要读取输入框",
-  "@plugslotsWantsDraft": {
-    "placeholders": {
-      "plugin": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsWantsClipboard": "「{plugin}」要读取剪贴板",
-  "@plugslotsWantsClipboard": {
-    "placeholders": {
-      "plugin": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsWantsBoth": "「{plugin}」要读取输入框和剪贴板",
-  "@plugslotsWantsBoth": {
-    "placeholders": {
-      "plugin": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsWantsWhen": "只在点按它时读取",
-  "plugslotsWantsCompose": "「{plugin}」要替换你输入的文字",
-  "@plugslotsWantsCompose": {
-    "placeholders": {
-      "plugin": {
-        "type": "String"
-      }
-    }
-  },
-  "plugslotsReplaceConfirm": "让「{plugin}」替换你输入的文字？当前文字会被覆盖，且无法撤销。",
-  "@plugslotsReplaceConfirm": {
-    "placeholders": {
-      "plugin": {
-        "type": "String"
-      }
-    }
-  },
-  "plugslotsIssueReplaceDenied": "点按后输入框内容已变化，已跳过替换",
   "plugslotsAllow": "允许",
   "plugslotsNoResponse": "「{plugin}」没有响应",
-  "@plugslotsNoResponse": {
-    "placeholders": {
-      "plugin": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsFailed": "「{plugin}」出错了",
-  "@plugslotsFailed": {
-    "placeholders": {
-      "plugin": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsNeedsChat": "先打开一个对话",
   "plugslotsFromPlugin": "来自「{plugin}」",
-  "@plugslotsFromPlugin": {
-    "placeholders": {
-      "plugin": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsPanelOffline": "连不上插件",
   "plugslotsIssueTooMany": "最多 {max} 个，其余不显示",
-  "@plugslotsIssueTooMany": {
-    "placeholders": {
-      "max": {
-        "type": "int"
-      }
-    }
-  },
   "plugslotsIssueTrimmed": "超过 {max} 字，已截断",
-  "@plugslotsIssueTrimmed": {
-    "placeholders": {
-      "max": {
-        "type": "int"
-      }
-    }
-  },
   "plugslotsIssueNeedsApp": "需要 DSH Go {version} 或更新版本",
-  "@plugslotsIssueNeedsApp": {
-    "placeholders": {
-      "version": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsIssueNewerProtocol": "需要更新 App",
   "plugslotsIssueUnknownIcon": "不认识的图标，已换成默认图标",
   "plugslotsIssueUnknownEffect": "不支持的效果「{name}」",
-  "@plugslotsIssueUnknownEffect": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsIssueLate": "点按 3 秒后才返回，已忽略",
   "plugslotsIssueHttps": "只支持 https 链接",
   "plugslotsIssueUnknownPage": "没有「{page}」这个页面",
-  "@plugslotsIssueUnknownPage": {
-    "placeholders": {
-      "page": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsIssueThrottled": "提示太频繁，已略过",
   "plugslotsIssueInvoke": "调用失败：{message}",
-  "@plugslotsIssueInvoke": {
-    "placeholders": {
-      "message": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsIssueStream": "数据出错：{message}",
-  "@plugslotsIssueStream": {
-    "placeholders": {
-      "message": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsIssueMissing": "缺少必填项",
   "plugslotsIssueDuplicate": "id 重复，已略过",
   "plugslotsIssueNoPlacement": "没有可放的位置",
   "plugslotsWantsMessage": "「{plugin}」要读取这条回复",
-  "@plugslotsWantsMessage": {
-    "placeholders": {
-      "plugin": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsCodeInvalidManifest": "声明有误，原生部分已停用",
   "plugslotsCodeInvalidField": "格式不对，已略过",
   "plugslotsCodeUnknownField": "不认识的字段，已忽略",
@@ -188,13 +52,6 @@
   "plugslotsCodeViewFile": "视图文件读不出",
   "plugslotsCodeBadEffect": "动作格式不对，已略过",
   "plugslotsCodeViolation": "出错 {count} 次",
-  "@plugslotsCodeViolation": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "plugslotsCodeDegraded": "出错太多，已停用到下次启动",
   "plugslotsCodeTimeout": "插件没有及时响应",
   "plugslotsCodeRateLimited": "点得太快了",
@@ -210,26 +67,12 @@
   "plugslotsCodeTooManyPending": "还有两件没做完",
   "plugslotsCodeNoStream": "连接断了",
   "plugslotsVoiceAsk": "允许「{plugin}」听你开口？",
-  "@plugslotsVoiceAsk": {
-    "placeholders": {
-      "plugin": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsVoiceWhen": "朗读时你一开口就停。声音只在手机上判断，不保存、不上传",
   "plugslotsVoiceDeny": "不允许",
   "plugslotsVoiceSwitch": "听你开口",
   "plugslotsPickerUnavailable": "此设备暂不支持文件选择",
   "plugslotsPickerBusy": "请先完成当前文件选择",
   "plugslotsPickerLimit": "最多选 {count} 个文件，单个 8 MiB，总计 16 MiB",
-  "@plugslotsPickerLimit": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "plugslotsPickerFailed": "文件未能交给插件，请重试",
   "plugslotsWebPlacesTitle": "网页版界面",
   "plugslotsPlaceBesideComposer": "输入框旁",
@@ -246,9 +89,166 @@
   "plugslotsPlaceUnknown": "它的网页界面",
   "plugslotsChatEntry": "插件",
   "plugslotsChatWebFrom": "网页插件 · {names}",
+  "plugslotsIssueReplaceDenied": "点按后输入框内容已变化，已跳过替换",
+  "plugslotsReplaceConfirm": "让「{plugin}」替换你输入的文字？当前文字会被覆盖，且无法撤销。",
+  "plugslotsWantsCompose": "「{plugin}」要替换你输入的文字",
+  "@plugslotsIssueCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@plugslotsViewSize": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsInvokeMs": {
+    "placeholders": {
+      "ms": {
+        "type": "int"
+      }
+    }
+  },
+  "@plugslotsWantsDraft": {
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsWantsClipboard": {
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsWantsBoth": {
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsNoResponse": {
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsFailed": {
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsFromPlugin": {
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsIssueTooMany": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "@plugslotsIssueTrimmed": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "@plugslotsIssueNeedsApp": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsIssueUnknownEffect": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsIssueUnknownPage": {
+    "placeholders": {
+      "page": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsIssueInvoke": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsIssueStream": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsWantsMessage": {
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsCodeViolation": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@plugslotsVoiceAsk": {
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsPickerLimit": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "@plugslotsChatWebFrom": {
     "placeholders": {
       "names": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsReplaceConfirm": {
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsWantsCompose": {
+    "placeholders": {
+      "plugin": {
         "type": "String"
       }
     }

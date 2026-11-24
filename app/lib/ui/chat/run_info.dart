@@ -328,7 +328,8 @@ class RunActivity {
 }
 
 /// [runActivityOf] of a conversation, worked out once per chat update for the
-/// activity strip and the pet alike.
+/// activity strip and the pet alike. Its titles are in the language of the
+/// moment: the app invalidates it after switching [appL10n].
 final runActivityProvider = Provider.autoDispose.family<RunActivity?, String>(
   (ref, sessionId) => ref.watch(chatProvider(sessionId).select(runActivityOf)),
 );
@@ -454,8 +455,8 @@ RunActivity? runActivityOf(ChatState s) {
           since: openSince((sp) => sp.callId == item.callId) ?? openSince((sp) => sp.kind == TraceKind.model),
         );
       case AssistantChatItem(:final streaming, :final text, :final reasoning) when streaming:
-        final writing = text.trim().isNotEmpty;
-        final thinking = reasoning.trim().isNotEmpty;
+        final writing = text.trimLeft().isNotEmpty;
+        final thinking = reasoning.trimLeft().isNotEmpty;
         return make(
           writing
               ? ActivityKind.writing
@@ -508,7 +509,7 @@ RunActivity compactionActivity(ChatState s, DateTime since) {
 String? narrationOf(List<ChatItem> items) {
   for (final item in items.reversed) {
     if (item is UserChatItem) return null;
-    if (item is AssistantChatItem && item.text.trim().isNotEmpty) {
+    if (item is AssistantChatItem && item.text.trimLeft().isNotEmpty) {
       return extractNarration(item.text);
     }
   }

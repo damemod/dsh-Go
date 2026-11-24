@@ -8,9 +8,9 @@ import { dirname, isAbsolute, join } from "node:path";
 import { performance } from "node:perf_hooks";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { ID, LIMITS, PKG, PROTOCOL, TONES, ICON } from "./limits.js";
-import { classifyState, parseManifest, renderPlugin } from "./manifest.js";
+import { parseManifest, renderPlugin } from "./manifest.js";
 import {
-  call, chars, cleanLine, deepEqual, errorText, isPlainObject, mergeApply, mergeDiff,
+  call, chars, cleanLine, compareSemver, deepEqual, errorText, isPlainObject, mergeApply, mergeDiff,
   normalizeScope, sanitizeNotes, scopeMatches, shortHash, toJson, truncateChars, withoutNulls,
 } from "./util.js";
 
@@ -218,7 +218,12 @@ export class NativeCore {
 
   /** ok | degraded | unsupported | needs-app | invalid; caps undefined skips app checks. */
   stateOf(rec, caps) {
-    return classifyState(rec.parsed, caps, this.health.get(rec.pkg)?.degraded === true);
+    const p = rec.parsed;
+    if (!p.valid) return "invalid";
+    if (p.v !== PROTOCOL || (caps && !caps.versions.includes(p.v))) return "unsupported";
+    if (caps && p.minApp !== undefined && compareSemver(caps.app, p.minApp) < 0) return "needs-app";
+    if (this.health.get(rec.pkg)?.degraded) return "degraded";
+    return "ok";
   }
 
   /** The contributions response body (memoized per state and caps). */

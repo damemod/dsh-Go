@@ -25,6 +25,19 @@ export 'usage_ledger.dart' show UsageCount;
 /// [UsageStatsController.tokenUsage]; counting still obeys the switch.
 enum UsageTokenSource { chatLog, tavern, companion, engine }
 
+/// Wire-level operation labels required by upstream connection/host callers.
+/// Defined locally so no v4 ledger / daily-activity collector is pulled in.
+enum UsageOperation {
+  runtimeDirect, runtimeProot, runtimeOther,
+  sshInitial, sshReconnect, relayInitial, relayReconnect,
+  chatTurnLocal, chatTurnRemote, chatFirstTextLocal, chatFirstTextRemote,
+  phoneTask, updateDownload, updateInstall, callConnect, callSession,
+  pluginInstall, pluginExecute, onboardingLocal, onboardingRemote, onboardingTavern,
+  crash, anr;
+}
+
+enum UsageOutcome { ready, failed, cancelled, unknown }
+
 class UsageStatsState {
   const UsageStatsState({this.loaded = false, this.enabled = false, this.noticed = false});
 
@@ -183,6 +196,9 @@ class UsageStatsController extends Notifier<UsageStatsState> {
     if (input is! int || output is! int) return;
     tokens(input, output);
   }
+  /// Upstream callers begin an operation and settle it later. Collection stays
+  /// off: returns null so every settle() is a no-op and nothing is recorded.
+  void Function(UsageOutcome, {UsageOperation? actual})? beginOperation(UsageOperation kind) => null;
 
   /// The host's plugin list was read: [installed] plugins on it.
   void plugins(int installed) => _record((ledger, now) => ledger.plugins(installed, now));

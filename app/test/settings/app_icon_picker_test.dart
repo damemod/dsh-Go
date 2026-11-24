@@ -302,22 +302,14 @@ void main() {
         final frame = await (await ui.instantiateImageCodec(bytes)).getNextFrame();
         return (await frame.image.toByteData())!;
       });
+      // Inside the body (108 grid (53.5, 70)), at 4 px per unit.
+      final at = (280 * 432 + 214) * 4;
+      final pixel = [for (var i = 0; i < 4; i++) rgba!.getUint8(at + i)];
       final mono = AppIconArt.of(AppIcon.ink).mono!;
-      // The shipped glyph is now a thin blue-violet outline. Its opaque pixels
-      // are few and scattered, so check the tint across the whole glyph layer
-      // instead of one hard-coded point: opaque glyph pixels must exist, and
-      // their colour must be a cool tint close to the preview's mono colour.
-      var opaque = 0;
-      var tinted = 0;
-      for (var p = 0; p < rgba!.lengthInBytes; p += 4) {
-        if (rgba.getUint8(p + 3) < 250) continue;
-        opaque++;
-        final r = rgba.getUint8(p), g = rgba.getUint8(p + 1), b = rgba.getUint8(p + 2);
-        if (b > r && b > g && (r - (mono.r * 255).round()).abs() < 90) tinted++;
-      }
-      expect(opaque, greaterThan(0), reason: 'the shipped glyph has visible pixels');
-      expect(tinted / opaque, greaterThan(0.5),
-          reason: 'glyph pixels are a cool tint near the preview mono colour');
+      expect(pixel[3], 255);
+      expect(pixel[0], closeTo((mono.r * 255).round(), 2));
+      expect(pixel[1], closeTo((mono.g * 255).round(), 2));
+      expect(pixel[2], closeTo((mono.b * 255).round(), 2));
     });
   });
 

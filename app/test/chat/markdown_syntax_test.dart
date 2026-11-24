@@ -43,6 +43,11 @@ void main() {
       expect(normalizeMath(r'$5 and $10, but $x^2$ is maths'), r'$5 and $10, but \(x^2\) is maths');
     });
 
+    test('a scan with no delimiter changes reuses its input', () {
+      final source = '${'正文 ' * 100}${r'cost $5 and $10; run `echo $HOME $PATH`'}';
+      expect(normalizeMath(source, streaming: true), same(source));
+    });
+
     test('escaped dollars are literal', () {
       expect(normalizeMath(r'cost \$5 and \$10'), r'cost \$5 and \$10');
       expect(normalizeMath(r'$\$5 + x$'), r'\(\$5 + x\)');
@@ -207,6 +212,19 @@ void main() {
     test('a bare rule stays a rule', () {
       expect(blankLineBeforeTables('标题\n---'), '标题\n---');
     });
+  });
+
+  test('prepareTables is one pass of blankLineBeforeTables then boldTableHeaders', () {
+    for (final source in [
+      '清单：\n| a | b |\n|---|---|\n| 1 | 2 |',
+      // The blank above the second header cuts the first one off its delimiter.
+      '| x | y |\n|---|---|\n|---|---|',
+      '| a | b |\n|---|---|\n|---|---|\n|---|---|',
+    ]) {
+      expect(prepareTables(source), boldTableHeaders(blankLineBeforeTables(source)));
+    }
+    expect(prepareTables('| x | y |\n|---|---|\n|---|---|'), '| x | y |\n\n|**---**|**---**|\n|---|---|');
+  });
 
   test('stream updates prepare only the live tail and preserve whole-reply syntax', () {
     String whole(String input) => prepareTables(normalizeMath(fenceBareDshUiViews(input), streaming: true));
@@ -237,6 +255,13 @@ void main() {
     check('$sealed```sh\necho "\$HOME"\n| A | B |\n|---|---|\n');
     expect(lengths, isEmpty, reason: 'an open code body passes through preparation unchanged');
 
+    // A list step's fence indented up to three spaces is trusted like a flush one.
+    const step = '1. Run:\n\n   ```sh\n   echo "\$HOME"\n   ```\n\n';
+    check(sealed + step);
+    lengths.clear();
+    check('$sealed${step}red');
+    expect(lengths, [3]);
+
     for (final (start, more) in [
       ('prefix ```inline\n```dart\nx\n```\n\n', r'tail $x$'),
       ('cost \$a\\\n~~~\$\nx\n~~~\n\n', r'tail $x$'),
@@ -252,6 +277,5 @@ void main() {
       check(sealed + start + more);
     }
     check(r'Replaced with $y$.');
-  });
   });
 }

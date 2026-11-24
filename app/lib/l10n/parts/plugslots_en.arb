@@ -8,175 +8,39 @@
   "plugslotsSurfacePanel": "Panels",
   "plugslotsNativeUi": "Native UI",
   "plugslotsIssueCount": "{count, plural, =1{1 problem} other{{count} problems}}",
-  "@plugslotsIssueCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "plugslotsAllGood": "No problems",
   "plugslotsViewSize": "View {size}",
-  "@plugslotsViewSize": {
-    "placeholders": {
-      "size": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsInvokeMs": "{ms} ms",
-  "@plugslotsInvokeMs": {
-    "placeholders": {
-      "ms": {
-        "type": "int"
-      }
-    }
-  },
   "plugslotsLastView": "Last view",
   "plugslotsLastInvoke": "Last response",
   "plugslotsProblems": "Problems",
   "plugslotsNoProblems": "No problems",
   "plugslotsWantsDraft": "{plugin} wants to read your draft",
-  "@plugslotsWantsDraft": {
-    "placeholders": {
-      "plugin": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsWantsClipboard": "{plugin} wants to read your clipboard",
-  "@plugslotsWantsClipboard": {
-    "placeholders": {
-      "plugin": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsWantsBoth": "{plugin} wants to read your draft and clipboard",
-  "@plugslotsWantsBoth": {
-    "placeholders": {
-      "plugin": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsWantsWhen": "Only when you tap it",
-  "plugslotsWantsCompose": "{plugin} wants to replace your input text",
-  "@plugslotsWantsCompose": {
-    "placeholders": {
-      "plugin": {
-        "type": "String"
-      }
-    }
-  },
-  "plugslotsReplaceConfirm": "Let {plugin} replace your input text? Your current text will be overwritten and this cannot be undone.",
-  "@plugslotsReplaceConfirm": {
-    "placeholders": {
-      "plugin": {
-        "type": "String"
-      }
-    }
-  },
-  "plugslotsIssueReplaceDenied": "Input changed since the tap; replace skipped",
   "plugslotsAllow": "Allow",
   "plugslotsNoResponse": "{plugin} didn't respond",
-  "@plugslotsNoResponse": {
-    "placeholders": {
-      "plugin": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsFailed": "{plugin} ran into a problem",
-  "@plugslotsFailed": {
-    "placeholders": {
-      "plugin": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsNeedsChat": "Open a chat first",
   "plugslotsFromPlugin": "From {plugin}",
-  "@plugslotsFromPlugin": {
-    "placeholders": {
-      "plugin": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsPanelOffline": "Can't reach the plugin",
   "plugslotsIssueTooMany": "Up to {max}; the rest are hidden",
-  "@plugslotsIssueTooMany": {
-    "placeholders": {
-      "max": {
-        "type": "int"
-      }
-    }
-  },
   "plugslotsIssueTrimmed": "Over {max} characters; shortened",
-  "@plugslotsIssueTrimmed": {
-    "placeholders": {
-      "max": {
-        "type": "int"
-      }
-    }
-  },
   "plugslotsIssueNeedsApp": "Needs DSH Go {version} or later",
-  "@plugslotsIssueNeedsApp": {
-    "placeholders": {
-      "version": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsIssueNewerProtocol": "Needs a newer app",
   "plugslotsIssueUnknownIcon": "Unknown icon; using the default",
   "plugslotsIssueUnknownEffect": "Unsupported effect \"{name}\"",
-  "@plugslotsIssueUnknownEffect": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsIssueLate": "Came back more than 3 s after the tap; ignored",
   "plugslotsIssueHttps": "Only https links",
   "plugslotsIssueUnknownPage": "No page called \"{page}\"",
-  "@plugslotsIssueUnknownPage": {
-    "placeholders": {
-      "page": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsIssueThrottled": "Notices too frequent; skipped",
   "plugslotsIssueInvoke": "Call failed: {message}",
-  "@plugslotsIssueInvoke": {
-    "placeholders": {
-      "message": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsIssueStream": "Data failed: {message}",
-  "@plugslotsIssueStream": {
-    "placeholders": {
-      "message": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsIssueMissing": "Missing a required field",
   "plugslotsIssueDuplicate": "Duplicate id; skipped",
   "plugslotsIssueNoPlacement": "Nowhere to show it",
   "plugslotsWantsMessage": "{plugin} wants to read this reply",
-  "@plugslotsWantsMessage": {
-    "placeholders": {
-      "plugin": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsCodeInvalidManifest": "The declaration is invalid; native parts are off",
   "plugslotsCodeInvalidField": "Wrong format; skipped",
   "plugslotsCodeUnknownField": "Unknown field; ignored",
@@ -188,13 +52,6 @@
   "plugslotsCodeViewFile": "Couldn't read the view file",
   "plugslotsCodeBadEffect": "Malformed action; skipped",
   "plugslotsCodeViolation": "Failed {count, plural, =1{once} other{{count} times}}",
-  "@plugslotsCodeViolation": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "plugslotsCodeDegraded": "Too many errors; off until the next start",
   "plugslotsCodeTimeout": "The plugin didn't answer in time",
   "plugslotsCodeRateLimited": "Tapped too fast",
@@ -210,26 +67,12 @@
   "plugslotsCodeTooManyPending": "Two are still running",
   "plugslotsCodeNoStream": "The connection dropped",
   "plugslotsVoiceAsk": "Let {plugin} hear you speak?",
-  "@plugslotsVoiceAsk": {
-    "placeholders": {
-      "plugin": {
-        "type": "String"
-      }
-    }
-  },
   "plugslotsVoiceWhen": "Reading stops the moment you speak. Your voice is checked on this phone, never saved or sent",
   "plugslotsVoiceDeny": "Don't allow",
   "plugslotsVoiceSwitch": "Hear you speak",
   "plugslotsPickerUnavailable": "File selection is unavailable on this device",
   "plugslotsPickerBusy": "Finish the current file selection first",
   "plugslotsPickerLimit": "Up to {count} files, 8 MiB each and 16 MiB total",
-  "@plugslotsPickerLimit": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "plugslotsPickerFailed": "Could not share the files with this plugin. Try again",
   "plugslotsWebPlacesTitle": "In DSH Web",
   "plugslotsPlaceBesideComposer": "Beside the composer",
@@ -245,5 +88,162 @@
   "plugslotsPlaceElsewhere": "Elsewhere",
   "plugslotsPlaceUnknown": "Its web interface",
   "plugslotsChatEntry": "Plugins",
-  "plugslotsChatWebFrom": "Web plugins · {names}"
+  "plugslotsChatWebFrom": "Web plugins · {names}",
+  "plugslotsIssueReplaceDenied": "Input changed since the tap; replace skipped",
+  "plugslotsReplaceConfirm": "Let {plugin} replace your input text? Your current text will be overwritten and this cannot be undone.",
+  "plugslotsWantsCompose": "{plugin} wants to replace your input text",
+  "@plugslotsIssueCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@plugslotsViewSize": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsInvokeMs": {
+    "placeholders": {
+      "ms": {
+        "type": "int"
+      }
+    }
+  },
+  "@plugslotsWantsDraft": {
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsWantsClipboard": {
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsWantsBoth": {
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsNoResponse": {
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsFailed": {
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsFromPlugin": {
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsIssueTooMany": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "@plugslotsIssueTrimmed": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "@plugslotsIssueNeedsApp": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsIssueUnknownEffect": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsIssueUnknownPage": {
+    "placeholders": {
+      "page": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsIssueInvoke": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsIssueStream": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsWantsMessage": {
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsCodeViolation": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@plugslotsVoiceAsk": {
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsPickerLimit": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@plugslotsReplaceConfirm": {
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  },
+  "@plugslotsWantsCompose": {
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  }
 }

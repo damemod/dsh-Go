@@ -159,7 +159,6 @@
   "botsDuplicateHint": "Same settings, fresh chat and memory",
   "botsDuplicateNamed": "Duplicate {name}?",
   "botsDuplicateBody": "The new Bot keeps its job, instructions and model settings, starts with a fresh chat and personal memory, and gets its name from the host. When a model is available, it opens with a greeting.",
-  "@botsDuplicateNamed": {"placeholders": {"name": {"type": "String"}}},
   "botsChooseModelStart": "Choose a model to start",
   "botsNoChats": "No chats yet",
   "botsUnreadCount": "{count, plural, =1{1 unread} other{{count} unread}}",
@@ -197,13 +196,6 @@
   "botsPickTwoBots": "Pick at least two bots",
   "botsFullText": "Full text",
   "botsTextPartial": "Showing the first {count} characters",
-  "@botsTextPartial": {
-    "placeholders": {
-      "count": {
-        "type": "String"
-      }
-    }
-  },
   "botsTextCompletenessUnknown": "Couldn’t confirm this is the complete text",
   "botsRoomGone": "This group chat is gone",
   "botsNamedSpeaking": "{name} is speaking",
@@ -317,9 +309,9 @@
   "botsPetChange": "Change pet",
   "botsPetHideHour": "Hide for 1 hour",
   "botsPetSettings": "Pet settings",
-  "botsPetLumi": "Lumi",
-  "botsPetMia": "Mia",
-  "botsPetKira": "Kira",
+  "botsPetDeepy": "Deepy",
+  "botsPetWhaleGirl": "Whale girl",
+  "botsPetPinkFish": "Pink fish",
   "botsPetNone": "None",
   "botsPets": "Pets",
   "botsPetSource": "Original assets of this fork",
@@ -371,6 +363,7 @@
   "botsKeySlash": "Slash",
   "botsKeyDash": "Hyphen",
   "botsTerminal": "Terminal",
+  "botsTerminalShowKeyboard": "Show keyboard",
   "botsTerminalRename": "Rename terminal",
   "botsTerminalName": "Terminal name",
   "botsTerminalRenameFailed": "Couldn’t rename",
@@ -436,15 +429,32 @@
   "botsRelayLimitInvalid": "Enter a whole number from 1 to 200.",
   "botsRelayLimitRestore": "Restore default",
   "botsRelayLimitConnectionChanged": "The connection changed. Close this sheet and open it again.",
+  "botsMobileUnsupportedTitle": "DS Bot isn't on mobile yet",
+  "botsMobileApiRequired": "Use it in DSH Web for now",
+  "botsMobileApiMissing": "Not on mobile yet. Use it in DSH Web for now",
+  "botsCreationConnectionChanged": "The connection changed. Reopen this form to create on the current host.",
+  "botsPetKira": "Kira",
+  "botsPetLumi": "Lumi",
+  "botsPetMia": "Mia",
+  "@botsDuplicateNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@botsTextPartial": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "@botsRelayLimitDefault": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
-  },
-  "botsMobileUnsupportedTitle": "DS Bot isn't on mobile yet",
-  "botsMobileApiRequired": "Use it in DSH Web for now",
-  "botsMobileApiMissing": "Not on mobile yet. Use it in DSH Web for now",
-  "botsCreationConnectionChanged": "The connection changed. Reopen this form to create on the current host."
+  }
 }

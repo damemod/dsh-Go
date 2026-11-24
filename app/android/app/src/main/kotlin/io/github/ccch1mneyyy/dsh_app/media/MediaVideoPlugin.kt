@@ -20,7 +20,6 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.view.TextureRegistry
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileDescriptor
 import java.io.FileInputStream
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
@@ -41,6 +40,7 @@ class MediaVideoPlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallH
     private var focusListener: AudioManager.OnAudioFocusChangeListener? = null
     private class Clip(val producer: TextureRegistry.SurfaceProducer, val player: MediaPlayer) {
         var prepared = false
+        var rotation: Int? = null
         var pending: MethodChannel.Result? = null
         var timeout: Runnable? = null
     }
@@ -111,11 +111,24 @@ class MediaVideoPlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallH
             player = MediaPlayer()
             val p = player
             val surface = producer
-            var rotation = 0
             val id = surface.id()
             val clip = Clip(surface, p).also { it.pending = result }
+            if (surface.handlesCropAndRotation()) clip.rotation = 0
+            // Answers once the player is prepared and the rotation is known, in either order.
+            fun publish() {
+                val rotation = clip.rotation ?: return
+                if (!clip.prepared) return
+                clip.timeout?.let(main::removeCallbacks)
+                val pending = clip.pending
+                clip.pending = null
+                pending?.success(mapOf("texture" to id, "width" to p.videoWidth, "height" to p.videoHeight, "durationMs" to p.duration, "rotation" to rotation))
+            }
             clips[id] = clip
-            val timeout = Runnable { if (clip.pending != null) close(id, "timeout") }
+            val timeout = Runnable {
+                // A prepared player still opens; an unread rotation just falls back to none.
+                if (clip.pending == null) return@Runnable
+                if (clip.prepared) { clip.rotation = clip.rotation ?: 0; publish() } else close(id, "timeout")
+            }
             clip.timeout = timeout
             main.postDelayed(timeout, 20_000)
             surface.setCallback(object : TextureRegistry.SurfaceProducer.Callback {
@@ -133,15 +146,15 @@ class MediaVideoPlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallH
                 if (it.videoWidth <= 0 || it.videoHeight <= 0) { close(id, "unsupported"); return@setOnPreparedListener }
                 clip.prepared = true
                 surface.setSize(it.videoWidth, it.videoHeight)
-                clip.timeout?.let(main::removeCallbacks)
-                val pending = clip.pending
-                clip.pending = null
-                pending?.success(mapOf("texture" to id, "width" to it.videoWidth, "height" to it.videoHeight, "durationMs" to it.duration, "rotation" to rotation))
+                publish()
             }
-            FileInputStream(path!!).use {
-                p.setDataSource(it.fd)
-                if (!surface.handlesCropAndRotation()) rotation = videoRotation(it.fd)
-            }
+            FileInputStream(path!!).use { p.setDataSource(it.fd) }
+            // A container without an index can take a full scan: read it off the platform thread, on its
+            // own thread so a stale scan never delays the next video.
+            if (clip.rotation == null) Thread({
+                val rotation = videoRotation(path)
+                main.post { if (clips[id] === clip) { clip.rotation = rotation; publish() } }
+            }, "dsh-video-rotation").apply { isDaemon = true }.start()
             p.setSurface(surface.surface)
             p.prepareAsync()
         } catch (_: Exception) {
@@ -155,10 +168,10 @@ class MediaVideoPlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallH
     }
 
     /** Display dimensions already include rotation; only the untransformed texture needs it. */
-    private fun videoRotation(fd: FileDescriptor): Int = runCatching {
+    private fun videoRotation(path: String): Int = runCatching {
         val retriever = MediaMetadataRetriever()
         try {
-            retriever.setDataSource(fd)
+            retriever.setDataSource(path)
             when (val rotation = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)?.toIntOrNull() ?: 0) {
                 90, 180, 270 -> rotation
                 else -> 0

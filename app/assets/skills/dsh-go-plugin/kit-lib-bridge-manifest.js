@@ -255,20 +255,6 @@ function placementFor(placement, caps) {
 }
 
 /**
- * The five plugin states, in one place (protocol §7/§11/§12). `caps` may be
- * undefined: app/version-negotiation checks are skipped then (core.stateOf's
- * documented contract), while protocol-v and health degradation still apply.
- * Pure: it never records issues — callers that render a row add those.
- */
-export function classifyState(parsed, caps, degraded) {
-  if (!parsed.valid) return "invalid";
-  if (parsed.v !== PROTOCOL || (caps && !caps.versions.includes(parsed.v))) return "unsupported";
-  if (caps && parsed.minApp !== undefined && compareSemver(caps.app, parsed.minApp) < 0) return "needs-app";
-  if (degraded) return "degraded";
-  return "ok";
-}
-
-/**
  * Plugin row of the contributions response. `caps`: { versions: number[], app, locale, surfaces };
  * `live`: { panels: Map id->{data:boolean}, strips: Set, handlers: Set, degraded: boolean,
  * runtimeIssues: issue[] }.
@@ -284,11 +270,16 @@ export function renderPlugin(parsed, caps, live) {
     issues.push(issue(path, "too-long", "warn", `exceeds ${max} characters for locale ${caps.locale || "default"}; truncated`));
     return truncateChars(s, max);
   };
-  const state = classifyState(parsed, caps, live.degraded);
-  if (state === "unsupported") {
+  let state = "ok";
+  if (!parsed.valid) state = "invalid";
+  else if (parsed.v !== PROTOCOL || !caps.versions.includes(parsed.v)) {
+    state = "unsupported";
     issues.push(issue(ptr("v"), "unsupported-version", "error", `protocol v${parsed.v} is not supported (app speaks ${caps.versions.join(",")})`));
-  } else if (state === "needs-app") {
+  } else if (parsed.minApp !== undefined && compareSemver(caps.app, parsed.minApp) < 0) {
+    state = "needs-app";
     issues.push(issue(ptr("minApp"), "needs-app", "error", `needs app ${parsed.minApp} (have ${caps.app})`));
+  } else if (live.degraded) {
+    state = "degraded";
   }
   const row = {
     pkg: parsed.pkg,

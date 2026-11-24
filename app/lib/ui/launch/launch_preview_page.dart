@@ -102,7 +102,7 @@ class _LaunchPreviewPageState extends State<LaunchPreviewPage> {
   void dispose() {
     _timer?.cancel();
     _c.removeListener(_follow);
-    // 提前关闭（返回）：不留 timer，并释放画面播放器。
+    // Closed early (back): no timer left behind, and the picture's player is released.
     _c.gone();
     super.dispose();
   }
