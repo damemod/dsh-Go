@@ -7235,7 +7235,8 @@ class L10nEn extends L10n {
   String get engineSubscriptionPlanNotEnabled => 'This grant does not allow ChatGPT subscription models.';
 
   @override
-  String get engineSubscriptionRevocationUnconfirmed => 'Signed out on this phone, but OpenAI revocation could not be confirmed.';
+  String get engineSubscriptionRevocationUnconfirmed =>
+      'Signed out on this phone, but OpenAI revocation could not be confirmed.';
 
   @override
   String get engineProvidersSubscription => 'Subscriptions';
@@ -13161,7 +13162,34 @@ class L10nEn extends L10n {
   String get phoneAutoCollapse => 'Collapse when idle';
 
   @override
-  String get phoneAutoCollapseHint => 'Shrinks to a ball; tap to open';
+  String get phoneAutoCollapseHint =>
+      'Left alone, the card closes and the bar shrinks to a ball; off, only when you tap';
+
+
+  @override
+  String get phoneEdgeGlow => 'Screen edge glow';
+
+
+  @override
+  String get phoneEdgeGlowHint => 'Light round the screen while DSH works';
+
+
+  @override
+  String get phoneSystemIsland => 'Show in the system island';
+
+
+  @override
+  String get phoneSystemIslandHint =>
+      'On HyperOS, ColorOS and MagicOS, progress goes into the system\'s own island instead of the floating bar';
+
+
+  @override
+  String get phoneSystemIslandOff =>
+      'Turn on Live activity in the notification settings first; until then the floating bar shows';
+
+
+  @override
+  String get phoneSystemIslandUnsupported => 'This phone has no system island to use; the floating bar shows';
 
   @override
   String get phoneDeveloperOptions => 'Developer options';
@@ -18364,6 +18392,14 @@ class L10nEn extends L10n {
 
   @override
   String get searchKwPhoneAutoCollapse => 'floating bar,collapse,bubble';
+
+
+  @override
+  String get searchKwPhoneEdgeGlow => 'edge glow,glow,light,effect,border';
+
+
+  @override
+  String get searchKwPhoneSystemIsland => 'island,dynamic island,live updates,floating bar,capsule';
 
   @override
   String get searchKwPhoneReturn => 'return,come back';
