@@ -60,10 +60,62 @@ void main() {
       expect((LauncherEntry.parse({'kind': 'chat', 'sessionId': 's2'}) as OpenChatEntry).host, HostRef.local);
     });
 
+    test("a companion phone task's way back is her room or the app as it was, never a chat", () {
+      final room = LauncherEntry.parse({'kind': 'chat', 'sessionId': 'companion:room:t1:r1', 'host': HostRef.local.encode()});
+      expect(room, isA<OpenCompanionEntry>().having((e) => e.room, 'room', isTrue));
+      final floating = LauncherEntry.parse({'kind': 'chat', 'sessionId': 'companion:floating:t1:r1'});
+      expect(floating, isA<OpenCompanionEntry>().having((e) => e.room, 'room', isFalse));
+    });
+
+    test("her full-mode session's way back is her room too; other chats stay chats", () {
+      bool hers(HostRef host, String id) => host == HostRef.local && id == 's-hers';
+      final back = LauncherEntry.parse({'kind': 'chat', 'sessionId': 's-hers'})!.forCompanion(hers);
+      expect(back, isA<OpenCompanionEntry>().having((e) => e.room, 'room', isTrue));
+      final other = LauncherEntry.parse({'kind': 'chat', 'sessionId': 's-other'})!.forCompanion(hers);
+      expect(other, isA<OpenChatEntry>().having((e) => e.sessionId, 'sessionId', 's-other'));
+      final elsewhere = LauncherEntry.parse({
+        'kind': 'chat',
+        'sessionId': 's-hers',
+        'host': const HostRef.ssh('box').encode(),
+      })!.forCompanion(hers);
+      expect(elsewhere, isA<OpenChatEntry>());
+      expect(LauncherEntry.parse({'kind': 'new'})!.forCompanion(hers), isA<NewChatEntry>());
+    });
+
     test('a pet screenshot carries only its private cache path', () {
       final entry = LauncherEntry.parse({'kind': 'screenshot', 'path': '/cache/pet-screenshots/slot/screen.png'});
       expect(entry, isA<ScreenshotEntry>());
       expect((entry as ScreenshotEntry).path, '/cache/pet-screenshots/slot/screen.png');
+    });
+
+    test('the system assistant opens the room even when Android shares no page', () {
+      final plain = LauncherEntry.parse({'kind': 'companion_assistant', 'page': null}) as CompanionAssistantEntry;
+      expect(plain.page, isNull);
+      expect(plain.returnToApp, isFalse);
+      final entry = LauncherEntry.parse({
+        'kind': 'companion_assistant',
+        'page': 'Train arrives at 9:30',
+        'returnToApp': true,
+      }) as CompanionAssistantEntry;
+      expect(entry.page, 'Train arrives at 9:30');
+      expect(entry.returnToApp, isTrue);
+    });
+
+    test('a reminder notification retains its task and the revision that was opened', () {
+      final entry = LauncherEntry.parse({'kind': 'companion_task', 'taskId': 'task-one', 'taskRev': 2});
+      expect(entry, isA<OpenCompanionTaskEntry>());
+      entry as OpenCompanionTaskEntry;
+      expect(entry.taskId, 'task-one');
+      expect(entry.taskRev, 2);
+      for (final invalid in [
+        {'taskId': '', 'taskRev': 1},
+        {'taskId': 'bad\u0000id', 'taskRev': 1},
+        {'taskId': 'task-one', 'taskRev': 0},
+        {'taskId': 'task-one', 'taskRev': '2'},
+        {'taskId': 'task-one'},
+      ]) {
+        expect(LauncherEntry.parse({'kind': 'companion_task', ...invalid}), isNull);
+      }
     });
 
     test('malformed screenshot entries are dropped', () {
