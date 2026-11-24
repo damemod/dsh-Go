@@ -102,8 +102,8 @@ class _LaunchPreviewPageState extends State<LaunchPreviewPage> {
   void dispose() {
     _timer?.cancel();
     _c.removeListener(_follow);
-    // Leaves no timer behind when the page is closed early (back).
-    _c.ready();
+    // 提前关闭（返回）：不留 timer，并释放画面播放器。
+    _c.gone();
     super.dispose();
   }
 

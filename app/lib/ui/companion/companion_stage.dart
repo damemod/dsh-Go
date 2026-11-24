@@ -200,7 +200,11 @@ class _CompanionStageState extends State<CompanionStage> with WidgetsBindingObse
       final id = defaultTargetPlatform == TargetPlatform.android ? WebViewGuard.identifierOf(web) : null;
       if (id != null) {
         final guarded = await IslandPlatform.instance.attach(id, dark: false, textZoom: 100);
-        if (stale()) return;
+        if (stale()) {
+          // 在 attach 等待期间离开小屋：从未显示，立即销毁（无封面需保留的 id）。
+          unawaited(IslandPlatform.instance.destroy(id));
+          return;
+        }
         if (!guarded) {
           _fail('guard');
           return;

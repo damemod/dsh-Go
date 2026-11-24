@@ -265,6 +265,10 @@ class _VoiceCallPageState extends ConsumerState<VoiceCallPage> with WidgetsBindi
       _shown = phase;
     }
     if (phase == CallPhase.ended && _leave == null) {
+      // 字幕识别器随通话结束释放，不随页面：后台时页面要等回到前台才离开。
+      final live = _live;
+      _live = null;
+      unawaited(live?.stop());
       // Hung up: the light sinks away first. Ended for a reason: the reason stays a moment.
       _leave = Timer(
         _call.ended == CallEnd.hungUp ? const Duration(milliseconds: 380) : const Duration(milliseconds: 2600),
