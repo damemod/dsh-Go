@@ -16,6 +16,14 @@
         }
       }
     },
+    "client-chunk-empty-path.diff": {
+      "0.2.2-rc.1": {
+        "node_modules/@deepseek-ai/dsh-client-modules/lib/index.js": {
+          "after": "9554f37910bae77f351e73fe4eafcb35b724582571a8f8a5ade61f413175cb4e",
+          "before": "df8d52b11e513073225b8a47175dd267039744e048e30c18cc45a88d26d3759a"
+        }
+      }
+    },
     "client-hmr-closed-response.diff": {
       "0.2.2-rc.1": {
         "node_modules/@deepseek-ai/dsh-client-hmr/lib/index.js": {
@@ -48,6 +56,14 @@
         }
       }
     },
+    "config-editor-empty-layer-copy.diff": {
+      "0.2.2-rc.1": {
+        "node_modules/@deepseek-ai/dsh-config-editor/lib/index.js": {
+          "after": "8607bb319cdb73e88887bc2a89230502696d5ea84a3312b24c10edefb73bff47",
+          "before": "5afb26351f03086d97f5c3028bf80c49c495c367dd68f26473a1da0424601427"
+        }
+      }
+    },
     "config-editor-lock-order.diff": {
       "0.2.2-rc.1": {
         "node_modules/@deepseek-ai/dsh-config-editor/lib/index.js": {
@@ -61,6 +77,14 @@
         "node_modules/@deepseek-ai/cordis/lib/index.js": {
           "after": "b8b87360ebc67df2d0aabea214b8ed30d4bde3767e354ebb1b85fc6c15b45a05",
           "before": "627409afa06a265f7253200d3bc4648e88805c39fd3768568eb9b9518a31fe8f"
+        }
+      }
+    },
+    "cordis-effect-setup-retention.diff": {
+      "0.2.2-rc.1": {
+        "node_modules/@deepseek-ai/cordis/lib/index.js": {
+          "after": "88d38fb02b95162246aeb13d6e421be9d16680b0bcbcde59a6de09d7229ea140",
+          "before": "b8b87360ebc67df2d0aabea214b8ed30d4bde3767e354ebb1b85fc6c15b45a05"
         }
       }
     },
@@ -512,6 +536,22 @@
         }
       }
     },
+    "otel-log-transformer-imports.diff": {
+      "0.2.2-rc.1": {
+        "node_modules/@deepseek-ai/dsh-otel/lib/index.js": {
+          "after": "cdd9ca183f7b93009d34bbfe58731b41c846ad86edafea14e3dd7a84f9699264",
+          "before": "a0fc967c148bfa896a0252f19078a7c8f75731cc770afa8928028149e2f10e01"
+        }
+      }
+    },
+    "otel-product-transport-lazy.diff": {
+      "0.2.2-rc.1": {
+        "node_modules/@deepseek-ai/dsh-otel/lib/index.js": {
+          "after": "a0fc967c148bfa896a0252f19078a7c8f75731cc770afa8928028149e2f10e01",
+          "before": "0728ddddf76c16193fc92a76d67863d4c0879e1d369e4b6ec4ded78efde53c70"
+        }
+      }
+    },
     "piai-anthropic-opus55-thinking.diff": {
       "0.2.2-rc.1": {
         "node_modules/@earendil-works/pi-ai/dist/api/anthropic-messages.js": {
@@ -636,6 +676,14 @@
         }
       }
     },
+    "read-window-source-retention.diff": {
+      "0.2.2-rc.1": {
+        "node_modules/@deepseek-ai/dsh-tool-fs/lib/index.js": {
+          "after": "5539df22bdb630266f9c673351d26ac4c62b2af1cd9cedda87f565e9491711bd",
+          "before": "7272a6bfd420207046882ad93de64fd70146965e39b7f9c6ceefc6d1f64cc70e"
+        }
+      }
+    },
     "route-guard.diff": {
       "0.2.1-rc.2": {
         "node_modules/@deepseek-ai/dsh-host-webserver/lib/index.js": {
@@ -692,6 +740,14 @@
         }
       }
     },
+    "schedule-task-schema-on-demand.diff": {
+      "0.2.2-rc.1": {
+        "node_modules/@deepseek-ai/dsh-schedule/lib/index.js": {
+          "after": "a89c6b8a6aa0e087cbee8df5dcf792629d1452f6838cd16ff7ac813db114e099",
+          "before": "303e9cfbc7f0f9816cfae71169d8a6ab262706b791192f20dc0dea61cbc72a98"
+        }
+      }
+    },
     "schemastery-json-context.diff": {
       "0.2.1-rc.4": {
         "node_modules/@deepseek-ai/schemastery/lib/index.cjs": {
@@ -711,6 +767,14 @@
         "node_modules/@deepseek-ai/schemastery/lib/index.mjs": {
           "after": "f9caeae34766dc34b091d52ec9a8308f2cedd8a4cd0d5528dd59f6284bef9cee",
           "before": "cfcbe46c7416bdb35ce891c252152bbf519e08199bede5930dd7cb880c65f1ef"
+        }
+      }
+    },
+    "session-cold-unused-fingerprint.diff": {
+      "0.2.2-rc.1": {
+        "node_modules/@deepseek-ai/dsh-session-query-sqlite/lib/index.js": {
+          "after": "f226f15108bd2079a6a88f3cc5d9e7e022b6b46bf6628fde38df66f0c1ec83a4",
+          "before": "6a70f328528d9c799b9f15a0c4505712ebb259163d4e9abe7a6a7dfa0557730b"
         }
       }
     },
@@ -771,6 +835,14 @@
         "node_modules/@deepseek-ai/dsh-tools/lib/index.js": {
           "after": "c0962008b6accafc500f009a50286c12d6523c3e09d0ddecb2dc0d0fb0463791",
           "before": "8ae46512081dde3af5a12b7c3d37c2d7a89f48e344c15e2fdc2887f4176c8bf0"
+        }
+      }
+    },
+    "tool-schema-intrinsic-source.diff": {
+      "0.2.2-rc.1": {
+        "node_modules/@deepseek-ai/dsh-tools/lib/shared-DTdn5dXO.js": {
+          "after": "4cb442983513b52a8fc7447b6f597191201379a1fac19b3a4f1e7c049328ff03",
+          "before": "74d06fece2b46e0b9637a90f1c5682270a22ea743a37b753f5e869140ef83a71"
         }
       }
     },
@@ -2443,6 +2515,7 @@
   "targetSets": {
     "android": [
       "cordis-effect-dispose-completion.diff",
+      "cordis-effect-setup-retention.diff",
       "credentials-decimal-refs.diff",
       "fs-create-exclusive.diff",
       "install-log-redaction.diff",
@@ -2456,6 +2529,7 @@
       "client-modules-combo-rebuild.diff",
       "client-modules-manifest-read.diff",
       "client-modules-combo-buffer.diff",
+      "client-chunk-empty-path.diff",
       "schemastery-json-context.diff",
       "session-title-word-prefix.diff",
       "str-editor-view-prefix.diff",
@@ -2487,6 +2561,8 @@
       "zzzzzzz-query-open-retry.diff",
       "zzzzzzz-reference-drop-size.diff",
       "zzzzzzz-reference-encoding.diff",
+      "otel-product-transport-lazy.diff",
+      "otel-log-transformer-imports.diff",
       "zzzzzzz-retainer-decode-copy.diff",
       "zzzzzzz-settings-local-redaction.diff",
       "zzzzzzz-skill-watcher-recheck.diff",
@@ -2534,6 +2610,7 @@
       "zzzzzzzzzzzzzzz-read-line-surrogate.diff",
       "zzzzzzzzzzzzzzz-workflow-result-unicode.diff",
       "zzzzzzzzzzzzzzzz-read-line-cr-truncation.diff",
+      "read-window-source-retention.diff",
       "zzzzzzzzzzzzzzzzz-web-fetch-unicode.diff",
       "zzzzzzzzzzzzzzzzzz-skill-catalog-unicode.diff",
       "zzzzzzzzzzzzzzzzzzz-fs-text-bom.diff",
@@ -2559,6 +2636,7 @@
       "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-instruction-encoding-reuse.diff",
       "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-str-editor-bom.diff",
       "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-sqlite-document-count.diff",
+      "session-cold-unused-fingerprint.diff",
       "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-session-lifecycle-enumeration.diff",
       "jsonl-materialize-rename.diff",
       "jsonl-migration-link-fallback.diff",
@@ -2582,6 +2660,7 @@
       "tool-author-annotation-keys.diff",
       "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-phone-run-end.diff",
       "tool-schema-keyword-types.diff",
+      "tool-schema-intrinsic-source.diff",
       "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-phone-run-end-schema.diff",
       "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-phone-run-end-retry.diff",
       "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-phone-run-end-live-retry.diff",
@@ -2599,8 +2678,10 @@
       "deepseek-attachment-error.diff",
       "fork-default-effort.diff",
       "config-editor-lock-order.diff",
+      "config-editor-empty-layer-copy.diff",
       "piai-overflow-output-limit.diff",
       "schedule-authorization-availability.diff",
+      "schedule-task-schema-on-demand.diff",
       "deepseek-refusal.diff",
       "deepseek-unnamed-stream-error.diff",
       "web-empty-reply-notice.diff",
@@ -2609,6 +2690,7 @@
     ],
     "ohos": [
       "cordis-effect-dispose-completion.diff",
+      "cordis-effect-setup-retention.diff",
       "credentials-decimal-refs.diff",
       "fs-create-exclusive.diff",
       "install-log-redaction.diff",
@@ -2622,6 +2704,7 @@
       "client-modules-combo-rebuild.diff",
       "client-modules-manifest-read.diff",
       "client-modules-combo-buffer.diff",
+      "client-chunk-empty-path.diff",
       "schemastery-json-context.diff",
       "session-title-word-prefix.diff",
       "str-editor-view-prefix.diff",
@@ -2653,6 +2736,8 @@
       "zzzzzzz-query-open-retry.diff",
       "zzzzzzz-reference-drop-size.diff",
       "zzzzzzz-reference-encoding.diff",
+      "otel-product-transport-lazy.diff",
+      "otel-log-transformer-imports.diff",
       "zzzzzzz-retainer-decode-copy.diff",
       "zzzzzzz-settings-local-redaction.diff",
       "zzzzzzz-skill-watcher-recheck.diff",
@@ -2700,6 +2785,7 @@
       "zzzzzzzzzzzzzzz-read-line-surrogate.diff",
       "zzzzzzzzzzzzzzz-workflow-result-unicode.diff",
       "zzzzzzzzzzzzzzzz-read-line-cr-truncation.diff",
+      "read-window-source-retention.diff",
       "zzzzzzzzzzzzzzzzz-web-fetch-unicode.diff",
       "zzzzzzzzzzzzzzzzzz-skill-catalog-unicode.diff",
       "zzzzzzzzzzzzzzzzzzz-fs-text-bom.diff",
@@ -2725,6 +2811,7 @@
       "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-instruction-encoding-reuse.diff",
       "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-str-editor-bom.diff",
       "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-sqlite-document-count.diff",
+      "session-cold-unused-fingerprint.diff",
       "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-session-lifecycle-enumeration.diff",
       "jsonl-materialize-rename.diff",
       "jsonl-migration-link-fallback.diff",
@@ -2748,6 +2835,7 @@
       "tool-author-annotation-keys.diff",
       "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-phone-run-end.diff",
       "tool-schema-keyword-types.diff",
+      "tool-schema-intrinsic-source.diff",
       "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-phone-run-end-schema.diff",
       "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-phone-run-end-retry.diff",
       "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-phone-run-end-live-retry.diff",
@@ -2765,8 +2853,10 @@
       "deepseek-attachment-error.diff",
       "fork-default-effort.diff",
       "config-editor-lock-order.diff",
+      "config-editor-empty-layer-copy.diff",
       "piai-overflow-output-limit.diff",
       "schedule-authorization-availability.diff",
+      "schedule-task-schema-on-demand.diff",
       "deepseek-refusal.diff",
       "deepseek-unnamed-stream-error.diff",
       "web-empty-reply-notice.diff",

@@ -1,5 +1,6 @@
 # One patch per line, in application order. Keep every .diff exactly once.
 cordis-effect-dispose-completion.diff
+cordis-effect-setup-retention.diff
 credentials-decimal-refs.diff
 fs-create-exclusive.diff
 install-log-redaction.diff
@@ -13,6 +14,7 @@ client-hmr-closed-response.diff
 client-modules-combo-rebuild.diff
 client-modules-manifest-read.diff
 client-modules-combo-buffer.diff
+client-chunk-empty-path.diff
 schemastery-json-context.diff
 session-title-word-prefix.diff
 str-editor-view-prefix.diff
@@ -44,6 +46,8 @@ zzzzzzz-prompt-tool-order.diff
 zzzzzzz-query-open-retry.diff
 zzzzzzz-reference-drop-size.diff
 zzzzzzz-reference-encoding.diff
+otel-product-transport-lazy.diff
+otel-log-transformer-imports.diff
 zzzzzzz-retainer-decode-copy.diff
 zzzzzzz-settings-local-redaction.diff
 zzzzzzz-skill-watcher-recheck.diff
@@ -91,6 +95,7 @@ plugin-manager-execa-lazy.diff
 zzzzzzzzzzzzzzz-read-line-surrogate.diff
 zzzzzzzzzzzzzzz-workflow-result-unicode.diff
 zzzzzzzzzzzzzzzz-read-line-cr-truncation.diff
+read-window-source-retention.diff
 zzzzzzzzzzzzzzzzz-web-fetch-unicode.diff
 zzzzzzzzzzzzzzzzzz-skill-catalog-unicode.diff
 zzzzzzzzzzzzzzzzzzz-fs-text-bom.diff
@@ -116,6 +121,7 @@ zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-fs-patch-equal-width.diff
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-instruction-encoding-reuse.diff
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-str-editor-bom.diff
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-sqlite-document-count.diff
+session-cold-unused-fingerprint.diff
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-session-lifecycle-enumeration.diff
 jsonl-materialize-rename.diff
 jsonl-migration-link-fallback.diff
@@ -139,6 +145,7 @@ zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-companion-signals.diff
 tool-author-annotation-keys.diff
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-phone-run-end.diff
 tool-schema-keyword-types.diff
+tool-schema-intrinsic-source.diff
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-phone-run-end-schema.diff
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-phone-run-end-retry.diff
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-phone-run-end-live-retry.diff
@@ -156,8 +163,10 @@ web-search-key-write-result.diff
 deepseek-attachment-error.diff
 fork-default-effort.diff
 config-editor-lock-order.diff
+config-editor-empty-layer-copy.diff
 piai-overflow-output-limit.diff
 schedule-authorization-availability.diff
+schedule-task-schema-on-demand.diff
 deepseek-refusal.diff
 deepseek-unnamed-stream-error.diff
 web-empty-reply-notice.diff
