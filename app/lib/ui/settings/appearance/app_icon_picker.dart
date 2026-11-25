@@ -211,16 +211,16 @@ class AppIconArt {
   final Color? mono;
 
   /// The gradient's ends in the launcher's 108 grid (ic_launcher_background.xml).
-  static const start = Offset(7.57, -5.87);
-  static const end = Offset(100.43, 113.87);
+  static const start = Offset(0, 0);
+  static const end = Offset(108, 108);
 
   static AppIconArt of(AppIcon icon) => switch (icon) {
     // The default icon; on the phone its glyph is the original art, here the
     // brand master's glass (the same fit).
-    AppIcon.mist => const AppIconArt._(Color(0xFF9AB0E8), Color(0xFF405AAD), AppIconGlyph.glassDark),
-    AppIcon.night => const AppIconArt._(Color(0xFF2C3D6C), Color(0xFF0C122D), AppIconGlyph.glassDark),
-    AppIcon.frost => const AppIconArt._(Color(0xFFFCFDFF), Color(0xFFDDE5F8), AppIconGlyph.glassLight),
-    AppIcon.ink => const AppIconArt._(Color(0xFF292B30), Color(0xFF0D0E11), AppIconGlyph.mono, Color(0xFFF5F7FB)),
+    AppIcon.mist => const AppIconArt._(Color(0xFF1A2248), Color(0xFF3A2856), AppIconGlyph.glassDark),
+    AppIcon.night => const AppIconArt._(Color(0xFF4A1A1A), Color(0xFF642C18), AppIconGlyph.glassDark),
+    AppIcon.frost => const AppIconArt._(Color(0xFF103438), Color(0xFF16444C), AppIconGlyph.glassLight),
+    AppIcon.ink => const AppIconArt._(Color(0xFF142642), Color(0xFF1A3854), AppIconGlyph.mono, Color(0xFF8293B3)),
   };
 }
 
