@@ -137,7 +137,7 @@ test("effects: shorthand, whitelist, limits", () => {
   assert.ok(validate({ type: "refresh" }, { panels: new Set(["a"]), source: "a", static: true }).issue);
 });
 
-test("effects: replace is a handler effect with the insert ceiling, never static or deferred", () => {
+test("effects: replace is a handler effect with the insert ceiling, never static but deferred-capable", () => {
   const opts = { panels: new Set(["usage"]), source: "usage" };
   // canonical + shorthand both carry the text through fromShorthand
   let r = normalize([{ type: "replace", text: "all new" }, { replace: "整段替换" }], opts);
@@ -151,7 +151,11 @@ test("effects: replace is a handler effect with the insert ceiling, never static
   assert.equal(r.effects.length, 0);
   assert.equal(r.violation, true);
   assert.equal(normalize({ replace: "ok" }, { ...opts, static: true }).effects.length, 0, "never a manifest-static effect");
-  assert.equal(normalize({ replace: "ok" }, { ...opts, deferred: true }).effects.length, 0, "v1: not a deferred effect");
+  // replace is allowed in deferred results (D3 phase 2), gated App-side by
+  // compose authorization + unchanged draft (native_taps.dart), not here.
+  let rd = normalize({ replace: "ok" }, { ...opts, deferred: true });
+  assert.deepEqual(rd.effects, [{ type: "replace", text: "ok" }], "deferred replace accepted");
+  assert.equal(rd.violation, false);
   assert.ok(validate({ type: "replace", text: "" }, opts).issue, "empty text rejected");
 });
 
@@ -651,6 +655,9 @@ test("deferred: splitPending shapes, clamps and the deferred whitelist", () => {
   const opts = { panels: new Set(["p"]), source: "p", deferred: true };
   r = normalize([{ insert: "a" }, { copy: "b" }, { toast: "c" }, { patch: { x: 1 } }], opts);
   assert.deepEqual(r.effects.map((e) => e.type), ["insert", "copy", "toast", "patch"]);
+  // replace is also deferred-capable (separate call: effectsPerInvoke = 4)
+  r = normalize({ replace: "d" }, opts);
+  assert.deepEqual(r.effects.map((e) => e.type), ["replace"]);
   assert.equal(r.violation, false);
   for (const e of [{ link: "https://x.example" }, { open: "panel:p" }, { command: "compact" }, { refresh: true }]) {
     r = normalize(e, opts);
