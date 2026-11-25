@@ -161,7 +161,7 @@ export function apply(ctx) {
 | `{ close: true }` / `{ close: 'stats' }` | 收起自己的面板；仅独占页面 / 专用 sheet 时生效，内嵌面板忽略 |
 | 多个键写在一个对象里 | 按顺序都执行，例如 `{ copy: md, toast: '已复制' }` |
 
-**慢活（调模型、联网）用延后效果**：先回 `pending`，App 显示等待；结果 ≤ 60 秒到，只能是 `insert` `copy` `toast` `patch`；每插件同时最多 2 个；`signal` 在取消 / 超时 / 断开时触发，收到就停。
+**慢活（调模型、联网）用延后效果**：先回 `pending`，App 显示等待；结果 ≤ 60 秒到，可以是 `insert` `copy` `toast` `patch` `replace`（`replace` 需声明 compose want、用户确认且输入框文字自点按后未变）；每插件同时最多 2 个；`signal` 在取消 / 超时 / 断开时触发，收到就停。
 
 ```js
 ctx.dshGo.on('translate', (scope) => ({

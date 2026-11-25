@@ -57,10 +57,12 @@ const slow: InvokeHandler = (scope) => effects.deferred(async (signal) => {
   signal.throwIfAborted()
   return { insert: scope.clipboard ?? '' }
 }, { label: '正在翻译' })
+const deferredReplace: InvokeHandler = () => ({ pending: true, result: Promise.resolve({ replace: 'whole new text' }) })
 const literal: InvokeHandler = () => ({ pending: true, result: Promise.resolve([effects.copy('x'), { toast: '已复制' }]) })
 // @ts-expect-error command is not allowed in a deferred result
 const badDeferred: InvokeHandler = () => ({ pending: true, result: Promise.resolve(effects.command('compact')) })
 void slow
+void deferredReplace
 void literal
 void badDeferred
 

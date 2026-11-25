@@ -35,7 +35,7 @@ export const pickImage = (action, { maxFiles = 1 } = {}) => ({ type: 'pickImage'
  * pending state with `label`), `work` finishes later, within `timeoutMs`
  * (1–60 s, default 30 s). `work` gets an AbortSignal that fires when the person
  * cancels, time runs out or the app disconnects. Its result may only carry
- * insert, copy, toast and patch. At most 2 pending per plugin.
+ * insert, copy, toast, patch and replace. At most 2 pending per plugin.
  *
  *   ctx.dshGo.on('translate', (scope) => effects.deferred(async (signal) => ({ insert: await translate(scope.clipboard, signal) }), { label: '正在翻译' }))
  */

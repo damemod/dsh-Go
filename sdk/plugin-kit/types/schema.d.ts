@@ -710,7 +710,7 @@ export interface InvokePatch {
 }
 
 /** Effects a deferred result may carry (§4.7). */
-export type InvokeDeferredEffect = InvokeInsert | InvokeCopy | InvokeToast | InvokePatch
+export type InvokeDeferredEffect = InvokeInsert | InvokeCopy | InvokeToast | InvokePatch | InvokeReplace
 
 export type InvokeAudio = {
   type: "audio"

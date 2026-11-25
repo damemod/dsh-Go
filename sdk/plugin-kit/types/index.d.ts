@@ -91,11 +91,11 @@ export interface EffectShorthand {
 
 export type ImmediateResult = void | undefined | null | Effect | EffectShorthand | Array<Effect | EffectShorthand>
 
-/** What a deferred result may finally carry: insert, copy, toast, patch only. */
-export type DeferredEffect = InvokeInsert | InvokeCopy | InvokeToast | InvokePatch
+/** What a deferred result may finally carry: insert, copy, toast, patch, replace (replace needs compose consent and an unchanged draft). */
+export type DeferredEffect = InvokeInsert | InvokeCopy | InvokeToast | InvokePatch | InvokeReplace
 export type DeferredValue =
-  | void | undefined | null | DeferredEffect | Pick<EffectShorthand, 'insert' | 'copy' | 'toast' | 'patch'>
-  | Array<DeferredEffect | Pick<EffectShorthand, 'insert' | 'copy' | 'toast' | 'patch'>>
+  | void | undefined | null | DeferredEffect | Pick<EffectShorthand, 'insert' | 'copy' | 'toast' | 'patch' | 'replace'>
+  | Array<DeferredEffect | Pick<EffectShorthand, 'insert' | 'copy' | 'toast' | 'patch' | 'replace'>>
 
 /**
  * A deferred result (protocol §4.7): the tap answers at once with a pending state, the

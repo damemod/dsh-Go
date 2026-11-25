@@ -10,7 +10,7 @@ export const STATIC_TYPES = new Set(["insert", "command", "open", "link", "toast
 // effect has no tap source and would run outside the panel's own route).
 export const ALL_TYPES = new Set([...STATIC_TYPES, "refresh", "patch", "close", "replace"]);
 /** What a deferred result may carry (protocol §4.7): no command / open / link / refresh. */
-export const DEFERRED_TYPES = new Set(["insert", "copy", "toast", "patch"]);
+export const DEFERRED_TYPES = new Set(["insert", "copy", "toast", "patch", "replace"]);
 const SHORTHAND = ["insert", "command", "open", "link", "toast", "copy", "refresh", "patch", "close", "replace"];
 const COMMAND = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$/;
 const PAGE = /^(panel:([A-Za-z0-9][A-Za-z0-9_.-]{0,39})|[a-z][a-z0-9-]{0,31})$/;
@@ -56,7 +56,7 @@ export function validate(e, opts) {
   if (opts.fileResult && !["patch", "refresh", "toast"].includes(e.type)) return bad(`${e.type} is not allowed in a file selection callback`);
   const allowed = opts.static ? STATIC_TYPES : opts.deferred ? DEFERRED_TYPES : ALL_TYPES;
   if (!ALL_TYPES.has(e.type)) return { issue: { code: "unknown-effect", message: `unknown effect type ${JSON.stringify(e.type).slice(0, 40)}`, violation: false } };
-  if (!allowed.has(e.type)) return bad(opts.deferred ? `${e.type} is not allowed in a deferred result (only insert, copy, toast, patch)` : `${e.type} is not allowed here`);
+  if (!allowed.has(e.type)) return bad(opts.deferred ? `${e.type} is not allowed in a deferred result (only insert, copy, toast, patch, replace)` : `${e.type} is not allowed here`);
   const ownPanel = (id) => typeof id === "string" && ID.test(id) && opts.panels.has(id);
   switch (e.type) {
     case "insert": case "copy": case "replace": {

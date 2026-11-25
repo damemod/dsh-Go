@@ -415,6 +415,9 @@
         },
         {
           "$ref": "#/$defs/patch"
+        },
+        {
+          "$ref": "#/$defs/replace"
         }
       ]
     },

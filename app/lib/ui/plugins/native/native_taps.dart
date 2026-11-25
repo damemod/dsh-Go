@@ -658,7 +658,7 @@ Future<bool> _invoke(
         switch (effect) {
           case PatchEffect():
             dataEffect(effect);
-          case InsertEffect() || CopyEffect() || ToastEffect():
+          case InsertEffect() || CopyEffect() || ToastEffect() || ReplaceEffect():
             if (host != null && host.mounted) {
               await _runEffect(
                 host,

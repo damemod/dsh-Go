@@ -447,7 +447,7 @@ class SeamGateTests(unittest.TestCase):
         # 意图：close 不能出现在延后结果里（tap 已过期，关闭会误伤宿主栈）。
         # 把它塞进 DEFERRED_TYPES 后延后结果可返回 close，探针必须翻假。
         self._replace("effects.js",
-                      'export const DEFERRED_TYPES = new Set(["insert", "copy", "toast", "patch"]);',
+                      'export const DEFERRED_TYPES = new Set(["insert", "copy", "toast", "patch", "replace"]);',
                       'export const DEFERRED_TYPES = new Set(["insert", "copy", "toast", "patch", "close"]);')
         self.assertIs(self._guard("closeOwnPanel"), False,
                       "close 变成延后后探针应检测到 deferred close 不再被拒")

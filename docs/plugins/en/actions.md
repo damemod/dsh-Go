@@ -84,7 +84,7 @@ ctx.dshGo.on('translate', (scope) => ({
 | `pending` | `true` or `{ label?, timeoutMs? }`; `label` ≤ 16 characters, shown in the waiting state |
 | `timeoutMs` | 1–60 s, default 30 s; clamped |
 | `result` | A Promise, or `(signal) => value \| Promise`, with the same value forms as an ordinary handler |
-| Allowed effects | **Only `insert`, `copy`, `toast`, `patch`.** Opening pages, links and commands must come straight from a tap |
+| Allowed effects | **`insert`, `copy`, `toast`, `patch`, `replace`** (`replace` additionally needs the compose want, user consent, and an unchanged composer draft since the tap). Opening pages, links and commands must come straight from a tap |
 | Per plugin | At most 2 at a time; another tap is refused (the app says try again shortly) |
 | Settles once | Done, timeout, cancel by the person, or disconnect — first one wins; later results are dropped |
 | `signal` | Fires on timeout, cancel or disconnect. Stop then: abort requests, stop the model call |

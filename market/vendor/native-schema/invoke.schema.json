@@ -362,6 +362,24 @@
         }
       }
     },
+    "replace": {
+      "type": "object",
+      "required": [
+        "type",
+        "text"
+      ],
+      "properties": {
+        "type": {
+          "const": "replace"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "description": "Replace the composer's whole text, after explicit user consent and only if it has not changed since the tap. Never sends."
+    },
     "deferredEffect": {
       "description": "Effects a deferred result may carry (§4.7).",
       "oneOf": [
@@ -376,6 +394,9 @@
         },
         {
           "$ref": "#/$defs/patch"
+        },
+        {
+          "$ref": "#/$defs/replace"
         }
       ]
     },

@@ -84,7 +84,7 @@ ctx.dshGo.on('translate', (scope) => ({
 | `pending` | `true`，或 `{ label?, timeoutMs? }`。`label` ≤ 16 字，显示在等待状态里 |
 | `timeoutMs` | 1–60 秒，缺省 30 秒；超出范围按边界算 |
 | `result` | Promise，或 `(signal) => 值 \| Promise`。值的写法和普通 handler 一样（效果对象、数组、简写） |
-| 结果里能放的效果 | **只有 `insert`、`copy`、`toast`、`patch`**。打开页面、链接、命令都必须由用户当场点出来，不能延后 |
+| 结果里能放的效果 | **`insert`、`copy`、`toast`、`patch`、`replace`**（`replace` 另需声明 compose want、用户确认，且输入框文字自点按后未变）。打开页面、链接、命令都必须由用户当场点出来，不能延后 |
 | 每插件同时 | 最多 2 个；再点会被拒绝（App 提示稍后再试） |
 | 只结算一次 | 完成、超时、用户取消、App 断开，四者先到先算；后到的结果丢弃 |
 | `signal` | 超时、取消、断开时触发。收到就停手：取消网络请求、停止模型调用 |
