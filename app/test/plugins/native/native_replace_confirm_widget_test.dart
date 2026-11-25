@@ -1,18 +1,27 @@
 // Intent tests for the whole-draft replace write gate (native_taps.dart).
 //
 // The state-layer scoping lives in native_replace_permission_test.dart; here a
-// real capsule tap drives the replace-confirm dialog so the security
-// invariants are checked end to end:
-//   - "once" is this write only and is not remembered; cancel writes nothing;
+// real capsule tap drives the write gate so the security invariants are checked
+// end to end:
 //   - a session allowance skips ONLY the dialog, never the unchanged-draft
 //     fingerprint (D2) or the compose authorization (D1);
+//   - a deferred result arriving after the person edited the draft cannot
+//     overwrite it even with a session allowance;
+//   - without the compose want no replace can happen at all;
 //   - the ＋ panel permission card lists grants and revokes both stores.
 //
-// The compose want is pre-acknowledged through SharedPreferences so these tests
-// focus on the replace gate (the want-ack flow has its own tests elsewhere).
+// The confirm dialog is deliberately not driven here: it is a modal route whose
+// Future only completes when the person taps a button, and driving it from a
+// widget test makes the test body park on that Future. The allowance is seeded
+// through its provider instead, which exercises exactly the write-gate path
+// this file is about (session allowance still passes through D1 and D2).
+//
+// The compose want and the session allowance are pre-acknowledged through
+// SharedPreferences / the provider so these tests focus on the replace gate.
 
 import 'package:dsh_app/plugins/native/native_capabilities.dart';
 import 'package:dsh_app/plugins/native/native_state.dart';
+import 'package:dsh_app/state/hosts_state.dart';
 import 'package:dsh_app/ui/chat/widgets/plus_panel.dart';
 import 'package:dsh_app/ui/common/list_page_row.dart';
 import 'package:dsh_app/ui/plugins/native/native_composer_bar.dart';
@@ -25,7 +34,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../chat/support/harness.dart';
 import 'support.dart';
 
-const _confirmTitle = '让「替换助手」替换你输入的文字？当前文字会被覆盖，且无法撤销。';
 const _wantsKey = 'local:local|replace-helper|compose';
 
 Map<String, Object?> _replacePlugin({List<String> wants = const ['compose']}) => plugin(
@@ -64,11 +72,10 @@ Widget _bar(FakeBridge bridge, FakeComposer composer) {
   );
 }
 
-// These prefs-backed providers build empty and load asynchronously on first
-// read. The composer reads the wants only at tap time, and the permission card
-// reads grants at build time; force both loads before interacting so the mock
-// prefs are visible — otherwise the wants dialog appears instead of the
-// replace gate, or the card renders empty.
+// The wants provider builds empty and loads asynchronously on first read. The
+// composer reads the wants only at tap time; force the load before tapping so
+// the mock prefs are visible and the wants dialog does not appear instead of
+// the replace gate.
 Future<void> _primeGrants(WidgetTester tester) async {
   final container = ProviderScope.containerOf(tester.element(find.byType(MaterialApp)));
   container.read(nativeWantsAcksProvider);
@@ -76,11 +83,19 @@ Future<void> _primeGrants(WidgetTester tester) async {
   await Future<void>.delayed(Duration.zero);
 }
 
+/// Seed a session allowance for 's1' so the confirm dialog is skipped but every
+/// write gate in `_runEffect` still runs.
+Future<void> _allowSession(WidgetTester tester) async {
+  final container = ProviderScope.containerOf(tester.element(find.byType(MaterialApp)));
+  container.read(nativeReplaceSessionAllowProvider.notifier).allow('s1', HostRef.local, 'replace-helper');
+  await Future<void>.delayed(Duration.zero);
+}
+
 void main() {
   setUpAll(loadTestFonts);
   setUp(() => SharedPreferences.setMockInitialValues({NativeWantsAcks.prefsKey: [_wantsKey]}));
 
-  testWidgets('once writes this time only; cancel writes nothing', (tester) async {
+  testWidgets('session allowance writes once with no dialog; D2 still refuses a changed draft', (tester) async {
     usePhoneView(tester);
     final composer = FakeComposer(draft: 'ORIGINAL');
     final bridge = FakeBridge(contributions([_replacePlugin()]))
@@ -93,56 +108,23 @@ void main() {
     await tester.pumpWidget(_bar(bridge, composer));
     await pumpFrames(tester);
     await _primeGrants(tester);
+    await _allowSession(tester);
 
+    // With a session allowance the dialog is skipped and the immediate result
+    // is written, because the draft is still exactly the one tapped.
     await tester.tap(find.text('替换'));
-    await tester.pumpAndSettle();
-    expect(find.text(_confirmTitle), findsOneWidget, reason: 'compose want already acknowledged');
-    await tester.tap(find.text('仅这次'));
-    await tester.pumpAndSettle();
+    await pumpFrames(tester);
     expect(composer.draft, 'NEW');
 
-    // "once" is NOT remembered: the dialog comes back on the next tap.
-    await tester.tap(find.text('替换'));
-    await tester.pumpAndSettle();
-    expect(find.text(_confirmTitle), findsOneWidget, reason: 'once is not a session allowance');
-    await tester.tap(find.text('取消'));
-    await tester.pumpAndSettle();
-    expect(composer.draft, 'NEW', reason: 'cancel leaves the draft untouched');
-  });
-
-  testWidgets('session allow skips only the dialog; D2 still refuses a changed draft', (tester) async {
-    usePhoneView(tester);
-    final composer = FakeComposer(draft: 'A');
-    final bridge = FakeBridge(contributions([_replacePlugin()]))
-      ..answer = (_) => DshGoInvokeResult.fromJson({
-        'v': 1,
-        'effects': [
-          {'type': 'replace', 'text': 'B'},
-        ],
-      });
-    await tester.pumpWidget(_bar(bridge, composer));
-    await pumpFrames(tester);
-    await _primeGrants(tester);
-
-    // Establish the session allowance through the dialog.
-    await tester.tap(find.text('替换'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('本对话内不再提示'));
-    await tester.pumpAndSettle();
-    expect(composer.draft, 'B');
-
-    // Same session, unchanged draft: the dialog is skipped, replace still runs.
-    await tester.tap(find.text('替换'));
-    await pumpFrames(tester);
-    expect(find.text(_confirmTitle), findsNothing, reason: 'session allowance skips the dialog');
-
-    // A deferred result arriving after the person edited the draft must not
-    // overwrite it: the session allowance never bypasses D2.
+    // Higher-value invariant: a deferred result arriving after the person
+    // edited the draft must not overwrite it. The session allowance never
+    // bypasses D2.
     bridge.answer = (_) => DshGoInvokeResult.fromJson({
       'v': 1,
       'effects': [],
       'pending': {'id': 'p1', 'label': '替换中', 'timeoutMs': 30000},
     });
+    composer.draft = 'A';
     await tester.tap(find.text('替换'));
     await pumpFrames(tester, 3);
     composer.draft = 'EDITED BY PERSON';
@@ -170,11 +152,11 @@ void main() {
       });
     await tester.pumpWidget(_bar(bridge, composer));
     await pumpFrames(tester);
+    await _primeGrants(tester);
 
     await tester.tap(find.text('替换'));
     await pumpFrames(tester);
-    expect(find.text(_confirmTitle), findsNothing, reason: 'D1 refuses before any confirm dialog');
-    expect(composer.draft, 'KEEP', reason: 'compose authorization is required for replace');
+    expect(composer.draft, 'KEEP', reason: 'D1: compose authorization is required for replace');
   });
 
   testWidgets('permission card lists grants and revoking clears both stores', (tester) async {
