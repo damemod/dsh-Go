@@ -35,8 +35,20 @@ class CompanionEngineSessionsTest {
         assertFalse(hers.replace(listOf("b", 3)))
         assertFalse(hers.replace(listOf("")))
         assertFalse(hers.replace(listOf("bad\u0000id")))
-        assertFalse(hers.replace(List(65) { "s$it" }))
+        // A bad entry past the kept newest still fails the whole list.
+        assertFalse(hers.replace(listOf(3) + List(64) { "s$it" }))
         assertTrue("a" in hers)
+        assertFalse("s0" in hers)
         assertFalse("b" in hers)
+    }
+
+    @Test fun aLongListKeepsItsNewestAndDropsTheOldSet() {
+        val hers = CompanionEngineSessions()
+        hers.replace(listOf("retired"))
+        assertTrue(hers.replace(List(65) { "s$it" }))
+        assertFalse("retired" in hers)
+        assertFalse("s0" in hers)
+        assertTrue("s1" in hers)
+        assertTrue("s64" in hers)
     }
 }

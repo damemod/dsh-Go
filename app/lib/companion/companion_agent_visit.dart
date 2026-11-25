@@ -48,7 +48,7 @@ class CompanionAgentAttachment {
   final _CompanionAgentWindow _window;
 
   bool get isAttached => _window.current(_visit);
-  bool get preparing => _visit.preparing;
+  bool get preparing => _visit.preparing || _visit.clearing;
   bool get running => _visit.run?.running ?? false;
   // Retained API: local task speech has no model preparation.
   String? get preparingSignalId => null;
@@ -331,6 +331,11 @@ class _CompanionAgentVisit {
   late bool boundLight;
   bool closed = false;
   bool preparing = false;
+
+  /// 清空对话 in progress: nothing new is taken until it is done, or its run
+  /// would be dropped along with the old conversation's.
+  Future<void>? clearingNow;
+  bool get clearing => clearingNow != null;
   bool entered = false;
   CompanionInitiativeRoom? enteredRoom;
   int epoch = 0;
@@ -676,7 +681,7 @@ class _CompanionAgentVisit {
     bool returnToApp = false,
     void Function(MemoryRow)? onCommitted,
   }) async {
-    if (!active || !originCurrent() || raw.trim().isEmpty || (preparing && !replacePreparing)) return;
+    if (!active || clearing || !originCurrent() || raw.trim().isEmpty || (preparing && !replacePreparing)) return;
     final noticeReply = notices?.replyContext(raw, retrySource: retrySource?['id'] as String?);
     notices?.invalidate(keepReply: true);
     lastUserInteractionAt = DateTime.now();
@@ -1020,8 +1025,21 @@ class _CompanionAgentVisit {
     changed();
   }
 
+  /// A second 清空 while one is running waits for that one, so the guard is
+  /// let go only when the conversation is really clear.
   Future<void> restart() async {
     if (!active) return;
+    await (clearingNow ??= () async {
+      try {
+        await _clear();
+      } finally {
+        clearingNow = null;
+        changed();
+      }
+    }());
+  }
+
+  Future<void> _clear() async {
     stop(discard: true);
     final current = captureCurrent();
     final owner = await openMemory();
@@ -1074,6 +1092,17 @@ class _CompanionAgentVisit {
       ...events,
       CompanionContextEvent(id: 'e-${now.microsecondsSinceEpoch}-${++eventSerial}', kind: kind, at: now, detail: note),
     ], now: now);
+  }
+
+  /// What she just said about the screen, for the next real turn in either
+  /// mode. Only her newest three lines: they never crowd out the person's own.
+  void rememberScreenLine(String line, {String? app, String? scene}) {
+    final earlier = [for (final event in events) if (event.kind == 'screen') event];
+    if (earlier.length > 2) {
+      final dropped = earlier.sublist(0, earlier.length - 2).toSet();
+      events = [for (final event in events) if (!dropped.contains(event)) event];
+    }
+    remember('screen', companionScreenNote(companionWithoutMarks(line), app: app, scene: scene));
   }
 
   Future<CompanionSnapshot?> refreshKeeper() async {
@@ -1221,7 +1250,7 @@ class _CompanionAgentVisit {
             ref.read(companionSessionFilterProvider)(ref.read(activeHostProvider), session),
         offer: offerResidentSignal,
       );
-      residentSignals!.refresh();
+      residentSignals!.observeRecipient();
     }
   }
 
