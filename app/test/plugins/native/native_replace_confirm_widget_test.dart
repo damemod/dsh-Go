@@ -95,18 +95,18 @@ void main() {
     await _primeGrants(tester);
 
     await tester.tap(find.text('替换'));
-    await pumpFrames(tester);
+    await tester.pumpAndSettle();
     expect(find.text(_confirmTitle), findsOneWidget, reason: 'compose want already acknowledged');
     await tester.tap(find.text('仅这次'));
-    await pumpFrames(tester);
+    await tester.pumpAndSettle();
     expect(composer.draft, 'NEW');
 
     // "once" is NOT remembered: the dialog comes back on the next tap.
     await tester.tap(find.text('替换'));
-    await pumpFrames(tester);
+    await tester.pumpAndSettle();
     expect(find.text(_confirmTitle), findsOneWidget, reason: 'once is not a session allowance');
     await tester.tap(find.text('取消'));
-    await pumpFrames(tester);
+    await tester.pumpAndSettle();
     expect(composer.draft, 'NEW', reason: 'cancel leaves the draft untouched');
   });
 
@@ -126,9 +126,9 @@ void main() {
 
     // Establish the session allowance through the dialog.
     await tester.tap(find.text('替换'));
-    await pumpFrames(tester);
+    await tester.pumpAndSettle();
     await tester.tap(find.text('本对话内不再提示'));
-    await pumpFrames(tester);
+    await tester.pumpAndSettle();
     expect(composer.draft, 'B');
 
     // Same session, unchanged draft: the dialog is skipped, replace still runs.
