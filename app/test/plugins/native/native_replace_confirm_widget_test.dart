@@ -138,12 +138,11 @@ void main() {
 
     // A deferred result arriving after the person edited the draft must not
     // overwrite it: the session allowance never bypasses D2.
-    bridge
-      ..answer = (_) => DshGoInvokeResult.fromJson({
-        'v': 1,
-        'effects': [],
-        'pending': {'id': 'p1', 'label': '替换中', 'timeoutMs': 30000},
-      });
+    bridge.answer = (_) => DshGoInvokeResult.fromJson({
+      'v': 1,
+      'effects': [],
+      'pending': {'id': 'p1', 'label': '替换中', 'timeoutMs': 30000},
+    });
     await tester.tap(find.text('替换'));
     await pumpFrames(tester, 3);
     composer.draft = 'EDITED BY PERSON';

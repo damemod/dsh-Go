@@ -782,12 +782,12 @@ Future<void> _runEffect(
       final canRemember = sessionId != null;
       final allow = ref.read(nativeReplaceSessionAllowProvider.notifier);
       var ok = false;
-      if (canRemember && allow.allows(sessionId!, host, plugin.package)) {
+      if (canRemember && allow.allows(sessionId, host, plugin.package)) {
         ok = true; // skip only the dialog; never skip a gate
       } else {
         final choice = await _askReplaceConfirm(context, title, canRemember: canRemember);
         if (choice == _ReplaceConfirm.cancel) break;
-        if (choice == _ReplaceConfirm.session && sessionId != null) allow.allow(sessionId!, host, plugin.package);
+        if (choice == _ReplaceConfirm.session && sessionId != null) allow.allow(sessionId, host, plugin.package);
         ok = true;
       }
       // A cancelled confirm is the person's choice, not a plugin error.
@@ -972,9 +972,10 @@ Future<bool> _askWants(BuildContext context, String title, Set<String> wants) as
 
 /// The destructive replace's write-confirm choice. `once` is the old confirm
 /// (this one write, no memory). `session` remembers "don't ask again" for the
-/// current conversation. `always` is reserved for a future cross-session tier
-/// and is never offered yet.
-enum _ReplaceConfirm { cancel, once, session, always }
+/// current conversation. A future cross-session ("always") tier can be added
+/// here and checked ahead of the session tier in [NativeReplaceSessionAllow]
+/// without touching the three security gates in `_runEffect`.
+enum _ReplaceConfirm { cancel, once, session }
 
 Future<_ReplaceConfirm> _askReplaceConfirm(BuildContext context, String title, {required bool canRemember}) async {
   final l10n = context.l10n;
