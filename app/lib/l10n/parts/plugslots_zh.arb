@@ -91,7 +91,17 @@
   "plugslotsChatWebFrom": "网页插件 · {names}",
   "plugslotsIssueReplaceDenied": "点按后输入框内容已变化，已跳过替换",
   "plugslotsReplaceConfirm": "让「{plugin}」替换你输入的文字？当前文字会被覆盖，且无法撤销。",
+  "plugslotsReplaceOnce": "仅这次",
+  "plugslotsReplaceSession": "本对话内不再提示",
   "plugslotsWantsCompose": "「{plugin}」要替换你输入的文字",
+  "plugslotsPluginPermissions": "插件权限",
+  "plugslotsPluginPermissionsEmpty": "没有已授权的插件",
+  "plugslotsPluginPermissionsRevoke": "撤销",
+  "plugslotsPermDraft": "读取草稿",
+  "plugslotsPermClipboard": "读取剪贴板",
+  "plugslotsPermMessage": "读取消息",
+  "plugslotsPermCompose": "替换输入文字",
+  "plugslotsPermVoice": "听你开口",
   "@plugslotsIssueCount": {
     "placeholders": {
       "count": {

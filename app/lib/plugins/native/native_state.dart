@@ -364,9 +364,70 @@ class NativeWantsAcks extends Notifier<Set<String>> {
       await prefs.setStringList(prefsKey, [...state]);
     } catch (_) {}
   }
+
+  /// Grants already given, parsed for the permission-management page. A key
+  /// that does not fit the `host|package|wants` shape is skipped, never shown.
+  /// Parse from the right so a `|` inside a relay host id cannot be mistaken
+  /// for a package separator (package itself has no `|` by bridge schema).
+  List<({String hostKey, String package, Set<String> wants})> grantedWants() {
+    final out = <({String hostKey, String package, Set<String> wants})>[];
+    for (final key in state) {
+      final i = key.lastIndexOf('|');
+      if (i <= 0) continue;
+      final j = key.lastIndexOf('|', i - 1);
+      if (j <= 0 || i == j + 1) continue;
+      final wants = key.substring(i + 1).split('+').where((w) => w.isNotEmpty).toSet();
+      if (wants.isEmpty) continue;
+      out.add((hostKey: key.substring(0, j), package: key.substring(j + 1, i), wants: wants));
+    }
+    return out;
+  }
+
+  /// Revoke every want granted to one plugin and persist. Also drops that
+  /// plugin's session-level replace allowances: with no authorization left,
+  /// "don't ask again this conversation" must not survive.
+  Future<void> revokeWants(String hostKey, String package) async {
+    final prefix = '$hostKey|$package|';
+    state = {...state.where((key) => !key.startsWith(prefix))};
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(prefsKey, [...state]);
+    } catch (_) {}
+    ref.read(nativeReplaceSessionAllowProvider.notifier).revoke(hostKey, package);
+  }
 }
 
 final nativeWantsAcksProvider = NotifierProvider<NativeWantsAcks, Set<String>>(NativeWantsAcks.new);
+
+/// Session-scoped "don't ask again" for the destructive replace effect.
+/// Purely in memory — process death drops every key. Scoped to session, host
+/// and plugin so one plugin's allowance never leaks into another.
+/// Extension point: a persisted, cross-session tier can be checked ahead of
+/// this one without touching the three security gates in `native_taps.dart`.
+class NativeReplaceSessionAllow extends Notifier<Set<String>> {
+  static String keyOf(String sessionId, HostRef host, String package) =>
+      '$sessionId|${uiHostKey(host)}|$package';
+
+  @override
+  Set<String> build() => const {};
+
+  bool allows(String sessionId, HostRef host, String package) =>
+      state.contains(keyOf(sessionId, host, package));
+
+  void allow(String sessionId, HostRef host, String package) {
+    state = {...state, keyOf(sessionId, host, package)};
+  }
+
+  /// Drop every session's allowance for one plugin (called when D1 is revoked).
+  void revoke(String hostKey, String package) {
+    final suffix = '|$hostKey|$package';
+    state = {...state.where((key) => !key.endsWith(suffix))};
+  }
+}
+
+final nativeReplaceSessionAllowProvider = NotifierProvider<NativeReplaceSessionAllow, Set<String>>(
+  NativeReplaceSessionAllow.new,
+);
 
 // ── Slots ────────────────────────────────────────────────────────────────────
 

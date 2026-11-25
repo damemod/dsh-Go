@@ -17819,9 +17819,39 @@ class L10nEn extends L10n {
   }
 
   @override
+  String get plugslotsReplaceOnce => 'Just this once';
+
+  @override
+  String get plugslotsReplaceSession => 'Don\'t ask again in this chat';
+
+  @override
   String plugslotsWantsCompose(String plugin) {
     return '$plugin wants to replace your input text';
   }
+
+  @override
+  String get plugslotsPluginPermissions => 'Plugin permissions';
+
+  @override
+  String get plugslotsPluginPermissionsEmpty => 'No plugins have been granted a permission';
+
+  @override
+  String get plugslotsPluginPermissionsRevoke => 'Revoke';
+
+  @override
+  String get plugslotsPermDraft => 'Reads your draft';
+
+  @override
+  String get plugslotsPermClipboard => 'Reads your clipboard';
+
+  @override
+  String get plugslotsPermMessage => 'Reads messages';
+
+  @override
+  String get plugslotsPermCompose => 'Replaces your input';
+
+  @override
+  String get plugslotsPermVoice => 'Listens when you speak';
 
   @override
   String get plugViewInvalid => 'Plugin view has an error';

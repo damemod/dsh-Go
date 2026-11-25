@@ -31176,11 +31176,71 @@ abstract class L10n {
   /// **'让「{plugin}」替换你输入的文字？当前文字会被覆盖，且无法撤销。'**
   String plugslotsReplaceConfirm(String plugin);
 
+  /// No description provided for @plugslotsReplaceOnce.
+  ///
+  /// In zh, this message translates to:
+  /// **'仅这次'**
+  String get plugslotsReplaceOnce;
+
+  /// No description provided for @plugslotsReplaceSession.
+  ///
+  /// In zh, this message translates to:
+  /// **'本对话内不再提示'**
+  String get plugslotsReplaceSession;
+
   /// No description provided for @plugslotsWantsCompose.
   ///
   /// In zh, this message translates to:
   /// **'「{plugin}」要替换你输入的文字'**
   String plugslotsWantsCompose(String plugin);
+
+  /// No description provided for @plugslotsPluginPermissions.
+  ///
+  /// In zh, this message translates to:
+  /// **'插件权限'**
+  String get plugslotsPluginPermissions;
+
+  /// No description provided for @plugslotsPluginPermissionsEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有已授权的插件'**
+  String get plugslotsPluginPermissionsEmpty;
+
+  /// No description provided for @plugslotsPluginPermissionsRevoke.
+  ///
+  /// In zh, this message translates to:
+  /// **'撤销'**
+  String get plugslotsPluginPermissionsRevoke;
+
+  /// No description provided for @plugslotsPermDraft.
+  ///
+  /// In zh, this message translates to:
+  /// **'读取草稿'**
+  String get plugslotsPermDraft;
+
+  /// No description provided for @plugslotsPermClipboard.
+  ///
+  /// In zh, this message translates to:
+  /// **'读取剪贴板'**
+  String get plugslotsPermClipboard;
+
+  /// No description provided for @plugslotsPermMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'读取消息'**
+  String get plugslotsPermMessage;
+
+  /// No description provided for @plugslotsPermCompose.
+  ///
+  /// In zh, this message translates to:
+  /// **'替换输入文字'**
+  String get plugslotsPermCompose;
+
+  /// No description provided for @plugslotsPermVoice.
+  ///
+  /// In zh, this message translates to:
+  /// **'听你开口'**
+  String get plugslotsPermVoice;
 
   /// No description provided for @plugViewInvalid.
   ///

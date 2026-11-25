@@ -91,7 +91,17 @@
   "plugslotsChatWebFrom": "Web plugins · {names}",
   "plugslotsIssueReplaceDenied": "Input changed since the tap; replace skipped",
   "plugslotsReplaceConfirm": "Let {plugin} replace your input text? Your current text will be overwritten and this cannot be undone.",
+  "plugslotsReplaceOnce": "Just this once",
+  "plugslotsReplaceSession": "Don't ask again in this chat",
   "plugslotsWantsCompose": "{plugin} wants to replace your input text",
+  "plugslotsPluginPermissions": "Plugin permissions",
+  "plugslotsPluginPermissionsEmpty": "No plugins have been granted a permission",
+  "plugslotsPluginPermissionsRevoke": "Revoke",
+  "plugslotsPermDraft": "Reads your draft",
+  "plugslotsPermClipboard": "Reads your clipboard",
+  "plugslotsPermMessage": "Reads messages",
+  "plugslotsPermCompose": "Replaces your input",
+  "plugslotsPermVoice": "Listens when you speak",
   "@plugslotsIssueCount": {
     "placeholders": {
       "count": {

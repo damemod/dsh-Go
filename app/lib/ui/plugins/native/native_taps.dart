@@ -778,19 +778,22 @@ Future<void> _runEffect(
         break;
       }
       if (!context.mounted) break;
-      final ok = await showAppDialog<bool>(
-        context: context,
-        builder: (dialog) => AlertDialog(
-          title: Text(l10n.plugslotsReplaceConfirm(title)),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(dialog, false), child: Text(l10n.commonCancel)),
-            FilledButton(onPressed: () => Navigator.pop(dialog, true), child: Text(l10n.commonConfirm)),
-          ],
-        ),
-      );
+      final host = ref.read(activeHostProvider);
+      final canRemember = sessionId != null;
+      final allow = ref.read(nativeReplaceSessionAllowProvider.notifier);
+      var ok = false;
+      if (canRemember && allow.allows(sessionId!, host, plugin.package)) {
+        ok = true; // skip only the dialog; never skip a gate
+      } else {
+        final choice = await _askReplaceConfirm(context, title, canRemember: canRemember);
+        if (choice == _ReplaceConfirm.cancel) break;
+        if (choice == _ReplaceConfirm.session && sessionId != null) allow.allow(sessionId!, host, plugin.package);
+        ok = true;
+      }
       // A cancelled confirm is the person's choice, not a plugin error.
       // Re-check the draft after the dialog: they may have typed meanwhile.
-      if (ok == true && context.mounted && stillCurrent?.call() != false && composer.draft == draftAtTap) {
+      // All four conditions stay intact on the remembered path too.
+      if (ok && context.mounted && stillCurrent?.call() != false && composer.draft == draftAtTap) {
         composer.replace(text);
       }
     case CommandEffect(:final line):
@@ -965,6 +968,40 @@ Future<bool> _askWants(BuildContext context, String title, Set<String> wants) as
     ),
   );
   return ok == true;
+}
+
+/// The destructive replace's write-confirm choice. `once` is the old confirm
+/// (this one write, no memory). `session` remembers "don't ask again" for the
+/// current conversation. `always` is reserved for a future cross-session tier
+/// and is never offered yet.
+enum _ReplaceConfirm { cancel, once, session, always }
+
+Future<_ReplaceConfirm> _askReplaceConfirm(BuildContext context, String title, {required bool canRemember}) async {
+  final l10n = context.l10n;
+  final choice = await showAppDialog<_ReplaceConfirm>(
+    context: context,
+    builder: (dialog) => AlertDialog(
+      title: Text(l10n.plugslotsReplaceConfirm(title)),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(dialog, _ReplaceConfirm.cancel), child: Text(l10n.commonCancel)),
+        // New chat (no sessionId): only cancel / confirm-once — there is no
+        // conversation to remember an allowance in.
+        if (canRemember)
+          TextButton(
+            onPressed: () => Navigator.pop(dialog, _ReplaceConfirm.once),
+            child: Text(l10n.plugslotsReplaceOnce),
+          ),
+        if (canRemember)
+          FilledButton(
+            onPressed: () => Navigator.pop(dialog, _ReplaceConfirm.session),
+            child: Text(l10n.plugslotsReplaceSession),
+          )
+        else
+          FilledButton(onPressed: () => Navigator.pop(dialog, _ReplaceConfirm.once), child: Text(l10n.commonConfirm)),
+      ],
+    ),
+  );
+  return choice ?? _ReplaceConfirm.cancel;
 }
 
 void _toast(BuildContext context, String text) {

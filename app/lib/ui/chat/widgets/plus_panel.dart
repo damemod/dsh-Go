@@ -22,6 +22,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/l10n.dart';
+import '../../../plugins/native/native_capabilities.dart';
 import '../../../plugins/native/native_model.dart';
 import '../../../plugins/native/native_state.dart';
 import '../../../state/android_features.dart';
@@ -168,6 +169,9 @@ class _PlusRoot extends ConsumerWidget {
           const SizedBox(height: 24),
           const _SystemActionsCard(),
         ],
+        // Plugin permissions: only rendered when something is granted, so the
+        // no-grant case keeps the panel geometry (and card indices) unchanged.
+        const _PluginPermissionsCard(),
         const SizedBox(height: 20),
       ],
     );
@@ -315,6 +319,144 @@ class _ThisChatCardState extends ConsumerState<_ThisChatCard> {
             trailing: Switch.adaptive(value: plan, onChanged: _busy ? null : (v) => unawaited(_togglePlan(v))),
           ),
         ),
+      ],
+    );
+  }
+}
+
+/// Aggregated plugin grants, keyed by `hostKey|package`. Built from every
+/// sensitive-authority source (wants + voice) so new sources (e.g. file
+/// access) can be added by contributing another entry generator, without
+/// changing the page's grouping or revoke interaction.
+typedef _PluginGrant = ({String hostKey, String package, Set<String> labels});
+
+List<_PluginGrant> _collectPluginGrants(WidgetRef ref) {
+  final byKey = <String, _PluginGrant>{};
+  void put(String hostKey, String package, String label) {
+    final k = '$hostKey|$package';
+    final existing = byKey[k];
+    if (existing == null) {
+      byKey[k] = (hostKey: hostKey, package: package, labels: {label});
+    } else {
+      byKey[k] = (hostKey: hostKey, package: package, labels: {...existing.labels, label});
+    }
+  }
+
+  final l = appL10n;
+  for (final g in ref.read(nativeWantsAcksProvider.notifier).grantedWants()) {
+    for (final w in g.wants) {
+      final label = switch (w) {
+        'draft' => l.plugslotsPermDraft,
+        'clipboard' => l.plugslotsPermClipboard,
+        'message' => l.plugslotsPermMessage,
+        'compose' => l.plugslotsPermCompose,
+        _ => w,
+      };
+      put(g.hostKey, g.package, label);
+    }
+  }
+  for (final g in ref.read(nativeVoiceConsentProvider.notifier).grantedVoice()) {
+    put(g.hostKey, g.package, l.plugslotsPermVoice);
+  }
+  final list = byKey.values.toList();
+  list.sort((a, b) {
+    final c = a.hostKey.compareTo(b.hostKey);
+    return c != 0 ? c : a.package.compareTo(b.package);
+  });
+  return list;
+}
+
+/// The ＋ panel card. Hidden entirely when no plugin has any grant, so the
+/// no-grant geometry and the existing ListPageCard index assertions in
+/// plus_panel_test.dart stay unchanged.
+class _PluginPermissionsCard extends ConsumerWidget {
+  const _PluginPermissionsCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watch the underlying providers so the card appears/disappears after a
+    // revoke. grantedWants/grantedVoice are one-shot synchronous reads (no
+    // timers, no polling).
+    final wants = ref.watch(nativeWantsAcksProvider);
+    final voice = ref.watch(nativeVoiceConsentProvider);
+    if (wants.isEmpty && voice.values.every((v) => !v)) return const SizedBox.shrink();
+    final l10n = context.l10n;
+    return Column(
+      children: [
+        const SizedBox(height: 24),
+        ListPageCard(
+          title: l10n.plugslotsPluginPermissions,
+          margin: const EdgeInsets.symmetric(horizontal: PlusPanelMetrics.side),
+          children: [
+            ListPageRow(
+              title: l10n.plugslotsPluginPermissions,
+              onTap: () => SheetNavigator.of(context).push((_) => const NativePluginPermissionsPage()),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// Lists every plugin that holds any sensitive grant and lets the person
+/// revoke all of its grants at once. Data model is source-agnostic: adding a
+/// new authority only adds another collector in [_collectPluginGrants].
+class NativePluginPermissionsPage extends ConsumerStatefulWidget {
+  const NativePluginPermissionsPage({super.key});
+
+  @override
+  ConsumerState<NativePluginPermissionsPage> createState() => _NativePluginPermissionsPageState();
+}
+
+class _NativePluginPermissionsPageState extends ConsumerState<NativePluginPermissionsPage> {
+  bool _busy = false;
+
+  Future<void> _revoke(_PluginGrant g) async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    await ref.read(nativeWantsAcksProvider.notifier).revokeWants(g.hostKey, g.package);
+    await ref.read(nativeVoiceConsentProvider.notifier).revokeVoice(g.hostKey, g.package);
+    if (!mounted) return;
+    setState(() => _busy = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    ref.watch(nativeWantsAcksProvider);
+    ref.watch(nativeVoiceConsentProvider);
+    final grants = _collectPluginGrants(ref);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SheetTitleBar(l10n.plugslotsPluginPermissions),
+        SheetGroup(
+          children: [
+            if (grants.isEmpty)
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  l10n.plugslotsPluginPermissionsEmpty,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              )
+            else
+              for (final g in grants)
+                ListPageRow(
+                  title: g.package,
+                  subtitle: g.labels.join(' · '),
+                  danger: true,
+                  trailing: TextButton(
+                    onPressed: _busy ? null : () => unawaited(_revoke(g)),
+                    child: Text(l10n.plugslotsPluginPermissionsRevoke),
+                  ),
+                ),
+          ],
+        ),
+        const SizedBox(height: 16),
       ],
     );
   }

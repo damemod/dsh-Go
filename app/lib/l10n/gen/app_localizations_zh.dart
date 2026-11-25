@@ -16911,9 +16911,39 @@ class L10nZh extends L10n {
   }
 
   @override
+  String get plugslotsReplaceOnce => '仅这次';
+
+  @override
+  String get plugslotsReplaceSession => '本对话内不再提示';
+
+  @override
   String plugslotsWantsCompose(String plugin) {
     return '「$plugin」要替换你输入的文字';
   }
+
+  @override
+  String get plugslotsPluginPermissions => '插件权限';
+
+  @override
+  String get plugslotsPluginPermissionsEmpty => '没有已授权的插件';
+
+  @override
+  String get plugslotsPluginPermissionsRevoke => '撤销';
+
+  @override
+  String get plugslotsPermDraft => '读取草稿';
+
+  @override
+  String get plugslotsPermClipboard => '读取剪贴板';
+
+  @override
+  String get plugslotsPermMessage => '读取消息';
+
+  @override
+  String get plugslotsPermCompose => '替换输入文字';
+
+  @override
+  String get plugslotsPermVoice => '听你开口';
 
   @override
   String get plugViewInvalid => '插件界面有误';

@@ -720,6 +720,34 @@ class NativeVoiceConsents extends Notifier<Map<String, bool>> {
       ]);
     } catch (_) {}
   }
+
+  /// Permissions explicitly allowed (true). A declined (false) or never-asked
+  /// plugin is not listed — there is nothing to revoke. Parse keys from the
+  /// right for the same reason as [NativeWantsAcks.grantedWants].
+  List<({String hostKey, String package})> grantedVoice() {
+    final out = <({String hostKey, String package})>[];
+    for (final MapEntry(:key, :value) in state.entries) {
+      if (value != true) continue;
+      final i = key.lastIndexOf('|');
+      if (i <= 0 || i == key.length - 1) continue;
+      out.add((hostKey: key.substring(0, i), package: key.substring(i + 1)));
+    }
+    return out;
+  }
+
+  /// Remove the consent entirely — back to "never asked", so the next voice
+  /// tap asks again. Removing the key (rather than writing false) also drives
+  /// the listener above to stop a plugin currently listening.
+  Future<void> revokeVoice(String hostKey, String package) async {
+    final key = '$hostKey|$package';
+    state = {...state}..remove(key);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(prefsKey, [
+        for (final MapEntry(:key, :value) in state.entries) '${value ? 1 : 0}:$key',
+      ]);
+    } catch (_) {}
+  }
 }
 
 final nativeVoiceConsentProvider = NotifierProvider<NativeVoiceConsents, Map<String, bool>>(NativeVoiceConsents.new);
