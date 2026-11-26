@@ -11140,6 +11140,9 @@ class L10nEn extends L10n {
   String get hubSessionNotStarted => 'Not started';
 
   @override
+  String get hubSessionTokenSpeed => 'tokens/s';
+
+  @override
   String get hubSessionTurnUsage => 'Usage by turn';
 
   @override
