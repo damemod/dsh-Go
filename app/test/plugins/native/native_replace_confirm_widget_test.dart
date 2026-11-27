@@ -199,10 +199,13 @@ void main() {
 
     await tester.tap(find.text('撤销'));
     await pumpFrames(tester, 10);
-    await Future<void>.delayed(Duration.zero);
-    final prefs = await SharedPreferences.getInstance();
-    expect(prefs.getStringList(NativeWantsAcks.prefsKey), isEmpty, reason: 'wants revoked');
-    expect(prefs.getStringList(NativeVoiceConsents.prefsKey), isEmpty, reason: 'voice revoked');
+    // revokeWants/revokeVoice update their in-memory state synchronously before
+    // the async prefs write. Read that state directly: a bare Future.delayed
+    // scheduled after the last pump never fires under the widget tester's fake
+    // clock, and prefs persistence is covered by native_replace_permission_test.
+    final container = ProviderScope.containerOf(tester.element(find.byType(MaterialApp)));
+    expect(container.read(nativeWantsAcksProvider), isEmpty, reason: 'wants revoked');
+    expect(container.read(nativeVoiceConsentProvider), isEmpty, reason: 'voice revoked');
     expect(find.text('没有已授权的插件'), findsOneWidget, reason: 'empty state after revoke');
   });
 }
