@@ -12,7 +12,7 @@ import java.nio.file.LinkOption
  *
  * proot maps the guest root onto the rootfs (`filesDir/runtime/rootfs`, see
  * RuntimeInstaller) and, with phone storage on, binds the shared storage at
- * `/sdcard` and `/storage` (PhoneStorage.binds). Symlinks usually hold guest
+ * `/sdcard` (PhoneStorage.binds). Symlinks usually hold guest
  * targets (`/usr/lib/…`), but `--link2symlink` uses host-absolute targets in
  * the rootfs's `/root/.l2s`. Rebase those targets before following each link
  * in the guest world, not by Android. tawc's opaque hard-link names instead
@@ -85,7 +85,6 @@ object GuestFiles {
         val phone = PhoneStorage.GUEST_PATH
         return when {
             guest == phone || guest.startsWith("$phone/") -> File(phoneRoot + guest.removePrefix(phone))
-            guest == "/storage" || guest.startsWith("/storage/") -> File(guest)
             else -> File(rootfs, guest.removePrefix("/"))
         }
     }

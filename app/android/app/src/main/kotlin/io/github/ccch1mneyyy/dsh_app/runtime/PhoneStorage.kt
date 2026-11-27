@@ -38,11 +38,16 @@ object PhoneStorage {
         "hostPath" to hostRoot(),
     )
 
-    /** proot `-b` values: the phone's storage at /sdcard, plus /storage for absolute paths apps share. */
-    fun binds(): List<String> {
+    /** proot `-b` values: the phone's shared storage at /sdcard only. */
+    fun binds(): List<String> = binds(hostRoot())
+
+    /** Test seam: [hostRoot] is injected so JVM tests need no Android Environment stub. */
+    internal fun binds(hostRoot: String): List<String> {
         // Skip the mount rather than fail the launch when the path isn't readable.
-        if (!java.io.File(hostRoot()).canRead()) return emptyList()
-        return listOf("${hostRoot()}:$GUEST_PATH", "/storage")
+        if (!java.io.File(hostRoot).canRead()) return emptyList()
+        // A bare /storage bind would expose the physical shared storage outside
+        // the single controlled /sdcard mount point. Keep only that mount.
+        return listOf("$hostRoot:$GUEST_PATH")
     }
 
     /** `/root/手机存储` → `/sdcard` inside the rootfs, present only while the mode is on. */

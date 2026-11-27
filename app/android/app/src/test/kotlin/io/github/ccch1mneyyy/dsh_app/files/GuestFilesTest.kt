@@ -180,6 +180,17 @@ class GuestFilesTest {
         assertResolved(actual, "/root/guest-phone/image.png")
     }
 
+    @Test fun storagePrefixNoLongerEscapesToPhysicalHostStorage() {
+        // With the /storage bind removed, a /storage/... guest path is an
+        // ordinary rootfs-relative path — it must not reach physical /storage.
+        val inRootfs = file("storage/emulated/0/photo.png", "rootfs photo")
+        assertResolved(inRootfs, "/storage/emulated/0/photo.png")
+
+        // With no rootfs counterpart, resolution fails instead of escaping to
+        // the device's physical /storage/emulated/0 tree.
+        assertNull(resolve("/storage/emulated/0/does-not-exist.png"))
+    }
+
     @Test fun tawcRegularObjectsResolveOnlyAtRootfsLeaves() {
         val alias = rootAlias()
         for (token in listOf("123", "456-2")) {
