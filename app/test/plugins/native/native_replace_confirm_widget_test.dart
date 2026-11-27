@@ -10,14 +10,13 @@
 //   - without the compose want no replace can happen at all;
 //   - the ＋ panel permission card lists grants and revokes both stores.
 //
-// The confirm dialog is deliberately not driven here: it is a modal route whose
-// Future only completes when the person taps a button, and driving it from a
-// widget test makes the test body park on that Future. The allowance is seeded
-// through its provider instead, which exercises exactly the write-gate path
-// this file is about (session allowance still passes through D1 and D2).
-//
-// The compose want and the session allowance are pre-acknowledged through
-// SharedPreferences / the provider so these tests focus on the replace gate.
+// The confirm dialog is deliberately not driven: the session allowance skips
+// it, and the wants dialog is avoided by seeding the wants/voice notifiers with
+// a fixed state. Both providers otherwise build empty and load SharedPreferences
+// asynchronously (native_state.dart:341-352, native_capabilities.dart:691-708);
+// if that load has not flushed at tap time, runNativeTap opens the wants dialog
+// (native_taps.dart:322-323) and waits for a tap that never comes -> 10-min test
+// timeout. Fixed notifiers make the grant state synchronous and deterministic.
 
 import 'package:dsh_app/plugins/native/native_capabilities.dart';
 import 'package:dsh_app/plugins/native/native_state.dart';
@@ -35,6 +34,23 @@ import '../../chat/support/harness.dart';
 import 'support.dart';
 
 const _wantsKey = 'local:local|replace-helper|compose';
+const _voiceKey = 'local:local|replace-helper';
+
+/// A wants notifier with a fixed, synchronous state — no async prefs load.
+class _FixedWants extends NativeWantsAcks {
+  _FixedWants(this.initial);
+  final Set<String> initial;
+  @override
+  Set<String> build() => initial;
+}
+
+/// A voice-consent notifier with a fixed, synchronous state.
+class _FixedVoice extends NativeVoiceConsents {
+  _FixedVoice(this.initial);
+  final Map<String, bool> initial;
+  @override
+  Map<String, bool> build() => initial;
+}
 
 Map<String, Object?> _replacePlugin({List<String> wants = const ['compose']}) => plugin(
   'replace-helper',
@@ -46,7 +62,13 @@ Map<String, Object?> _replacePlugin({List<String> wants = const ['compose']}) =>
   ],
 );
 
-Widget _bar(FakeBridge bridge, FakeComposer composer) {
+/// Overrides that seed the wants/voice grants synchronously for the harness.
+List<Override> _grants({Set<String> wants = const {_wantsKey}, Map<String, bool> voice = const {}}) => [
+  nativeWantsAcksProvider.overrideWith(() => _FixedWants(wants)),
+  nativeVoiceConsentProvider.overrideWith(() => _FixedVoice(voice)),
+];
+
+Widget _bar(FakeBridge bridge, FakeComposer composer, {List<Override> grants = const []}) {
   return testApp(
     Scaffold(
       backgroundColor: Colors.transparent,
@@ -68,19 +90,8 @@ Widget _bar(FakeBridge bridge, FakeComposer composer) {
         ),
       ),
     ),
-    overrides: [...nativeOverrides(bridge)],
+    overrides: [...nativeOverrides(bridge), ...grants],
   );
-}
-
-// The wants provider builds empty and loads asynchronously on first read. The
-// composer reads the wants only at tap time; force the load before tapping so
-// the mock prefs are visible and the wants dialog does not appear instead of
-// the replace gate.
-Future<void> _primeGrants(WidgetTester tester) async {
-  final container = ProviderScope.containerOf(tester.element(find.byType(MaterialApp)));
-  container.read(nativeWantsAcksProvider);
-  container.read(nativeVoiceConsentProvider);
-  await Future<void>.delayed(Duration.zero);
 }
 
 /// Seed a session allowance for 's1' so the confirm dialog is skipped but every
@@ -88,14 +99,14 @@ Future<void> _primeGrants(WidgetTester tester) async {
 Future<void> _allowSession(WidgetTester tester) async {
   final container = ProviderScope.containerOf(tester.element(find.byType(MaterialApp)));
   container.read(nativeReplaceSessionAllowProvider.notifier).allow('s1', HostRef.local, 'replace-helper');
-  await Future<void>.delayed(Duration.zero);
+  await pumpFrames(tester, 2);
 }
 
 void main() {
   setUpAll(loadTestFonts);
-  setUp(() => SharedPreferences.setMockInitialValues({NativeWantsAcks.prefsKey: [_wantsKey]}));
 
   testWidgets('session allowance writes once with no dialog; D2 still refuses a changed draft', (tester) async {
+    SharedPreferences.setMockInitialValues({});
     usePhoneView(tester);
     final composer = FakeComposer(draft: 'ORIGINAL');
     final bridge = FakeBridge(contributions([_replacePlugin()]))
@@ -105,9 +116,8 @@ void main() {
           {'type': 'replace', 'text': 'NEW'},
         ],
       });
-    await tester.pumpWidget(_bar(bridge, composer));
+    await tester.pumpWidget(_bar(bridge, composer, grants: _grants()));
     await pumpFrames(tester);
-    await _primeGrants(tester);
     await _allowSession(tester);
 
     // With a session allowance the dialog is skipped and the immediate result
@@ -150,9 +160,9 @@ void main() {
           {'type': 'replace', 'text': 'OVERWRITE'},
         ],
       });
-    await tester.pumpWidget(_bar(bridge, composer));
+    // No compose grant: the plugin has no wants, so composeAuthorized is false.
+    await tester.pumpWidget(_bar(bridge, composer, grants: _grants(wants: const {})));
     await pumpFrames(tester);
-    await _primeGrants(tester);
 
     await tester.tap(find.text('替换'));
     await pumpFrames(tester);
@@ -160,10 +170,7 @@ void main() {
   });
 
   testWidgets('permission card lists grants and revoking clears both stores', (tester) async {
-    SharedPreferences.setMockInitialValues({
-      NativeWantsAcks.prefsKey: [_wantsKey],
-      NativeVoiceConsents.prefsKey: ['1:local:local|replace-helper'],
-    });
+    SharedPreferences.setMockInitialValues({});
     usePhoneView(tester);
     await tester.pumpWidget(
       testApp(
@@ -177,10 +184,10 @@ void main() {
             ),
           ),
         ),
+        overrides: _grants(voice: const {_voiceKey: true}),
       ),
     );
     await pumpFrames(tester, 10);
-    await _primeGrants(tester);
     await tester.tap(find.text('打开'));
     await pumpFrames(tester, 10);
 
