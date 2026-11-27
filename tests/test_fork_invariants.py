@@ -26,6 +26,8 @@ ROOT = HERE.parent
 
 USAGE_STATS = ROOT / "app" / "lib" / "usage" / "usage_stats.dart"
 UPGRADE_NOTICE = ROOT / "app" / "lib" / "ui" / "shell" / "usage_upgrade_notice.dart"
+V4_LEDGER = ROOT / "app" / "lib" / "usage" / "usage_v4_ledger.dart"
+V4_LEDGER_TEST = ROOT / "app" / "test" / "usage" / "usage_v4_ledger_test.dart"
 EFFECTS_JS = ROOT / "runtime" / "bridge" / "dsh-go-bridge" / "lib" / "native" / "effects.js"
 NATIVE_EFFECTS = ROOT / "app" / "lib" / "plugins" / "native" / "native_effects.dart"
 LIMITS_JS = ROOT / "runtime" / "bridge" / "dsh-go-bridge" / "lib" / "native" / "limits.js"
@@ -74,6 +76,20 @@ class ForkInvariantTests(unittest.TestCase):
             UPGRADE_NOTICE.exists(),
             "usage_upgrade_notice.dart 重新出现（fork 3a4d4611 已删除该弹窗）",
         )
+
+    def test_no_v4_ledger_file(self):
+        """fork 不引入上游的 v4 日活账本；该文件与其测试不得重新出现。
+
+        上游 usage_v4_ledger.dart 是「默认开 + 日活不可关」的日活收集器，
+        fork 在 8e31 对齐时已将其与测试列为 BLOCKED/排除项。v1.4.0 clean
+        rebuild 曾把它们带回树（与上游逐字节相同，但无任何生产 import，
+        属死代码回流）。此断言拦截未来再次回流。
+        """
+        for path, label in ((V4_LEDGER, "usage_v4_ledger.dart"), (V4_LEDGER_TEST, "usage_v4_ledger_test.dart")):
+            self.assertFalse(
+                path.exists(),
+                "%s 重新出现（fork 恒排除上游 v4 日活账本）" % label,
+            )
 
     # ---- 身份 2：replace / close 效果原语 ----
 
