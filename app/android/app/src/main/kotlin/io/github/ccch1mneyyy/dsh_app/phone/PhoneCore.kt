@@ -3,6 +3,7 @@ package io.github.ccch1mneyyy.dsh_app.phone
 import io.github.ccch1mneyyy.dsh_app.phone.background.Reasons
 import io.github.ccch1mneyyy.dsh_app.phone.skills.PhoneTaskTrace
 import io.github.ccch1mneyyy.dsh_app.phone.skills.PhoneSkillReplaySelections
+import io.github.ccch1mneyyy.dsh_app.phone.a11y.ScreenFormat
 import io.github.ccch1mneyyy.dsh_app.phone.skills.PhoneSkillOutcomes
 import java.time.ZoneId
 import java.time.LocalDate
@@ -891,7 +892,10 @@ class PhoneCore(
         val shown = safety.filterScreen(snapshot, policy)
         if (!current(owner)) throw InterruptedException()
         if (shown === snapshot) driver.acceptVisualObservation(shown.id)
-        return shown
+        // Final exit backstop: every observation reaching the model must be free of
+        // invisible / reordering format characters, including drivers added later.
+        val cleanText = ScreenFormat.stripInvisible(shown.text)
+        return if (cleanText == shown.text) shown else shown.copy(text = cleanText)
     }
 
     private fun screen(a: Args, owner: PhoneTasks.Owner): Out {
@@ -906,8 +910,14 @@ class PhoneCore(
         lastScreen = which
         say(owner, if (which == PhoneScreen.BACKGROUND) ui.get("phone_reading_background", "DSH 正在看后台屏") else ui.get("phone_reading_screen", "DSH 正在看屏幕")) // l10n:keep test default
         if (!current(owner)) return stoppedOut(summary)
-        val snap = driver.observe(detail = a.bool("detail") == true, image = a.strictBool("image") == true,
+        val observed = driver.observe(detail = a.bool("detail") == true, image = a.strictBool("image") == true,
             automaticImage = !a.provided("image"))
+        // Sanitize before the identity-based read-refusal check below. returnedScreen() may
+        // copy a snapshot whose text still carries invisible/reordering characters, and
+        // screen() detects a safety refusal with `shown !== snap`. Making `snap` the already
+        // clean object keeps that signal meaning "safety refused" only.
+        val sanitizedText = ScreenFormat.stripInvisible(observed.text)
+        val snap = if (sanitizedText == observed.text) observed else observed.copy(text = sanitizedText)
         if (!current(owner) || !tasks.setAppIfCurrent(owner, snap.appLabel)) return stoppedOut(summary)
         val shown = returnedScreen(driver, snap, owner)
         val refused = shown !== snap

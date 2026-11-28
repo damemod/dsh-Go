@@ -182,7 +182,37 @@ class ScreenFormatTest {
         val visible = "Transfer 100"
         val cleaned = ScreenFormat.clean(visible + controls.joinToString(""))
         assertNotNull(cleaned)
-        assertTrue(cleaned!!, cleaned.none { Character.getType(it) == Character.FORMAT })
+        assertTrue(cleaned!!, cleaned.none { Character.getType(it) == Character.FORMAT.toInt() })
         assertEquals(visible, cleaned)
+    }
+
+    @Test fun cleanNeutralisesInlineBidiReordering() {
+        // A right-to-left override can hide "png" while the model sees "gnp".
+        val hostile = "OK\u202Egnp\u202C"
+        val shown = ScreenFormat.stripInvisible(hostile)
+        assertEquals("OKgnp", shown)
+        assertTrue(shown, shown.none { Character.getType(it) == Character.FORMAT.toInt() })
+    }
+
+    @Test fun stripInvisibleKeepsVisibleJoinersButDropsSupplementaryFormatCharacters() {
+        // ZWJ changes rendered text (emoji ligature): it must survive sanitizing.
+        val ligature = "\uD83D\uDC69\u200D\uD83D\uDCBB"
+        assertEquals(ligature, ScreenFormat.stripInvisible(ligature))
+        assertEquals(ligature, ScreenFormat.clean(ligature))
+        // Supplementary-plane Cf is a surrogate pair; a per-Char filter would miss it.
+        val egyptianJoiner = String(Character.toChars(0x13430))
+        val tagChar = String(Character.toChars(0xE0020))
+        val withInvisible = "Pay" + egyptianJoiner + tagChar + "01"
+        assertEquals("Pay01", ScreenFormat.stripInvisible(withInvisible))
+        assertEquals("Pay01", ScreenFormat.clean(withInvisible))
+    }
+
+    @Test fun stripInvisibleCoversRepresentativeCfFromEveryPlane() {
+        val samples = listOf(
+            "\u00AD", "\u061C", "\u180E", "\u206A", "\uFFF9",
+            String(Character.toChars(0x110BD)), String(Character.toChars(0x1BCA1)),
+            String(Character.toChars(0xE0001)),
+        )
+        for (s in samples) assertEquals("hidden", ScreenFormat.stripInvisible("hid" + s + "den"))
     }
 }

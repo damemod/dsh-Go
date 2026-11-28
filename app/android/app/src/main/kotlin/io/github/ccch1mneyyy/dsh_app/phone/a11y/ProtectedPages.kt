@@ -51,6 +51,7 @@ object ProtectedPages {
         fun walk(n: UiNode, inScroll: Boolean) {
             if (out.size >= limit) return
             val text = (n.text ?: n.desc)?.takeIf { it.isNotBlank() && !n.editable }
+                ?.let(ScreenFormat::stripInvisible)
             if (text != null && ((n.heading && n.bounds.centerY < screenHeight * 0.3) || (!inScroll && n.bounds.centerY < screenHeight * 0.2))) out += text
             n.children.forEach { walk(it, inScroll || n.scrollable) }
         }

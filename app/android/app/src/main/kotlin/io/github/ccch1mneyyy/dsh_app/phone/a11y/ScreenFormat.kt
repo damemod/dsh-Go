@@ -620,12 +620,47 @@ object ScreenFormat {
     // ---- text helpers -------------------------------------------------------------------------
 
     private val space = Regex("\\s+")
-    private val invisible = Regex("[\\u200B-\\u200F\\u202A-\\u202E\\u2060\\u2066-\\u2069\\uFEFF]")
+
+    /**
+     * Invisible / text-reordering Unicode format characters (general category Cf),
+     * stored as code-point ranges. U+200C/U+200D are deliberately excluded: they are
+     * visible joiners (emoji and script ligatures); removing them would make the model
+     * see a different string than the human. Ranges are code points, not UTF-16 chars,
+     * so a supplementary Cf such as U+13430 (a surrogate pair) is matched correctly.
+     * This table is a backstop for devices whose Unicode database predates a code point;
+     * [isInvisibleCodePoint] also consults the runtime's Character.getType.
+     */
+    private val invisibleCfRanges = listOf(
+        0x00AD..0x00AD, 0x0600..0x0605, 0x061C..0x061C, 0x06DD..0x06DD,
+        0x070F..0x070F, 0x0890..0x0891, 0x08E2..0x08E2, 0x180E..0x180E,
+        0x200B..0x200B, 0x200E..0x200F, 0x202A..0x202E, 0x2060..0x2064,
+        0x2066..0x206F, 0xFEFF..0xFEFF, 0xFFF9..0xFFFB, 0x110BD..0x110BD,
+        0x110CD..0x110CD, 0x13430..0x1343F, 0x1BCA0..0x1BCA3, 0x1D173..0x1D17A,
+        0xE0001..0xE0001, 0xE0020..0xE007F,
+    )
+
+    private fun isInvisibleCodePoint(cp: Int): Boolean {
+        if (cp == 0x200C || cp == 0x200D) return false
+        if (Character.getType(cp) == Character.FORMAT.toInt()) return true
+        return invisibleCfRanges.any { cp in it }
+    }
+
+    /** Removes invisible / reordering format characters; no masking, no whitespace folding. */
+    fun stripInvisible(value: String): String {
+        val out = StringBuilder(value.length)
+        var i = 0
+        while (i < value.length) {
+            val cp = value.codePointAt(i)
+            if (!isInvisibleCodePoint(cp)) out.appendCodePoint(cp)
+            i += Character.charCount(cp)
+        }
+        return out.toString()
+    }
 
     /** Single-line, masked, null when blank. */
     fun clean(value: String?): String? {
         if (value.isNullOrBlank()) return null
-        val flat = space.replace(invisible.replace(value, ""), " ").trim()
+        val flat = space.replace(stripInvisible(value), " ").trim()
         return if (flat.isEmpty()) null else ScreenMask.mask(flat)
     }
 
