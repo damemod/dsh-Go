@@ -13,7 +13,7 @@ scripts/seam-snapshot.mjs              # 快照：import 桥模块做行为探�
 scripts/vendor/acorn.mjs               # acorn 8.19.0 (MIT)，AST 探针用，固定随仓库提供
 scripts/vendor/LICENSE.acorn           # acorn 许可
 scripts/check_seam_security.py         # 门禁：快照与 golden 逐项对比，fail-closed
-golden/seam-baseline.json              # 安全基线，来源 v1.2.0 (c1a84e3)
+golden/seam-baseline.json              # 安全基线，来源本 fork 当前接缝定义 (11ce708)
 tests/test_seam_security_gate.py       # 意图驱动变异测试（34 例）
 SEAM_SECURITY.md                       # 本文件
 ```
@@ -23,7 +23,7 @@ SEAM_SECURITY.md                       # 本文件
 
 ## 2. 守什么
 
-golden 全部常量取自 v1.2.0 (`c1a84e3f833ad59ff07a5027994dae3935907a2d`) 真实源码：
+golden 全部常量取自本 fork 当前接缝定义 (`11ce7080d3028ab0db18726f7d2d87e2776c3306`) 真实源码：
 
 - `protocol = 1`（`limits.js:3`）；
 - effect 白名单：static/all/deferred（`effects.js:7-10`）、effectFeatures / pickerTypes
