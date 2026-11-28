@@ -620,7 +620,7 @@ object ScreenFormat {
     // ---- text helpers -------------------------------------------------------------------------
 
     private val space = Regex("\\s+")
-    private val invisible = Regex("[\\u200B-\\u200F\\u2060\\uFEFF]")
+    private val invisible = Regex("[\\u200B-\\u200F\\u202A-\\u202E\\u2060\\u2066-\\u2069\\uFEFF]")
 
     /** Single-line, masked, null when blank. */
     fun clean(value: String?): String? {

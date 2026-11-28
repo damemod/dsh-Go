@@ -171,4 +171,18 @@ class ScreenFormatTest {
             bounds = Box(0, 100, 300, 150), editable = true))
         assertFalse(hinted.text, hinted.text.lines().single { it.contains("昵称") }.contains("空"))
     }
+
+
+    @Test fun cleanStripsBidiAndZeroWidthFormatCharacters() {
+        val controls = listOf(
+            '\u202A', '\u202B', '\u202C', '\u202D', '\u202E',
+            '\u2066', '\u2067', '\u2068', '\u2069',
+            '\u200B', '\u200E', '\u2060', '\uFEFF'
+        )
+        val visible = "Transfer 100"
+        val cleaned = ScreenFormat.clean(visible + controls.joinToString(""))
+        assertNotNull(cleaned)
+        assertTrue(cleaned!!, cleaned.none { Character.getType(it) == Character.FORMAT })
+        assertEquals(visible, cleaned)
+    }
 }
