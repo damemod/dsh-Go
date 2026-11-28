@@ -25,6 +25,7 @@ import 'ui/chat/dsh_ui/dsh_ui_model.dart' show DshUiAppAccent;
 import 'ui/chat/run_info.dart' show runActivityProvider;
 import 'ui/common/keyboard_motion.dart';
 import 'ui/common/side_insets.dart';
+import 'ui/fx/bot_avatar/bot_avatar.dart' show BotAvatar;
 import 'ui/launch/launch_overlay.dart';
 import 'ui/shell/root_gate.dart';
 import 'ui/theme/theme.dart';
@@ -108,9 +109,13 @@ class _DshAppState extends ConsumerState<DshApp> with WidgetsBindingObserver {
     unawaited(ref.read(notifyChannelProvider).status());
   }
 
-  /// Decoded pet sheets nobody pins go, as Flutter's own image cache does.
+  /// Decoded pet sheets nobody pins and cached avatar stills go, as Flutter's
+  /// own image cache does.
   @override
-  void didHaveMemoryPressure() => PetSheets.instance.trim();
+  void didHaveMemoryPressure() {
+    PetSheets.instance.trim();
+    BotAvatar.clearStillCache();
+  }
 
   /// The system's remove-animations setting changed while the app was open: page
   /// transitions are chosen in [build], so they would keep the old answer.
