@@ -168,8 +168,10 @@ internal class MainScreenDriver(private val service: PhoneA11yService, private v
         val scope = visual.scope(snap.id) ?: return null
         val point = image.geometry.toScreen(action.x, action.y) ?: return null
         val node = snap.visualEvidence?.target(point.first, point.second) ?: return null
-        VisualTarget(scope, TargetInfo(snap.id, 0, "按钮", ScreenFormat.clip(ScreenMask.mask(node.text?.takeIf { it.isNotBlank() }
-            ?: node.description.orEmpty()), 160), scope.packageName, snap.appLabel,
+        val labelText = ScreenFormat.stripInvisible(node.text?.takeIf { it.isNotBlank() }
+            ?: node.description.orEmpty())
+        VisualTarget(scope, TargetInfo(snap.id, 0, "按钮", ScreenFormat.clip(ScreenMask.mask(labelText), 160),
+            scope.packageName, snap.appLabel,
             isPassword = false, isSecretField = false, isEditable = false, viewId = node.viewId))
     }
 
@@ -1331,7 +1333,7 @@ internal class MainScreenDriver(private val service: PhoneA11yService, private v
         val hint = ScreenFormat.clean(node.hintText?.toString())
             ?: if (node.isShowingHintTextCompat()) ScreenFormat.clean(node.text?.toString()) else null
         return node.isPassword || SensitiveWords.secretHit(
-            hint, node.contentDescription?.toString(), node.viewIdResourceName,
+            hint, node.contentDescription?.toString()?.let(ScreenFormat::stripInvisible), node.viewIdResourceName,
         ) != null
     }
 
@@ -1569,7 +1571,7 @@ internal class MainScreenDriver(private val service: PhoneA11yService, private v
             // l10n:keep agent screen result
             val now = if (currentSecret || SafetyRules.isSecretTarget(target)) "这是密码 / 验证码框，框里的内容不回传"
             // l10n:keep agent screen result
-            else "框里现在是" + ScreenMask.mask(got).let { if (it.isEmpty()) "空" else "「${ScreenFormat.clip(it, 40)}」" }
+            else "框里现在是" + ScreenMask.mask(ScreenFormat.stripInvisible(got)).let { if (it.isEmpty()) "空" else "「${ScreenFormat.clip(it, 40)}」" }
             // l10n:keep agent screen result
             return "已输入，但回读不一致：$now。没有重试，也没有提交；请看新屏幕决定下一步。"
         }

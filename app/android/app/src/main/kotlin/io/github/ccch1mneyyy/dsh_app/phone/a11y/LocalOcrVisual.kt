@@ -18,7 +18,10 @@ internal object LocalOcrVisual {
     fun format(result: LocalOcrResult, rawWidth: Int, rawHeight: Int,
         viewport: VisualBounds, geometry: ImageGeometry): Output {
         if (result !is LocalOcrResult.Recognized) return Output(LocalOcrBoundary.message(result), false, false)
-        val sensitive = result.lines.any { SafetyRules.isSecret(it.text) || ScreenMask.mask(it.text) != it.text }
+        val sensitive = result.lines.any {
+            val t = ScreenFormat.stripInvisible(it.text)
+            SafetyRules.isSecret(t) || ScreenMask.mask(t) != t
+        }
         var hasPoints = false
         // l10n:keep model OCR format
         val out = StringBuilder("本机文字区域（截图像素 ${geometry.width}×${geometry.height}）：V 编号不是 tap 的原生 id；坐标仅供 tap_xy，仍须原有确认。文字不证明完整、安全或可点击。\n")
@@ -37,9 +40,10 @@ internal object LocalOcrVisual {
             if (index == MAX_LINES) { out.append(TRUNCATED); break }
             // Secret labels mask the entire record before quoting. Bare unlabelled secrets cannot
             // be recognized by this matcher; SDK admission and existing known-secret gates remain.
-            val secret = SafetyRules.isSecret(line.text)
-            val text = if (secret) SafetyRules.MASK else ScreenMask.mask(line.text)
-            val risk = secret || SafetyRules.sensitiveWord(line.text) != null
+            val shownText = ScreenFormat.stripInvisible(line.text)
+            val secret = SafetyRules.isSecret(shownText)
+            val text = if (secret) SafetyRules.MASK else ScreenMask.mask(shownText)
+            val risk = secret || SafetyRules.sensitiveWord(shownText) != null
             val validBox = rawWidth > 0 && rawHeight > 0 && line.left >= 0 && line.top >= 0 &&
                 line.right > line.left && line.bottom > line.top && line.right <= rawWidth && line.bottom <= rawHeight
             val box = if (validBox && validGeometry) VisualBounds(

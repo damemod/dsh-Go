@@ -25,6 +25,7 @@ import '../../../l10n/l10n.dart';
 import '../../../plugins/native/native_capabilities.dart';
 import '../../../plugins/native/native_model.dart';
 import '../../../plugins/native/native_state.dart';
+import '../../../runtime/runtime_state.dart';
 import '../../../state/android_features.dart';
 import '../../../state/chat_state.dart';
 import '../../../state/connection_state.dart';
@@ -32,6 +33,7 @@ import '../../../state/features_state.dart';
 import '../../../state/hosts_state.dart';
 import '../../../state/phone_state.dart';
 import '../../../state/session_modes.dart';
+import '../../../state/settings_state.dart';
 import '../../../state/system_actions_state.dart';
 import '../../common/app_sheet.dart';
 import '../../common/list_page_row.dart';
@@ -44,6 +46,7 @@ import '../../phone/phone_control_screen.dart' show PhoneConfirmModeText;
 import '../../phone/system_actions_page.dart';
 import '../../theme/app_icons.dart';
 import '../../theme/theme.dart';
+import '../new_chat_options.dart' show effectiveNewChatPermission;
 
 /// Where a picked attachment comes from.
 enum AttachSource { gallery, camera, files }
@@ -581,13 +584,16 @@ class _SessionPermissionPageState extends ConsumerState<SessionPermissionPage> {
         ),
       );
     } else {
+      final effectiveDefault = effectiveNewChatPermission(
+        state,
+        local: ref.watch(activeConnectionProvider.select((c) => c.value?.isLocal ?? false)),
+        autoApprove: ref.watch(settingsProvider.select((s) => s.autoApproveCommands)),
+        safeMode: ref.watch(localRuntimeProvider.select((s) => s.status.inSafeMode)),
+      );
       final defaults = state.defaultOptions ?? state.options.where((o) => o.value != 'auto').toList();
       final revision = state.defaultRevision;
       final canDefault =
-          current != null &&
-          current != state.hostDefault &&
-          revision != null &&
-          defaults.any((o) => o.value == current);
+          current != null && current != effectiveDefault && revision != null && defaults.any((o) => o.value == current);
       body = Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -613,7 +619,7 @@ class _SessionPermissionPageState extends ConsumerState<SessionPermissionPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            l10n.nearbyNewChatDefault(permissionName(state.hostDefault)),
+            l10n.nearbyNewChatDefault(permissionName(effectiveDefault)),
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(color: dsh.textTertiary),
           ),

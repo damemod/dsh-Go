@@ -552,10 +552,21 @@ final class IOSPhoneScreen {
   }
 
   nonisolated private static func plain(_ text: String) -> String {
+    // Mirrors ScreenFormat.stripInvisible on Android: drop invisible / reordering
+    // format characters (Unicode Cf), keep the two visible joiners, fold whitespace.
+    let invisible: [(UInt32, UInt32)] = [
+      (0x00AD, 0x00AD), (0x0600, 0x0605), (0x061C, 0x061C), (0x06DD, 0x06DD),
+      (0x070F, 0x070F), (0x0890, 0x0891), (0x08E2, 0x08E2), (0x180E, 0x180E),
+      (0x200B, 0x200B), (0x200E, 0x200F), (0x202A, 0x202E), (0x2060, 0x2064),
+      (0x2066, 0x206F), (0xFEFF, 0xFEFF), (0xFFF9, 0xFFFB), (0x110BD, 0x110BD),
+      (0x110CD, 0x110CD), (0x13430, 0x1343F), (0x1BCA0, 0x1BCA3), (0x1D173, 0x1D17A),
+      (0xE0001, 0xE0001), (0xE0020, 0xE007F),
+    ]
     let scalars = text.unicodeScalars.map { scalar -> String in
       let value = scalar.value
-      if CharacterSet.controlCharacters.contains(scalar) || (0x202a...0x202e).contains(value)
-        || (0x2066...0x2069).contains(value) || (0x200b...0x200f).contains(value) { return " " }
+      if value == 0x200C || value == 0x200D { return String(scalar) }  // visible joiners
+      if invisible.contains(where: { value >= $0.0 && value <= $0.1 }) { return "" }
+      if CharacterSet.controlCharacters.contains(scalar) { return " " } // Cc whitespace (folded below)
       return String(scalar)
     }.joined()
     return scalars.split(whereSeparator: { $0.isWhitespace }).joined(separator: " ")
