@@ -2033,6 +2033,14 @@ class L10nEn extends L10n {
       'Uses only approximate location and requires background access. Coordinates aren’t saved or sent. This may use more battery.';
 
   @override
+  @override
+  String get remoteBackgroundMaster => 'Enable remote background protection';
+
+  @override
+  String get remoteBackgroundMasterHint =>
+      'Off by default. Keeps the remote link alive in the background only while a remote host is connected. Uses battery.';
+
+  @override
   String get remoteBackgroundLocationPermission => 'Allow background location access, then turn this option on.';
 
   @override

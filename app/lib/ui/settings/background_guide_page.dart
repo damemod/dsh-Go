@@ -466,15 +466,25 @@ class _RemoteBackgroundSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final options = ref.watch(remoteBackgroundOptionsProvider).value;
+    final enabled = options?.enabled ?? false;
     return SettingsSection(
       title: l10n.remoteBackgroundProtectionTitle,
       children: [
+        SettingsSwitchTile(
+          key: const ValueKey('remote-background-master'),
+          title: l10n.remoteBackgroundMaster,
+          subtitle: l10n.remoteBackgroundMasterHint,
+          value: enabled,
+          onChanged: options == null
+              ? null
+              : (value) => _set(context, () => ref.read(remoteBackgroundOptionsProvider.notifier).setEnabled(value)),
+        ),
         SettingsSwitchTile(
           key: const ValueKey('remote-background-audio'),
           title: l10n.backgroundProtectionAudio,
           subtitle: l10n.remoteBackgroundAudioHint,
           value: options?.audio ?? false,
-          onChanged: options == null
+          onChanged: options == null || !enabled
               ? null
               : (value) => _set(context, () => ref.read(remoteBackgroundOptionsProvider.notifier).setAudio(value)),
         ),
@@ -484,7 +494,7 @@ class _RemoteBackgroundSection extends ConsumerWidget {
             title: l10n.backgroundProtectionLocation,
             subtitle: l10n.remoteBackgroundLocationHint,
             value: options?.location ?? false,
-            onChanged: options == null
+            onChanged: options == null || !enabled
                 ? null
                 : (value) => _set(context, () async {
                     if (value && !await requestRemoteBackgroundLocation()) {

@@ -27,7 +27,7 @@ void main() {
     final container = ProviderContainer(overrides: [operatingSystemProvider.overrideWithValue('android')]);
     addTearDown(container.dispose);
     container.listen(remoteBackgroundProvider, (_, _) {});
-    expect(await container.read(remoteBackgroundOptionsProvider.future), (audio: false, location: false));
+    expect(await container.read(remoteBackgroundOptionsProvider.future), (enabled: false, audio: false, location: false));
     expect(calls, isEmpty);
 
     final options = container.read(remoteBackgroundOptionsProvider.notifier);
@@ -36,7 +36,7 @@ void main() {
     await options.setAudio(false);
     await container.pump();
     expect(calls, ['setRemoteAudio:true', 'setRemoteLocation:true', 'setRemoteAudio:false']);
-    expect(container.read(remoteBackgroundOptionsProvider).value, (audio: false, location: true));
+    expect(container.read(remoteBackgroundOptionsProvider).value, (enabled: false, audio: false, location: true));
   });
 
   test('arms only after the remote link connects, keeps recovery armed, then releases', () async {
@@ -60,6 +60,9 @@ void main() {
     addTearDown(container.dispose);
     container.listen(remoteBackgroundProvider, (_, _) {});
     await container.read(activeHostProvider.notifier).ready;
+    await container.read(remoteBackgroundOptionsProvider.notifier).setEnabled(true);
+    await container.pump();
+    expect(signals, isEmpty);
 
     Future<void> phase(HostLinkPhase phase) async {
       statuses.add(HostLinkStatus(phase));
@@ -80,5 +83,45 @@ void main() {
     container.read(activeHostProvider.notifier).select(HostRef.local);
     await container.pump();
     expect(signals, [true, false, true, false]);
+  });
+
+  test('remote background stays off at connected until the master switch is explicitly enabled', () async {
+    SharedPreferences.setMockInitialValues({ActiveHostController.prefsKey: _host.encode()});
+    final signals = <bool>[];
+    final messenger = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+    messenger.setMockMethodCallHandler(_channel, (call) async {
+      expect(call.method, 'setRemoteActive');
+      signals.add(call.arguments as bool);
+      return null;
+    });
+    addTearDown(() => messenger.setMockMethodCallHandler(_channel, null));
+    final statuses = StreamController<HostLinkStatus>();
+    addTearDown(statuses.close);
+    final container = ProviderContainer(
+      overrides: [
+        operatingSystemProvider.overrideWithValue('android'),
+        hostLinkStatusProvider(_host).overrideWith((ref) => statuses.stream),
+      ],
+    );
+    addTearDown(container.dispose);
+    container.listen(remoteBackgroundProvider, (_, _) {});
+    await container.read(activeHostProvider.notifier).ready;
+    Future<void> phase(HostLinkPhase p) async {
+      statuses.add(HostLinkStatus(p));
+      await Future<void>.delayed(Duration.zero);
+      await container.pump();
+    }
+
+    // Default-off: an established remote link must NOT arm the background service.
+    await phase(HostLinkPhase.connected);
+    expect(signals, isEmpty, reason: 'remote background must not auto-arm by default');
+    // Explicit opt-in arms it.
+    await container.read(remoteBackgroundOptionsProvider.notifier).setEnabled(true);
+    await container.pump();
+    expect(signals, [true]);
+    // Turning the master switch off releases it immediately.
+    await container.read(remoteBackgroundOptionsProvider.notifier).setEnabled(false);
+    await container.pump();
+    expect(signals, [true, false]);
   });
 }

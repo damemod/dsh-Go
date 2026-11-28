@@ -3654,6 +3654,12 @@ abstract class L10n {
   ///
   /// In zh, this message translates to:
   /// **'请授予后台位置权限，再开启此选项。'**
+  /// No description provided for @remoteBackgroundMaster.
+  String get remoteBackgroundMaster;
+
+  /// No description provided for @remoteBackgroundMasterHint.
+  String get remoteBackgroundMasterHint;
+
   String get remoteBackgroundLocationPermission;
 
   /// No description provided for @botsFolderGone.
