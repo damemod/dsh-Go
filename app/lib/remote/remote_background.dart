@@ -11,27 +11,22 @@ import '../state/hosts_state.dart';
 
 const _channel = MethodChannel('io.github.ccch1mneyyy.dsh_app/remote_background');
 
-typedef RemoteBackgroundOptions = ({bool enabled, bool audio, bool location});
+typedef RemoteBackgroundOptions = ({bool audio, bool location});
 
 final remoteBackgroundOptionsProvider = AsyncNotifierProvider<RemoteBackgroundPreferences, RemoteBackgroundOptions>(
   RemoteBackgroundPreferences.new,
 );
 
 class RemoteBackgroundPreferences extends AsyncNotifier<RemoteBackgroundOptions> {
-  static const _enabledKey = 'remote_background_enabled';
   static const _audioKey = 'remote_background_audio';
   static const _locationKey = 'remote_background_location';
 
-  static RemoteBackgroundOptions _read(SharedPreferences prefs) => (
-        enabled: prefs.getBool(_enabledKey) ?? false,
-        audio: prefs.getBool(_audioKey) ?? false,
-        location: prefs.getBool(_locationKey) ?? false,
-      );
+  static RemoteBackgroundOptions _read(SharedPreferences prefs) =>
+      (audio: prefs.getBool(_audioKey) ?? false, location: prefs.getBool(_locationKey) ?? false);
 
   @override
   Future<RemoteBackgroundOptions> build() async => _read(await SharedPreferences.getInstance());
 
-  Future<void> setEnabled(bool value) => _set(_enabledKey, value);
   Future<void> setAudio(bool enabled) => _set(_audioKey, enabled);
   Future<void> setLocation(bool enabled) => _set(_locationKey, enabled);
 
@@ -76,24 +71,25 @@ final remoteBackgroundProvider = Provider.autoDispose<void>((ref) {
   }
 
   var active = false;
-  // Master switch: remote background stays off until the user explicitly opts in.
-  // Turning it off releases the foreground service and wake lock immediately.
-  ref.listen(remoteBackgroundOptionsProvider.select((s) => s.value?.enabled ?? false), (previous, enabled) {
+
+  void updateArmed({required bool allowRecovery}) {
+    final options = ref.read(remoteBackgroundOptionsProvider).value;
+    final enabled = (options?.audio ?? false) || (options?.location ?? false);
     final (_, phase) = ref.read(_remotePhaseProvider);
-    final armed = enabled && (phase == HostLinkPhase.connected || phase == HostLinkPhase.reconnecting && active);
+    // Keep the foreground service and wake lock only while an explicit background
+    // option is on; keep protection through recovery on the same host.
+    final armed = enabled &&
+        (phase == HostLinkPhase.connected || phase == HostLinkPhase.reconnecting && active && allowRecovery);
     if (active == armed) return;
     active = armed;
     unawaited(report('setRemoteActive', active));
-  }, fireImmediately: true);
+  }
+
+  // Opt-in changes while connected must arm/release immediately.
+  ref.listen(remoteBackgroundOptionsProvider, (_, _) => updateArmed(allowRecovery: true));
   ref.listen(_remotePhaseProvider, (previous, next) {
     final (host, phase) = next;
-    final enabled = ref.read(remoteBackgroundOptionsProvider).value?.enabled ?? false;
-    // Keep protection through recovery on the same host, not through an initial dial.
-    final armed =
-        enabled && (phase == HostLinkPhase.connected || phase == HostLinkPhase.reconnecting && active && previous?.$1 == host);
-    if (active == armed) return;
-    active = armed;
-    unawaited(report('setRemoteActive', active));
+    updateArmed(allowRecovery: previous?.$1 == host);
   }, fireImmediately: true);
   ref.onDispose(() {
     if (active) unawaited(report('setRemoteActive', false));

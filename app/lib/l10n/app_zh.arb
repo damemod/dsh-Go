@@ -1093,8 +1093,6 @@
   "remoteBackgroundAudioHint": "退到后台时播放静音音频，可能增加耗电；系统仍可能暂停连接。",
   "remoteBackgroundLocationHint": "仅使用大致位置，需后台授权；不保存或发送坐标，可能增加耗电。",
   "remoteBackgroundLocationPermission": "请授予后台位置权限，再开启此选项。",
-  "remoteBackgroundMaster": "开启远程连接保活",
-  "remoteBackgroundMasterHint": "默认关闭。仅在连接远程主机时于后台维持链路，会增加耗电。",
   "botsFolderGone": "这个文件夹已经不在了",
   "botsFolderReadFailed": "没能读取这个文件夹",
   "botsFolderOpenFailed": "打不开这个文件夹",

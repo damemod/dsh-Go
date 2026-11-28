@@ -1918,13 +1918,6 @@ class L10nZh extends L10n {
   String get remoteBackgroundLocationHint => '仅使用大致位置，需后台授权；不保存或发送坐标，可能增加耗电。';
 
   @override
-  @override
-  String get remoteBackgroundMaster => '开启远程连接保活';
-
-  @override
-  String get remoteBackgroundMasterHint => '默认关闭。仅在连接远程主机时于后台维持链路，会增加耗电。';
-
-  @override
   String get remoteBackgroundLocationPermission => '请授予后台位置权限，再开启此选项。';
 
   @override

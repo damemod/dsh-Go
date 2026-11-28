@@ -27,7 +27,7 @@ void main() {
     final container = ProviderContainer(overrides: [operatingSystemProvider.overrideWithValue('android')]);
     addTearDown(container.dispose);
     container.listen(remoteBackgroundProvider, (_, _) {});
-    expect(await container.read(remoteBackgroundOptionsProvider.future), (enabled: false, audio: false, location: false));
+    expect(await container.read(remoteBackgroundOptionsProvider.future), (audio: false, location: false));
     expect(calls, isEmpty);
 
     final options = container.read(remoteBackgroundOptionsProvider.notifier);
@@ -36,7 +36,7 @@ void main() {
     await options.setAudio(false);
     await container.pump();
     expect(calls, ['setRemoteAudio:true', 'setRemoteLocation:true', 'setRemoteAudio:false']);
-    expect(container.read(remoteBackgroundOptionsProvider).value, (enabled: false, audio: false, location: true));
+    expect(container.read(remoteBackgroundOptionsProvider).value, (audio: false, location: true));
   });
 
   test('arms only after the remote link connects, keeps recovery armed, then releases', () async {
@@ -44,8 +44,7 @@ void main() {
     final signals = <bool>[];
     final messenger = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
     messenger.setMockMethodCallHandler(_channel, (call) async {
-      expect(call.method, 'setRemoteActive');
-      signals.add(call.arguments as bool);
+      if (call.method == 'setRemoteActive') signals.add(call.arguments as bool);
       return null;
     });
     addTearDown(() => messenger.setMockMethodCallHandler(_channel, null));
@@ -60,9 +59,10 @@ void main() {
     addTearDown(container.dispose);
     container.listen(remoteBackgroundProvider, (_, _) {});
     await container.read(activeHostProvider.notifier).ready;
-    await container.read(remoteBackgroundOptionsProvider.notifier).setEnabled(true);
+    await container.read(remoteBackgroundOptionsProvider.future);
+    // Opt in: the keepalive is now gated on this explicit background option.
+    await container.read(remoteBackgroundOptionsProvider.notifier).setAudio(true);
     await container.pump();
-    expect(signals, isEmpty);
 
     Future<void> phase(HostLinkPhase phase) async {
       statuses.add(HostLinkStatus(phase));
@@ -85,13 +85,12 @@ void main() {
     expect(signals, [true, false, true, false]);
   });
 
-  test('remote background stays off at connected until the master switch is explicitly enabled', () async {
+  test('explicit audio or location opt-in gates the remote background keepalive', () async {
     SharedPreferences.setMockInitialValues({ActiveHostController.prefsKey: _host.encode()});
     final signals = <bool>[];
     final messenger = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
     messenger.setMockMethodCallHandler(_channel, (call) async {
-      expect(call.method, 'setRemoteActive');
-      signals.add(call.arguments as bool);
+      if (call.method == 'setRemoteActive') signals.add(call.arguments as bool);
       return null;
     });
     addTearDown(() => messenger.setMockMethodCallHandler(_channel, null));
@@ -106,22 +105,31 @@ void main() {
     addTearDown(container.dispose);
     container.listen(remoteBackgroundProvider, (_, _) {});
     await container.read(activeHostProvider.notifier).ready;
-    Future<void> phase(HostLinkPhase p) async {
-      statuses.add(HostLinkStatus(p));
+    await container.read(remoteBackgroundOptionsProvider.future);
+
+    Future<void> phase(HostLinkPhase value) async {
+      statuses.add(HostLinkStatus(value));
       await Future<void>.delayed(Duration.zero);
       await container.pump();
     }
 
-    // Default-off: an established remote link must NOT arm the background service.
+    // Link connected but no background option enabled: no service, no wake lock.
     await phase(HostLinkPhase.connected);
-    expect(signals, isEmpty, reason: 'remote background must not auto-arm by default');
-    // Explicit opt-in arms it.
-    await container.read(remoteBackgroundOptionsProvider.notifier).setEnabled(true);
+    expect(signals, isEmpty);
+
+    // An explicit audio opt-in arms while the link stays connected.
+    await container.read(remoteBackgroundOptionsProvider.notifier).setAudio(true);
     await container.pump();
     expect(signals, [true]);
-    // Turning the master switch off releases it immediately.
-    await container.read(remoteBackgroundOptionsProvider.notifier).setEnabled(false);
+
+    // With every option off again the keepalive is released immediately.
+    await container.read(remoteBackgroundOptionsProvider.notifier).setAudio(false);
     await container.pump();
     expect(signals, [true, false]);
+
+    // Location alone is sufficient to arm.
+    await container.read(remoteBackgroundOptionsProvider.notifier).setLocation(true);
+    await container.pump();
+    expect(signals, [true, false, true]);
   });
 }
