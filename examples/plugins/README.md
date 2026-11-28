@@ -12,6 +12,7 @@
 | [`dsh-go-example-album`](dsh-go-example-album/) | 聊天页「插件」弹层：图集、空状态、环形进度、趋势线，跟随 App 主题色 | 要 |
 | [`dsh-go-example-toolbox`](dsh-go-example-toolbox/) | 较新的位置：加号面板工具、对话操作、回合尾注、插件详情页面板、弹层面板 | 要 |
 | [`dsh-go-example-overlay`](dsh-go-example-overlay/) | 网页接缝：显式启用的可拖动 / 点击浮层 + 侧栏底部、设置页签、详情分区三种单包入口；无额外依赖、无构建链 | App 内接缝要；网页版不要求 |
+| [`dsh-go-example-declarative`](dsh-go-example-declarative/) | 四种声明式能力合一：静态效果、延后结果、工具结果卡、多席位组合；全部在现有限额内 | 要 |
 
 安装：`dsh plugin --profile web add /绝对路径/<插件目录>`。端到端：`e2e/host-e2e.sh`（真 DSH + 桥接，按用户的方式安装三个示例）。MIT © DSH-TUI (ccch1mneyyy)。
 
@@ -27,5 +28,6 @@
 | [`dsh-go-example-album`](dsh-go-example-album/) | The chat page's Plugins sheet: a gallery, an empty state, a ring and a trend, in the app's palette | Yes |
 | [`dsh-go-example-toolbox`](dsh-go-example-toolbox/) | Newer places: plus panel tools, chat actions, turn notes, a panel on the plugin page, a panel as a sheet | Yes |
 | [`dsh-go-example-overlay`](dsh-go-example-overlay/) | Web seams: opt-in draggable / tappable overlay + three single-package entries (sidebar footer, settings tab, detail section); no extra dependencies or build chain | For app seams; not required in DSH Web |
+| [`dsh-go-example-declarative`](dsh-go-example-declarative/) | Four declarative capabilities together: static effects, a deferred result, a tool result card and several native seats; all within the current limits | Yes |
 
 Install: `dsh plugin --profile web add /absolute/path/to/<plugin>`. End to end: `e2e/host-e2e.sh` (real DSH + bridge, installs the three the way a person does). MIT © DSH-TUI (ccch1mneyyy).

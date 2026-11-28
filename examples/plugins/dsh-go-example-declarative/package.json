@@ -1,0 +1,73 @@
+{
+  "name": "dsh-go-example-declarative",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DSH plugin example for the dsh-go app: static effects, deferred results, tool result cards, and several native seats combined in one plugin.",
+  "author": "DSH-TUI (ccch1mneyyy)",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md",
+    "README.en.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "check": "node ../../../sdk/plugin-kit/bin/check.mjs ."
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "dshGo": {
+    "v": 1,
+    "title": { "zh": "声明式示例", "en": "Declarative demo" },
+    "icon": "puzzle",
+    "wants": ["draft", "clipboard"],
+    "contributes": {
+      "composer.actions": [
+        {
+          "id": "write-list",
+          "label": { "zh": "写清单", "en": "Write list" },
+          "icon": "todo",
+          "effect": { "type": "insert", "text": "列一份今天的待办清单，按重要性排序。" }
+        },
+        {
+          "id": "polish-list",
+          "label": { "zh": "润色清单", "en": "Polish" },
+          "icon": "edit"
+        }
+      ],
+      "composer.strip": [
+        { "id": "status", "text": { "zh": "声明式示例", "en": "Declarative demo" }, "panel": "overview" }
+      ],
+      "composer.tools": [
+        { "id": "insert-tool", "label": { "zh": "插入模板", "en": "Insert" }, "icon": "add", "effect": { "type": "insert", "text": "按以下结构写一段说明：背景、做法、结论。" } },
+        { "id": "open-tool", "label": { "zh": "打开面板", "en": "Panel" }, "icon": "panel", "panel": "overview" }
+      ],
+      "session.actions": [
+        { "id": "mark", "label": { "zh": "标记对话", "en": "Mark chat" }, "icon": "flag" }
+      ],
+      "turn.note": [
+        { "id": "turn" }
+      ],
+      "panels": [
+        { "id": "overview", "title": { "zh": "能力总览", "en": "Overview" }, "icon": "list", "placement": ["session.tab", "plugin"], "presentation": "page" },
+        { "id": "guide", "title": { "zh": "使用说明", "en": "Guide" }, "icon": "book", "placement": ["features"], "presentation": "sheet" }
+      ]
+    }
+  },
+  "engines": {
+    "node": ">=22.19",
+    "dsh": ">=0.2.1-rc.2 <0.3.0-0"
+  }
+}
